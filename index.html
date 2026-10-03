@@ -37856,7 +37856,7 @@ ${body}
           badge.style.cssText = "padding:3px 8px;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-size:.8rem;font-weight:600;";
           heading.appendChild(badge);
         }
-        if (typeof onAddModel === "function") {
+        if (!isClosed && typeof onAddModel === "function") {
           const addModelButton = document.createElement("button");
           addModelButton.type = "button";
           addModelButton.textContent = "Ajout modèle";
@@ -37882,7 +37882,7 @@ ${body}
           const previousExerciseButton = document.createElement("button");
           previousExerciseButton.type = "button";
           previousExerciseButton.textContent = "Exercice précédant";
-          previousExerciseButton.style.cssText = "padding:7px 12px;border:1px solid #15803d;border-radius:6px;background:#15803d;color:#fff;font-weight:600;cursor:pointer;";
+          previousExerciseButton.style.cssText = (typeof onAddModel === "function" && !isClosed ? "" : "margin-left:auto;") + "padding:7px 12px;border:1px solid #15803d;border-radius:6px;background:#15803d;color:#fff;font-weight:600;cursor:pointer;";
           const previousExerciseStatus = document.createElement("span");
           previousExerciseStatus.setAttribute("role", "status");
           previousExerciseStatus.style.cssText = "color:#b91c1c;font-size:.85rem;";
@@ -42478,6 +42478,7 @@ ${body}
       bulkMissionsSummary.textContent =
         "Cette action va générer des missions dans l’ensemble des exercices présents et reconduire les missions jusqu’à l’exercice courant " +
         currentYear + ". Confirmez-vous ce choix ? " +
+        "Les exercices jusqu’en " + (currentYear - 2) + " inclus seront clôturés et ne recevront pas de mission. " +
         "Elle s’appliquera à " + currentBulkMissionTargets.length + " dossier(s).";
       bulkMissionsStatus.textContent = "";
       bulkMissionsStatus.classList.remove("visible");
@@ -42510,6 +42511,35 @@ ${body}
           "UUID": apiSessionUuid
         },
         body: JSON.stringify(payload)
+      });
+      const responseText = await response.text();
+      if (!response.ok) {
+        const detail = responseText.trim().slice(0, 350);
+        throw new Error(detail
+          ? endpoint + " : erreur " + response.status + " — " + detail
+          : endpoint + " : erreur " + response.status);
+      }
+      return responseText;
+    }
+
+    async function closeBulkExercise(folderCode, exercise) {
+      const baseUrl = getSelectedApiBaseUrl();
+      await selectFolderSessionForData(baseUrl, apiSessionUuid, folderCode);
+      const endpoint = "/v1/exercices";
+      const response = await fetch(baseUrl + endpoint, {
+        method: "PUT",
+        headers: {
+          "Accept": "text/plain, application/json, */*",
+          "Content-Type": "application/json-patch+json",
+          "UUID": apiSessionUuid
+        },
+        body: JSON.stringify({
+          Code: String(exercise?.Code || "").trim(),
+          DateDebut: formatExerciseDateForApi(exercise?.DateDebut),
+          DateFin: formatExerciseDateForApi(exercise?.DateFin),
+          Cloture: true,
+          DateCloture: getTodayExerciseApiDate()
+        })
       });
       const responseText = await response.text();
       if (!response.ok) {
@@ -42579,8 +42609,20 @@ ${body}
         }
       }
 
+      const closureYearLimit = currentYear - 2;
+      let closedCount = 0;
+      for (const exercise of exercises) {
+        const year = getExerciseYear(exercise);
+        if (Number.isFinite(year) && year <= closureYearLimit && !exercise.Cloture) {
+          await closeBulkExercise(folderCode, exercise);
+          exercise.Cloture = true;
+          exercise.DateCloture = getTodayExerciseApiDate();
+          closedCount += 1;
+        }
+      }
+
       exercises.sort((a, b) => (getExerciseYear(b) || 0) - (getExerciseYear(a) || 0));
-      return { exercises, createdCount };
+      return { exercises, createdCount, closedCount };
     }
 
     async function runBulkMissionsUpdate() {
@@ -42595,6 +42637,7 @@ ${body}
       let completed = 0;
       let createdExercises = 0;
       let createdMissions = 0;
+      let closedExercises = 0;
       const errors = [];
 
       for (let i = 0; i < currentBulkMissionTargets.length; i += 1) {
@@ -42604,7 +42647,9 @@ ${body}
         try {
           const ensured = await createMissingBulkExercises(target.code, currentYear);
           createdExercises += ensured.createdCount;
+          closedExercises += ensured.closedCount;
           for (const exercise of ensured.exercises) {
+            if (exercise.Cloture) continue;
             await postFolderEditorMissionModel(target.code, exercise.Code);
             createdMissions += 1;
           }
@@ -42635,7 +42680,7 @@ ${body}
       bulkMissionsConfirmButton.disabled = false;
       bulkMissionsConfirmButton.textContent = "Fermer";
       bulkMissionsStatus.textContent =
-        completed + " dossier(s) traité(s), " + createdExercises + " exercice(s) créé(s) et " + createdMissions + " mission(s) créée(s)." +
+        completed + " dossier(s) traité(s), " + createdExercises + " exercice(s) créé(s), " + closedExercises + " exercice(s) clôturé(s) et " + createdMissions + " mission(s) créée(s)." +
         (errors.length ? " Erreurs : " + errors.join(" | ") : "");
       if (errors.length) bulkMissionsStatus.classList.add("visible");
       setApiMessage(errors.length
