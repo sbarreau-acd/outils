@@ -1117,6 +1117,203 @@
       display: none;
     }
 
+    .sandbox-editor-panel > .sandbox-assigned-collaborators-field {
+      grid-column: 1 / -1;
+    }
+
+    .sandbox-assigned-collaborators-field[hidden] {
+      display: none !important;
+    }
+
+    .sandbox-assigned-picker {
+      position: relative;
+      padding: 10px;
+      border: 1px solid #93c5fd;
+      border-radius: 9px;
+      background: #eff6ff;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, .08);
+    }
+
+    .sandbox-assigned-picker.is-locked {
+      border-color: #d1d5db;
+      background: #f3f4f6;
+      box-shadow: none;
+    }
+
+    .sandbox-assigned-collaborators-field.is-locked > label {
+      color: #6b7280;
+    }
+
+    .sandbox-assigned-picker.is-locked .sandbox-assigned-selected {
+      border-color: #e5e7eb;
+      background: #f8fafc;
+    }
+
+    .sandbox-assigned-picker.is-locked .api-multi-chip {
+      border-color: #cbd5e1;
+      background: #e5e7eb;
+      color: #64748b;
+    }
+
+    .sandbox-assigned-selected {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 44px;
+      align-items: center;
+      margin: 0 0 9px;
+      padding: 7px;
+      border: 1px solid #dbe7f5;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .sandbox-assigned-selected.api-multi-chips:empty {
+      display: flex;
+    }
+
+    .sandbox-assigned-selected:empty::before {
+      content: "Aucun collaborateur sélectionné";
+      padding: 4px 6px;
+      color: #64748b;
+      font-size: 12px;
+      font-style: italic;
+    }
+
+    .sandbox-assigned-search-wrap {
+      position: relative;
+    }
+
+    .sandbox-assigned-search-wrap input {
+      width: 100%;
+      padding-right: 42px;
+      border-color: #93c5fd;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .sandbox-assigned-picker.is-locked .sandbox-assigned-search-wrap input {
+      border-color: #d1d5db;
+      background: #e5e7eb;
+      color: #6b7280;
+      cursor: not-allowed;
+    }
+
+    .sandbox-assigned-picker.is-locked .sandbox-assigned-toggle {
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .sandbox-assigned-search-wrap input::placeholder {
+      color: #475569;
+      opacity: 1;
+    }
+
+    .sandbox-assigned-search-wrap input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .16);
+    }
+
+    .sandbox-assigned-toggle {
+      position: absolute;
+      top: 4px;
+      right: 5px;
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: #374151;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .sandbox-assigned-toggle:hover,
+    .sandbox-assigned-toggle[aria-expanded="true"] {
+      background: #eff6ff;
+      color: var(--primary);
+    }
+
+    .sandbox-assigned-collaborators-list {
+      position: absolute;
+      z-index: 80;
+      top: calc(100% + 5px);
+      left: 10px;
+      right: 10px;
+      max-height: 300px;
+      overflow: auto;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      background: #fff;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, .16);
+    }
+
+    .sandbox-assigned-collaborators-list[hidden] {
+      display: none;
+    }
+
+    .sandbox-assigned-group-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-bottom: 1px solid #dbeafe;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .sandbox-assigned-option {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 20px minmax(0, 1fr);
+      align-items: center;
+      gap: 9px;
+      padding: 10px 12px;
+      border: 0;
+      border-bottom: 1px solid #e5e7eb;
+      background: #fff;
+      color: #1f2937;
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .sandbox-assigned-option:hover,
+    .sandbox-assigned-option.selected {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .sandbox-assigned-option-check {
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      background: #fff;
+      color: transparent;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .sandbox-assigned-option.selected .sandbox-assigned-option-check {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .sandbox-assigned-empty {
+      padding: 14px;
+      color: #64748b;
+      font-size: 12px;
+      text-align: center;
+    }
+
     .sandbox-add-collaborator-chooser label {
       grid-column: 1 / -1;
       color: #334155;
@@ -1513,6 +1710,12 @@
     @media (min-width: 981px) {
       .sandbox-editor-panel > .field {
         grid-row: 2;
+      }
+
+      .sandbox-editor-panel > .sandbox-assigned-collaborators-field {
+        grid-column: 3 / 6;
+        grid-row: 2;
+        align-self: stretch;
       }
     }
 
@@ -9060,7 +9263,7 @@
                 </button>
               </div>
 
-              <div class="field">
+              <div class="field sandbox-editor-name-field">
                 <label for="sandboxEditorName">Nom de l’éditeur <span class="sandbox-required">*</span></label>
                 <input
                   type="text"
@@ -9086,7 +9289,7 @@
                 <div class="field-help">Obligatoire — utilisé pour générer le cabinet et le collaborateur administrateur.</div>
               </div>
 
-              <div class="field">
+              <div class="field sandbox-editor-email-field">
                 <label for="sandboxEditorEmail">Email de l’éditeur <span class="optional-label">(facultatif)</span></label>
                 <input
                   type="email"
@@ -9108,6 +9311,43 @@
                   inputmode="numeric"
                 >
                 <div class="field-help" id="sandboxCollaboratorCountHelp">Entre 0 et 10 (nombre de dossiers).</div>
+              </div>
+
+              <div class="field sandbox-assigned-collaborators-field" id="sandboxAssignedCollaboratorsField" hidden>
+                <label>Collaborateur(s) affecté(s) à la sandbox</label>
+                <div class="sandbox-assigned-picker" id="sandboxAssignedPicker">
+                  <div
+                    class="sandbox-assigned-selected api-multi-chips"
+                    id="sandboxAssignedCollaboratorsSelected"
+                    aria-label="Collaborateurs sélectionnés"
+                  ></div>
+                  <div class="sandbox-assigned-search-wrap">
+                    <input
+                      id="sandboxAssignedCollaboratorSearch"
+                      type="search"
+                      autocomplete="off"
+                      placeholder="Choisir un ou plusieurs collaborateurs"
+                      aria-label="Rechercher un collaborateur du cabinet"
+                      aria-expanded="false"
+                      aria-controls="sandboxAssignedCollaboratorsList"
+                    >
+                    <button
+                      class="sandbox-assigned-toggle"
+                      id="sandboxAssignedCollaboratorToggle"
+                      type="button"
+                      aria-label="Afficher les collaborateurs du cabinet"
+                      aria-expanded="false"
+                      aria-controls="sandboxAssignedCollaboratorsList"
+                    >▾</button>
+                  </div>
+                  <div
+                    class="sandbox-assigned-collaborators-list"
+                    id="sandboxAssignedCollaboratorsList"
+                    role="listbox"
+                    aria-label="Collaborateurs du cabinet à affecter à la sandbox"
+                    hidden
+                  ></div>
+                </div>
               </div>
 
               <div class="field">
@@ -14395,6 +14635,10 @@
       if (!Number.isFinite(folderCount)) folderCount = 10;
       folderCount = Math.min(1000, Math.max(1, folderCount));
 
+      if (isSandboxExistingOperation("modify")) {
+        return Math.max(1, getSandboxCollaboratorsForSelectedCabinet().length);
+      }
+
       if (isSandboxExistingOperation("create")) {
         const cabinetCollaboratorCount =
           getSandboxCollaboratorsForSelectedCabinet().length;
@@ -14868,7 +15112,8 @@
       const collaboratorCountField =
         sandboxCollaboratorCountInput?.closest(".field");
       if (collaboratorCountField) {
-        collaboratorCountField.hidden = waitingForExistingCabinet;
+        collaboratorCountField.hidden =
+          waitingForExistingCabinet || isSandboxExistingOperation("modify");
       }
 
       const sandboxExistingOperationGroup =
@@ -15070,6 +15315,8 @@
       if (existingNewSandbox) {
         syncExistingSandboxEditorEmail();
       }
+
+      renderSandboxAssignedCollaborators();
     }
 
     function updateSandboxCabinetExistingWarning(cabinetValid = null) {
@@ -15691,6 +15938,7 @@
       const visible = Boolean(
         isSandboxModeEnabled() &&
         isSandboxEditorSelectedOrEntered() &&
+        !isSandboxExistingOperation("modify") &&
         !isExistingNewSandboxCabinet()
       );
 
@@ -22881,6 +23129,161 @@ ${body}
       return getCollaboratorsForCabinet(
         getSandboxSelectedCabinetCodeForCollaborators()
       );
+    }
+
+    function renderSandboxAssignedCollaborators() {
+      const field = document.getElementById("sandboxAssignedCollaboratorsField");
+      const list = document.getElementById("sandboxAssignedCollaboratorsList");
+      const selectedContainer = document.getElementById("sandboxAssignedCollaboratorsSelected");
+      const search = document.getElementById("sandboxAssignedCollaboratorSearch");
+      const picker = document.getElementById("sandboxAssignedPicker");
+      const toggle = document.getElementById("sandboxAssignedCollaboratorToggle");
+      if (!field || !list || !selectedContainer || !search || !picker || !toggle) return;
+
+      const visible = Boolean(
+        isSandboxExistingOperation("modify") &&
+        isSandboxEditorSelectedOrEntered()
+      );
+      field.hidden = !visible;
+      if (!visible) return;
+
+      const hasRetrievedFolders = Boolean(
+        foldersHaveBeenGenerated && generatedFolders.length > 0
+      );
+      field.classList.toggle("is-locked", hasRetrievedFolders);
+      picker.classList.toggle("is-locked", hasRetrievedFolders);
+      search.disabled = hasRetrievedFolders;
+      toggle.disabled = hasRetrievedFolders;
+      if (hasRetrievedFolders) {
+        list.hidden = true;
+        search.setAttribute("aria-expanded", "false");
+        toggle.setAttribute("aria-expanded", "false");
+        const lockedTitle = "Les dossiers ont été récupérés : les collaborateurs ne peuvent plus être modifiés.";
+        picker.title = lockedTitle;
+      } else {
+        picker.removeAttribute("title");
+      }
+
+      const collaborators = getSandboxCollaboratorsForSelectedCabinet()
+        .slice()
+        .sort((a, b) => String(a.code).localeCompare(
+          String(b.code),
+          "fr",
+          { sensitivity: "base" }
+        ));
+      const selectedCodes = new Set(
+        getSandboxCurrentCollaboratorCodes()
+          .map(normalizeReferenceCode)
+          .filter(Boolean)
+      );
+      list.replaceChildren();
+      selectedContainer.replaceChildren();
+
+      const labelFor = collaborator => {
+        const name = String(collaborator.displayName || "").trim();
+        return name ? `${name} (${collaborator.code})` : collaborator.code;
+      };
+
+      collaborators
+        .filter(collaborator => selectedCodes.has(collaborator.normalizedCode))
+        .forEach(collaborator => {
+          const chip = document.createElement("span");
+          chip.className = "api-multi-chip";
+          if (hasRetrievedFolders) chip.classList.add("locked");
+
+          const chipLabel = document.createElement("span");
+          chipLabel.className = "api-multi-chip-label";
+          chipLabel.textContent = labelFor(collaborator);
+          chip.appendChild(chipLabel);
+
+          if (!hasRetrievedFolders) {
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.className = "api-multi-chip-remove";
+            remove.dataset.removeSandboxAssignedCollaborator = collaborator.code;
+            remove.textContent = "×";
+            remove.title = `Retirer ${labelFor(collaborator)}`;
+            remove.setAttribute("aria-label", remove.title);
+            chip.appendChild(remove);
+          }
+          selectedContainer.appendChild(chip);
+        });
+
+      if (!collaborators.length) {
+        const empty = document.createElement("div");
+        empty.className = "sandbox-assigned-empty";
+        empty.textContent = "Aucun collaborateur rattaché à ce cabinet.";
+        list.appendChild(empty);
+        return;
+      }
+
+      const query = normalizeApiMultiSearch(search.value);
+      const filtered = collaborators.filter(collaborator =>
+        !query || normalizeApiMultiSearch(
+          `${collaborator.code} ${collaborator.displayName || ""}`
+        ).includes(query)
+      );
+
+      const heading = document.createElement("div");
+      heading.className = "sandbox-assigned-group-heading";
+      const cabinetCode = getSandboxSelectedCabinetCodeForCollaborators();
+      const cabinet = availableCabinets.find(item =>
+        item.normalizedCode === normalizeReferenceCode(cabinetCode)
+      );
+      const cabinetName = cabinet
+        ? `${cabinet.label || cabinet.code} (${cabinet.code})`
+        : cabinetCode;
+      const headingLabel = document.createElement("span");
+      headingLabel.textContent = `Collaborateurs du cabinet ${cabinetName} · ${filtered.length}`;
+      heading.appendChild(headingLabel);
+
+      if (filtered.length) {
+        const selectAll = document.createElement("button");
+        selectAll.type = "button";
+        selectAll.className = "api-multi-bulk-button secondary";
+        selectAll.textContent = "Tout sélectionner";
+        selectAll.addEventListener("click", event => {
+          event.preventDefault();
+          // Le contenu de la liste est reconstruit ci-dessous : empêcher le
+          // clic de remonter au handler global qui ferme les menus.
+          event.stopPropagation();
+          const codes = [...new Set([
+            ...getSandboxCurrentCollaboratorCodes().filter(Boolean),
+            ...filtered.map(item => item.code)
+          ])];
+          syncSandboxCollaboratorListFromCodes(codes);
+          renderSandboxAssignedCollaborators();
+          search.focus();
+        });
+        heading.appendChild(selectAll);
+      }
+      list.appendChild(heading);
+
+      if (!filtered.length) {
+        const empty = document.createElement("div");
+        empty.className = "sandbox-assigned-empty";
+        empty.textContent = "Aucun collaborateur ne correspond à cette recherche.";
+        list.appendChild(empty);
+        return;
+      }
+
+      filtered.forEach(collaborator => {
+        const option = document.createElement("button");
+        option.type = "button";
+        option.className = "sandbox-assigned-option";
+        option.dataset.sandboxAssignedCode = collaborator.code;
+        option.classList.toggle("selected", selectedCodes.has(collaborator.normalizedCode));
+        option.setAttribute("role", "option");
+        option.setAttribute("aria-selected", String(selectedCodes.has(collaborator.normalizedCode)));
+
+        const check = document.createElement("span");
+        check.className = "sandbox-assigned-option-check";
+        check.textContent = "✓";
+        const text = document.createElement("span");
+        text.textContent = labelFor(collaborator);
+        option.append(check, text);
+        list.appendChild(option);
+      });
     }
 
     function getSandboxDefaultCollaboratorCode(index) {
@@ -43371,6 +43774,7 @@ ${body}
       }
 
       updateSandboxNewConfigurationVisibility();
+      renderSandboxPrimaryCollaboratorInfo();
       updateRetrieveFoldersButtonState();
 
       if (
@@ -43460,6 +43864,75 @@ ${body}
       }
 
       await openSandboxAddCollaboratorChooser();
+    });
+
+    const sandboxAssignedPicker = document.getElementById("sandboxAssignedPicker");
+    const sandboxAssignedSearch = document.getElementById("sandboxAssignedCollaboratorSearch");
+    const sandboxAssignedToggle = document.getElementById("sandboxAssignedCollaboratorToggle");
+    const sandboxAssignedList = document.getElementById("sandboxAssignedCollaboratorsList");
+
+    function setSandboxAssignedPickerOpen(open) {
+      if (!sandboxAssignedList || !sandboxAssignedSearch || !sandboxAssignedToggle) return;
+      open = Boolean(open && !sandboxAssignedSearch.disabled);
+      sandboxAssignedList.hidden = !open;
+      sandboxAssignedSearch.setAttribute("aria-expanded", String(open));
+      sandboxAssignedToggle.setAttribute("aria-expanded", String(open));
+      if (open) renderSandboxAssignedCollaborators();
+    }
+
+    sandboxAssignedSearch?.addEventListener("focus", () => {
+      setSandboxAssignedPickerOpen(true);
+    });
+    sandboxAssignedSearch?.addEventListener("input", () => {
+      setSandboxAssignedPickerOpen(true);
+    });
+    sandboxAssignedSearch?.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setSandboxAssignedPickerOpen(false);
+        sandboxAssignedSearch.blur();
+      }
+    });
+    sandboxAssignedToggle?.addEventListener("click", () => {
+      setSandboxAssignedPickerOpen(sandboxAssignedList.hidden);
+      if (!sandboxAssignedList.hidden) sandboxAssignedSearch.focus();
+    });
+    sandboxAssignedPicker?.addEventListener("click", event => {
+      const remove = event.target.closest("[data-remove-sandbox-assigned-collaborator]");
+      if (remove) {
+        event.preventDefault();
+        event.stopPropagation();
+        const removedCode = remove.dataset.removeSandboxAssignedCollaborator;
+        const remaining = getSandboxCurrentCollaboratorCodes().filter(code =>
+          normalizeReferenceCode(code) !== normalizeReferenceCode(removedCode)
+        );
+        syncSandboxCollaboratorListFromCodes(remaining);
+        renderSandboxAssignedCollaborators();
+        return;
+      }
+
+      const option = event.target.closest("[data-sandbox-assigned-code]");
+      if (!option) return;
+      event.preventDefault();
+      // La liste est rerendue après chaque choix. Sans cela, la cible du clic
+      // est retirée du DOM avant le handler global « clic à l’extérieur ».
+      event.stopPropagation();
+      const code = option.dataset.sandboxAssignedCode;
+      const selected = getSandboxCurrentCollaboratorCodes().filter(Boolean);
+      const exists = selected.some(item =>
+        normalizeReferenceCode(item) === normalizeReferenceCode(code)
+      );
+      const next = exists
+        ? selected.filter(item => normalizeReferenceCode(item) !== normalizeReferenceCode(code))
+        : [...selected, code];
+      syncSandboxCollaboratorListFromCodes(next);
+      renderSandboxAssignedCollaborators();
+      sandboxAssignedSearch?.focus();
+    });
+    document.addEventListener("click", event => {
+      if (sandboxAssignedPicker && !sandboxAssignedPicker.contains(event.target)) {
+        setSandboxAssignedPickerOpen(false);
+      }
     });
 
     sandboxAddCollaboratorSelect?.addEventListener(
@@ -43821,10 +44294,15 @@ ${body}
       if (!isSandboxModeEnabled()) return;
       if (isSandboxNewSandboxEnabled()) return;
 
+      if (isSandboxExistingOperation("modify")) {
+        syncSandboxCollaboratorListFromCodes([]);
+      }
+
       await ensureSandboxCollaboratorDirectoryLoaded();
       applySelectedSandboxExistingCabinet();
       populateSandboxPrimaryCollaboratorSelect();
       renderSandboxPrimaryCollaboratorInfo();
+      renderSandboxAssignedCollaborators();
     });
 
     sandboxEditorNameInput.addEventListener("input", () => {
