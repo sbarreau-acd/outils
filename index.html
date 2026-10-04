@@ -36,6 +36,7 @@
 
     .sidebar {
       width: 270px;
+      flex: 0 0 270px;
       background: var(--sidebar);
       color: white;
       padding: 24px 18px;
@@ -45,9 +46,40 @@
     }
 
     .brand {
+      position: relative;
       padding: 4px 10px 18px;
+      padding-right: 48px;
       border-bottom: 1px solid rgba(255,255,255,.12);
     }
+
+    .sidebar-toggle-button {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 8px;
+      background: rgba(255,255,255,.08);
+      color: #e5e7eb;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .sidebar-toggle-button:hover { background: rgba(255,255,255,.16); }
+    .sidebar-toggle-button:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+    .sidebar-hide-button { position: absolute; top: 0; right: 0; }
+
+    .sidebar-show-button {
+      margin: 0 0 14px;
+      border: 1px solid #bfdbfe;
+      background: #fff;
+      color: #1d4ed8;
+      box-shadow: 0 1px 3px rgba(15,23,42,.08);
+    }
+
+    .sidebar-toggle-button[hidden] { display: none !important; }
+    .app.sidebar-collapsed .sidebar { display: none; }
 
     .brand h1 {
       margin: 0;
@@ -150,6 +182,11 @@
     #folder-generator > .card {
       width: 100%;
       max-width: 1400px;
+    }
+
+    #folder-generator .table-zone[hidden],
+    #folderGeneratorWarningNote[hidden] {
+      display: none !important;
     }
 
     .card-header {
@@ -365,9 +402,13 @@
 
     .api-config-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 16px;
-      align-items: end;
+      align-items: start;
+    }
+
+    .api-config-grid > .field:first-child {
+      grid-column: 1 / -1;
     }
 
     .api-environment-buttons {
@@ -428,10 +469,59 @@
 
     .custom-api-url {
       display: none;
+      grid-column: span 2;
     }
 
     .custom-api-url.visible {
       display: block;
+    }
+
+    .api-connection-identity {
+      display: none;
+    }
+
+    .api-connection-identity.visible {
+      display: block;
+    }
+
+    .api-config-grid .api-connection-identity input[readonly] {
+      background: #f3f4f6;
+      color: #64748b;
+      border-color: #e5e7eb;
+      cursor: not-allowed;
+    }
+
+    .api-password-wrap {
+      position: relative;
+    }
+
+    .api-password-wrap input {
+      padding-right: 88px !important;
+    }
+
+    .api-password-toggle {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      padding: 4px 6px;
+      border: 0;
+      border-radius: 5px;
+      background: transparent;
+      color: #2563eb;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .api-password-toggle:hover {
+      background: #eff6ff;
+    }
+
+    .api-password-toggle:focus-visible {
+      outline: 2px solid #93b4ff;
+      outline-offset: 1px;
     }
 
     .custom-api-url input[readonly] {
@@ -451,10 +541,21 @@
       display: block;
     }
 
+    .api-config-grid > .api-login-panel.visible {
+      display: contents;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+
     .api-login-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(180px, 1fr));
       gap: 14px;
+    }
+
+    .api-config-grid .api-login-grid {
+      display: contents;
     }
 
     .api-connect-actions {
@@ -656,6 +757,14 @@
       .api-login-grid {
         grid-template-columns: 1fr;
       }
+
+      .api-config-grid > .field {
+        grid-column: 1 / -1;
+      }
+
+      .api-config-grid .api-login-grid > .field {
+        grid-column: 1 / -1;
+      }
     }
 
     /* -----------------------------
@@ -679,6 +788,86 @@
 
     .sandbox-mode-control.visible {
       display: inline-flex;
+    }
+
+    #sandboxModeControl[hidden] { display: none !important; }
+
+    .sandbox-workflow-card {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin: 0 0 18px;
+      padding: 18px 20px;
+      border: 2px solid #60a5fa;
+      border-radius: 14px;
+      background: linear-gradient(110deg, #eff6ff 0%, #f8fbff 70%);
+      box-shadow: 0 5px 18px rgba(37, 99, 235, .12);
+    }
+
+    .sandbox-workflow-card.visible { display: flex; }
+
+    .sandbox-workflow-card-heading {
+      margin: 0;
+      color: #1e3a8a;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .sandbox-workflow-card-help {
+      margin: 4px 0 0;
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    .sandbox-workflow-mode-group {
+      display: none;
+      justify-content: flex-end;
+      gap: 8px;
+      margin: 0;
+    }
+
+    .sandbox-workflow-mode-group.visible { display: flex; }
+
+    .sandbox-workflow-mode-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 7px 12px;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      background: #fff;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .sandbox-workflow-mode-option:has(input:checked) {
+      border-color: #60a5fa;
+      background: #eff6ff;
+      color: #1d4ed8;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, .1);
+    }
+
+    .sandbox-workflow-mode-option input {
+      width: 17px;
+      height: 17px;
+      margin: 0;
+      accent-color: var(--primary);
+    }
+
+    .sandbox-workflow-mode-option:has(input:disabled) {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 650px) {
+      .sandbox-workflow-card { align-items: stretch; flex-direction: column; }
+      .sandbox-workflow-mode-group { justify-content: flex-start; flex-wrap: wrap; }
+      .sandbox-workflow-mode-option { flex: 1 1 180px; justify-content: center; }
     }
 
     .sandbox-mode-control input {
@@ -1947,47 +2136,64 @@
     }
 
     #folderGeneratorConfig {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
+      grid-template-columns: repeat(10, minmax(0, 1fr));
     }
 
     #folderCountField {
       order: 1;
       grid-column: span 2;
+      padding: 12px;
+      border: 1px solid #93c5fd;
+      border-left: 4px solid #2563eb;
+      border-radius: 10px;
+      background: #eff6ff;
+      box-shadow: 0 3px 10px rgba(37, 99, 235, .10);
+    }
+
+    #folderCountField label {
+      color: #1d4ed8;
+      font-weight: 800;
+    }
+
+    #folderCountField input {
+      border: 2px solid #93c5fd;
+      background: #ffffff;
+      font-weight: 700;
     }
 
     #generatorGenreField {
-      order: 2;
-      grid-column: span 2;
-    }
-
-    #generatorPrefixField {
-      order: 3;
-      grid-column: span 2;
-    }
-
-    #generatorCabinetField {
       order: 4;
       grid-column: span 2;
     }
 
-    #generatorCollaboratorLevel1Field {
+    #generatorPrefixField {
       order: 5;
       grid-column: span 2;
     }
 
-    #generatorCollaboratorLevel2Field {
+    #generatorCabinetField {
       order: 6;
       grid-column: span 2;
     }
 
-    #generatorInternationalNamesField {
+    #generatorCollaboratorLevel1Field {
       order: 7;
-      grid-column: span 3;
+      grid-column: span 2;
+    }
+
+    #generatorCollaboratorLevel2Field {
+      order: 8;
+      grid-column: span 2;
+    }
+
+    #generatorInternationalNamesField {
+      order: 2;
+      grid-column: span 4;
     }
 
     #generatorGenderField {
-      order: 8;
-      grid-column: span 3;
+      order: 3;
+      grid-column: span 4;
     }
 
     @media (max-width: 1050px) {
@@ -2092,6 +2298,14 @@
       opacity: .82;
     }
 
+    .field.sandbox-reference-locked .api-multi-picker:disabled {
+      border-color: #cbd5e1;
+      background: #f1f5f9;
+      color: #64748b;
+      cursor: not-allowed;
+      opacity: 1;
+    }
+
 
     .api-reference-datalist {
       display: none;
@@ -2162,6 +2376,20 @@
       display: block;
     }
 
+    /* Le tableau des dossiers possède un en-tête sticky (z-index: 20).
+       Élever la carte des filtres quand une liste est ouverte évite qu'il
+       recouvre les options du menu qui débordent sous la carte. */
+    .generator-config-card:has(.api-multi-panel.open) {
+      position: relative;
+      z-index: 30;
+    }
+
+    /* La carte principale masque normalement les débordements pour garder
+       ses coins arrondis, mais cela coupait les dernières options des listes. */
+    #folder-generator > .card:has(.api-multi-panel.open) {
+      overflow: visible;
+    }
+
     .api-multi-toolbar {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
@@ -2196,7 +2424,7 @@
     }
 
     .api-multi-items {
-      max-height: 260px;
+      max-height: min(62vh, 560px);
       overflow-y: auto;
       overscroll-behavior: contain;
     }
@@ -2284,6 +2512,7 @@
 
     .api-multi-panel {
       top: 48px;
+      max-height: min(70vh, 640px);
       max-width: none;
       padding: 0;
       overflow: hidden;
@@ -2297,8 +2526,8 @@
     .api-multi-select .api-multi-panel {
       left: 0;
       right: auto;
-      width: min(520px, calc(100vw - 32px));
-      min-width: min(360px, calc(100vw - 32px));
+      width: min(680px, calc(100vw - 32px));
+      min-width: min(440px, calc(100vw - 32px));
       max-width: none;
       transform: none;
     }
@@ -2351,7 +2580,7 @@
     }
 
     .api-multi-items {
-      max-height: 280px;
+      max-height: min(62vh, 560px);
       padding: 0;
     }
 
@@ -7322,6 +7551,18 @@
       font: inherit;
       font-size: 12px;
     }
+
+    .sandbox-add-collaborator-chooser select optgroup[label^="➕"] {
+      color: #047857;
+      background: #ecfdf5;
+      font-weight: 800;
+    }
+
+    .sandbox-add-collaborator-chooser select option.sandbox-add-collaborator-new-option {
+      color: #047857;
+      background: #ecfdf5;
+      font-weight: 800;
+    }
     .folder-editor-ged-filters input.is-active-filter,
     .folder-editor-ged-filters select.is-active-filter,
     .folder-editor-ged-column-filter.is-active-filter {
@@ -9493,6 +9734,52 @@
     }
 
 
+    #sandboxExistingOperation { display: none !important; }
+    #folderGeneratorConfig.sandbox-modification-fields {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    #folderGeneratorConfig.sandbox-modification-fields > .field {
+      grid-column: auto !important;
+      order: initial !important;
+    }
+    #folderGeneratorConfig.sandbox-modification-fields > .field[hidden] {
+      display: none !important;
+    }
+    #folderGeneratorConfig[hidden] {
+      display: none !important;
+    }
+    .sandbox-modification-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid #dbeafe;
+    }
+    .sandbox-modification-actions[hidden] {
+      display: none !important;
+    }
+    .sandbox-modification-filter-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin: 0 0 10px;
+    }
+    .sandbox-modification-filter-actions[hidden] {
+      display: none !important;
+    }
+    .sandbox-modification-actions .generator-reset-button {
+      margin-left: 0;
+    }
+    .sandbox-editor-panel.sandbox-modification-hidden {
+      display: none !important;
+    }
+    @media (max-width: 1050px) {
+      #folderGeneratorConfig.sandbox-modification-fields {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
     .sandbox-operation-row { grid-column: 1 / 3; grid-row: 1; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-width: 0; }
     .sandbox-operation-options { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .sandbox-operation-options[hidden], #generatorConfigCard[hidden], #retrieveFoldersButton[hidden] { display: none !important; }
@@ -9503,7 +9790,10 @@
       .sandbox-editor-panel .sandbox-top-actions { grid-column: 1 / -1; grid-row: 2; }
     }
       #editorFolderOptionPanel { grid-column: 1 / -1; margin-bottom: 0; }
-    .folder-actions .clear-generated-folders-button { margin-left: 0; }
+    .folder-actions .clear-generated-folders-button {
+      order: 1;
+      margin-left: auto;
+    }
     .editor-folder-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
     #editorFolderOptionPanel[hidden], #editorFolderFields[hidden] { display: none !important; }
     #editorFolderFields input:disabled, #folderCount:disabled { background: #f3f4f6; color: #6b7280; cursor: not-allowed; }
@@ -9591,8 +9881,9 @@
 <body>
   <div class="app">
 
-    <aside class="sidebar">
+    <aside class="sidebar" id="toolsSidebar">
       <div class="brand">
+        <button class="sidebar-toggle-button sidebar-hide-button" id="hideSidebarButton" type="button" aria-label="Masquer la liste des outils" title="Masquer la liste des outils" aria-controls="toolsSidebar">‹</button>
         <h1>🧰 Outils</h1>
         <p>API ACd SuiteExpert</p>
       </div>
@@ -9627,6 +9918,7 @@
 
     <main class="main">
 
+      <button class="sidebar-toggle-button sidebar-show-button" id="showSidebarButton" type="button" aria-label="Afficher la liste des outils" title="Afficher la liste des outils" aria-controls="toolsSidebar" hidden>☰</button>
       <div class="page-header">
         <h2 id="pageTitle">Connexion API ACD SuiteExpert</h2>
         <p id="pageDescription">
@@ -9721,10 +10013,7 @@
                 <div class="api-header-actions">
                   <span class="api-status" id="apiStatus">Non connecté</span>
 
-                  <label class="sandbox-mode-control" id="sandboxModeControl" title="Activer la préparation des données de sandbox éditeur">
-                    <input type="checkbox" id="sandboxModeToggle">
-                    <span>SANDBOX</span>
-                  </label>
+                  <input type="checkbox" id="sandboxModeToggle" hidden aria-hidden="true">
 
                   <button
                     class="api-disconnect-button"
@@ -9773,31 +10062,44 @@
                     Seuls les domaines suiteexpert.fr et localhost sont autorisés.
                   </div>
                 </div>
-              </div>
 
-              
-              <div class="api-login-panel" id="apiLoginPanel">
-                <div class="api-login-grid">
-                  <div class="field">
-                    <label for="apiLogin">Identifiant</label>
-                    <input
-                      type="text"
-                      id="apiLogin"
-                      autocomplete="username"
-                    >
-                  </div>
+                <div class="field api-connection-identity" id="apiConnectionIdentityField">
+                  <label for="apiConnectionIdentity">Identifiant</label>
+                  <input type="text" id="apiConnectionIdentity" readonly aria-readonly="true" tabindex="0">
+                </div>
 
-                  <div class="field">
-                    <label for="apiPassword">Mot de passe</label>
-                    <input
-                      type="password"
-                      id="apiPassword"
-                      autocomplete="current-password"
-                    >
+                <div class="field api-connection-identity" id="apiConnectionPasswordField">
+                  <label for="apiConnectionPassword">Mot de passe</label>
+                  <div class="api-password-wrap">
+                    <input type="password" id="apiConnectionPassword" readonly aria-readonly="true" tabindex="0" autocomplete="off">
+                    <button type="button" class="api-password-toggle" id="toggleApiConnectionPasswordVisibility" aria-controls="apiConnectionPassword" aria-label="Afficher le mot de passe" aria-pressed="false">Afficher</button>
                   </div>
                 </div>
 
+                <div class="api-login-panel" id="apiLoginPanel">
+                  <div class="api-login-grid">
+                    <div class="field">
+                      <label for="apiLogin">Identifiant</label>
+                      <input
+                        type="text"
+                        id="apiLogin"
+                        autocomplete="username"
+                      >
+                    </div>
 
+                    <div class="field">
+                      <label for="apiPassword">Mot de passe</label>
+                      <div class="api-password-wrap">
+                        <input
+                          type="password"
+                          id="apiPassword"
+                          autocomplete="current-password"
+                        >
+                        <button type="button" class="api-password-toggle" id="toggleApiPasswordVisibility" aria-controls="apiPassword" aria-label="Afficher le mot de passe" aria-pressed="false">Afficher</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div class="api-connect-actions">
@@ -9820,6 +10122,23 @@
               <div class="creation-progress" id="creationProgress"></div>
             </div>
 
+            <div class="sandbox-workflow-card" id="sandboxWorkflowCard">
+              <div>
+                <h4 class="sandbox-workflow-card-heading">Mode de gestion des dossiers</h4>
+                <p class="sandbox-workflow-card-help">Choisissez l’action à effectuer.</p>
+              </div>
+              <div class="sandbox-workflow-mode-group" id="sandboxWorkflowModeGroup" role="radiogroup" aria-label="Mode de gestion des dossiers">
+                <label class="sandbox-workflow-mode-option">
+                  <input type="radio" name="sandboxWorkflowMode" value="create" checked>
+                  <span>Création de dossiers</span>
+                </label>
+                <label class="sandbox-workflow-mode-option">
+                  <input type="radio" name="sandboxWorkflowMode" value="modify">
+                  <span>Modification de dossiers</span>
+                </label>
+              </div>
+            </div>
+
             <div class="sandbox-editor-panel" id="sandboxEditorPanel">
               <div class="sandbox-operation-row">
               <label
@@ -9827,7 +10146,7 @@
                 id="sandboxNewSandboxOption"
                 title="Masquer les paramètres de génération si le cabinet existe déjà dans la base"
               >
-                <input type="checkbox" id="sandboxNewSandboxToggle" checked>
+                <input type="checkbox" id="sandboxNewSandboxToggle">
                 <span>Nouveau cabinet</span>
               </label>
                 <div id="sandboxExistingOperation" class="sandbox-operation-options" role="radiogroup" aria-label="Action sur le cabinet existant" hidden>
@@ -10147,6 +10466,15 @@
 
             <div class="generator-config-card" id="generatorConfigCard">
 
+              <div class="sandbox-modification-filter-actions" id="sandboxModificationFilterActions" hidden>
+                <button
+                  class="generator-reset-button"
+                  id="sandboxModificationClearFiltersButton"
+                  type="button"
+                  title="Vider les cabinets et les collaborateurs sélectionnés"
+                >Réinitialiser</button>
+              </div>
+
               <div class="form-grid" id="folderGeneratorConfig">
               <span id="folderCountHomeMarker" hidden></span>
               <div class="field" id="folderCountField">
@@ -10383,7 +10711,7 @@
                 </div>
                 <datalist class="api-reference-datalist" id="collaboratorLevel1Options"></datalist>
                 <div class="field-help api-validation-help" id="collaboratorLevel1ValidationHelp">
-                  Facultatif — saisissez un ou plusieurs codes collaborateurs.
+                  Facultatif — saisissez un ou plusieurs codes collaborateurs (10 caractères maximum par code).
                 </div>
               </div>
 
@@ -10447,7 +10775,7 @@
                 </div>
                 <datalist class="api-reference-datalist" id="collaboratorLevel2Options"></datalist>
                 <div class="field-help api-validation-help" id="collaboratorLevel2ValidationHelp">
-                  Facultatif — saisissez un ou plusieurs codes collaborateurs.
+                  Facultatif — saisissez un ou plusieurs codes collaborateurs (10 caractères maximum par code).
                 </div>
               </div>
 
@@ -10497,6 +10825,7 @@
               </div>
               </div>
 
+              <div class="sandbox-modification-actions" id="sandboxModificationActions" hidden></div>
             </div>
 
             <div class="generator-action-card" id="generatorActionCard" aria-labelledby="generatorActionTitle">
@@ -10625,7 +10954,7 @@
               </div>
             </div>
 
-            <div class="table-zone">
+            <div class="table-zone" id="folderGeneratorTableZone">
               <div class="folder-list-sticky-header">
               <div class="table-toolbar">
                 <div class="table-toolbar-left">
@@ -10877,7 +11206,7 @@
               </div>
             </div>
 
-            <div class="warning-note">
+            <div class="warning-note" id="folderGeneratorWarningNote">
               ⚠️ Les noms, adresses, e-mails et SIRET générés sont fictifs et destinés uniquement aux environnements de test.
             </div>
 
@@ -11716,6 +12045,21 @@
 
     const menuButtons = document.querySelectorAll(".menu-button[data-tool]");
     const toolPanels = document.querySelectorAll(".tool-panel");
+    const appShell = document.querySelector(".app");
+    const hideSidebarButton = document.getElementById("hideSidebarButton");
+    const showSidebarButton = document.getElementById("showSidebarButton");
+
+    function setSidebarCollapsed(collapsed, moveFocus = false) {
+      appShell.classList.toggle("sidebar-collapsed", collapsed);
+      hideSidebarButton.hidden = collapsed;
+      showSidebarButton.hidden = !collapsed;
+      setPreference("sidebarCollapsed", collapsed);
+      if (moveFocus) (collapsed ? showSidebarButton : hideSidebarButton).focus();
+    }
+
+    setSidebarCollapsed(getPreferenceBoolean("sidebarCollapsed", false));
+    hideSidebarButton.addEventListener("click", () => setSidebarCollapsed(true, true));
+    showSidebarButton.addEventListener("click", () => setSidebarCollapsed(false, true));
 
     const titles = {
       "password-generator": {
@@ -14127,6 +14471,12 @@
     const customApiUrlField = document.getElementById("customApiUrlField");
     const customApiUrlInput = document.getElementById("customApiUrl");
     let customApiUrlDraft = "";
+    const apiConnectionIdentityField = document.getElementById("apiConnectionIdentityField");
+    const apiConnectionIdentityInput = document.getElementById("apiConnectionIdentity");
+    const apiConnectionPasswordField = document.getElementById("apiConnectionPasswordField");
+    const apiConnectionPasswordInput = document.getElementById("apiConnectionPassword");
+    const toggleApiPasswordVisibilityButton = document.getElementById("toggleApiPasswordVisibility");
+    const toggleApiConnectionPasswordVisibilityButton = document.getElementById("toggleApiConnectionPasswordVisibility");
     const apiStatus = document.getElementById("apiStatus");
     const apiHeaderActions = document.querySelector(".api-header-actions");
     const apiConnectActions = document.querySelector(".api-connect-actions");
@@ -14143,8 +14493,10 @@
     const apiPasswordInput = document.getElementById("apiPassword");
     const apiMessage = document.getElementById("apiMessage");
     const creationProgress = document.getElementById("creationProgress");
-    const sandboxModeControl = document.getElementById("sandboxModeControl");
     const sandboxModeToggle = document.getElementById("sandboxModeToggle");
+    const sandboxWorkflowCard = document.getElementById("sandboxWorkflowCard");
+    const sandboxWorkflowModeGroup = document.getElementById("sandboxWorkflowModeGroup");
+    const sandboxWorkflowModeInputs = Array.from(document.querySelectorAll('input[name="sandboxWorkflowMode"]'));
     const sandboxEditorPanel = document.getElementById("sandboxEditorPanel");
     const sandboxTopActions = document.getElementById("sandboxTopActions");
     const sandboxEditorNameInput = document.getElementById("sandboxEditorName");
@@ -14183,6 +14535,9 @@
     const sandboxPrimaryFirstName = document.getElementById("sandboxPrimaryFirstName");
     const sandboxPrimaryEmail = document.getElementById("sandboxPrimaryEmail");
     const sandboxEditorActions = document.getElementById("sandboxEditorActions");
+    const sandboxModificationActions = document.getElementById("sandboxModificationActions");
+    const sandboxModificationFilterActions = document.getElementById("sandboxModificationFilterActions");
+    const sandboxModificationClearFiltersButton = document.getElementById("sandboxModificationClearFiltersButton");
     const exportSandboxCabinetButton = document.getElementById("exportSandboxCabinetButton");
     const exportSandboxCollaboratorsButton = document.getElementById("exportSandboxCollaboratorsButton");
     const sandboxMailButton = document.getElementById("sandboxMailButton");
@@ -14221,6 +14576,7 @@
     // Identifiant réellement utilisé lors de la dernière authentification API réussie.
     // Il est réutilisé notamment dans SOC_MEMO de l'export Cabinet SANDBOX.
     let apiConnectionLogin = "";
+    let apiConnectionPassword = "";
     let pendingCreationAfterLogin = false;
     let sandboxConfigurationSnapshot = null;
     let sandboxCabinetData = null;
@@ -14361,6 +14717,8 @@
     let sandboxCabinetEditedByUser = false;
     let sandboxLevel1EditedByUser = false;
     let sandboxLevel2EditedByUser = false;
+    let wasSandboxModificationMode = false;
+    let sandboxModificationCollaboratorSnapshot = null;
 
     const folderGeneratorConfig = document.getElementById("folderGeneratorConfig");
     const folderCountInput = document.getElementById("folderCount");
@@ -14941,6 +15299,10 @@
         sandboxModeToggle &&
         sandboxModeToggle.checked
       );
+    }
+
+    function usesStandardApiMultiSelects() {
+      return !isSandboxModeEnabled() || isSandboxExistingOperation("modify");
     }
 
     function normalizeSandboxEditorToken(value) {
@@ -15697,8 +16059,48 @@
       const existingCabinetSelected = Boolean(
         !isNewSandbox && getSelectedSandboxExistingCabinet()
       );
+      const modifyingExistingSandbox = isSandboxExistingOperation("modify");
+      const enteringModificationMode =
+        modifyingExistingSandbox && !wasSandboxModificationMode;
+      if (enteringModificationMode) {
+        sandboxModificationCollaboratorSnapshot = {
+          level1: collaboratorLevel1CodeInput.value,
+          level2: collaboratorLevel2CodeInput.value
+        };
+        const collaboratorCodes = [
+          ...parseCodeList(collaboratorLevel1CodeInput.value),
+          ...parseCodeList(collaboratorLevel2CodeInput.value)
+        ];
+        collaboratorLevel1CodeInput.value = formatCodeList(
+          [...new Set(collaboratorCodes.map(normalizeReferenceCode).filter(Boolean))]
+        );
+        collaboratorLevel2CodeInput.value = "";
+        for (const config of getApiMultiSelectConfigs().filter(isCollaboratorApiMultiConfig)) {
+          config.picker.value = "";
+          renderApiMultiSelectedChips(config);
+          syncApiMultiPickerState(config);
+          validateApiMultiSelectConfig(config);
+        }
+      } else if (
+        !modifyingExistingSandbox &&
+        wasSandboxModificationMode &&
+        sandboxModificationCollaboratorSnapshot
+      ) {
+        collaboratorLevel1CodeInput.value =
+          sandboxModificationCollaboratorSnapshot.level1;
+        collaboratorLevel2CodeInput.value =
+          sandboxModificationCollaboratorSnapshot.level2;
+        sandboxModificationCollaboratorSnapshot = null;
+        for (const config of getApiMultiSelectConfigs().filter(isCollaboratorApiMultiConfig)) {
+          config.picker.value = "";
+          renderApiMultiSelectedChips(config);
+          syncApiMultiPickerState(config);
+          validateApiMultiSelectConfig(config);
+        }
+      }
+      wasSandboxModificationMode = modifyingExistingSandbox;
       const waitingForExistingCabinet = Boolean(
-        active && !isNewSandbox && !existingCabinetSelected
+        active && !isNewSandbox && !modifyingExistingSandbox && !existingCabinetSelected
       );
 
       const cabinetSelectionHint =
@@ -15709,8 +16111,11 @@
 
       const emailField = sandboxEditorEmailInput?.closest(".field");
       if (emailField) {
-        emailField.hidden = waitingForExistingCabinet;
+        emailField.hidden = waitingForExistingCabinet || modifyingExistingSandbox;
       }
+
+      const editorNameField = sandboxEditorNameInput?.closest(".field");
+      if (editorNameField) editorNameField.hidden = modifyingExistingSandbox;
 
       const collaboratorCountField =
         sandboxCollaboratorCountInput?.closest(".field");
@@ -15759,7 +16164,7 @@
 
       if (sandboxExistingCabinetSelect) {
         sandboxExistingCabinetSelect.hidden =
-          !active || isNewSandbox;
+          !active || isNewSandbox || modifyingExistingSandbox;
 
         // En création de dossier, le cabinet choisi sert de référence fixe :
         // seul son nom reste verrouillé après sa sélection.
@@ -15884,17 +16289,45 @@
       // configuration, pas la barre d'actions.
       if (generatorConfigCard) {
         generatorConfigCard.hidden =
-          (isSandboxExistingOperation("create") && !getSelectedSandboxExistingCabinet()) ||
-          isSandboxExistingOperation("modify") ||
+          (modifyingExistingSandbox && foldersRetrievedOnce) ||
+          (!modifyingExistingSandbox && isSandboxExistingOperation("create") && !getSelectedSandboxExistingCabinet()) ||
           (active && isNewSandbox && !sandboxEditorNameInput.value.trim()) ||
           (existingNewSandbox && !locked && !sandboxEditModeEnabled);
       }
 
       if (folderGeneratorConfig) {
         folderGeneratorConfig.hidden =
-          isSandboxExistingOperation("modify") ||
-          (existingNewSandbox && locked && !sandboxEditModeEnabled);
+          (existingNewSandbox && locked && !sandboxEditModeEnabled) ||
+          (modifyingExistingSandbox && foldersRetrievedOnce);
+        folderGeneratorConfig.classList.toggle("sandbox-modification-fields", modifyingExistingSandbox);
+        const collaboratorLevel1Label =
+          document.querySelector('#generatorCollaboratorLevel1Field label');
+        if (collaboratorLevel1Label) {
+          collaboratorLevel1Label.innerHTML = modifyingExistingSandbox
+            ? 'Collaborateurs <span class="optional-label">(facultatif)</span>'
+            : 'Collaborateurs niveau 1 <span class="optional-label">(facultatif)</span>';
+        }
+        folderGeneratorConfig.querySelectorAll(":scope > .field").forEach(field => {
+          field.hidden = modifyingExistingSandbox && ![
+            "generatorCabinetField",
+            "generatorCollaboratorLevel1Field"
+          ].includes(field.id);
+        });
       }
+      if (sandboxModificationActions) {
+        sandboxModificationActions.hidden =
+          !active || !modifyingExistingSandbox || foldersRetrievedOnce;
+      }
+      if (sandboxModificationFilterActions) {
+        sandboxModificationFilterActions.hidden =
+          !active || !modifyingExistingSandbox || foldersRetrievedOnce;
+      }
+      sandboxEditorPanel?.classList.toggle(
+        "sandbox-modification-hidden",
+        modifyingExistingSandbox
+      );
+      moveRetrieveFoldersButtonForSandbox(active);
+      moveClearFoldersButtonForSandbox(active);
 
       if (generateFoldersButton) {
         generateFoldersButton.hidden = isSandboxExistingOperation("modify") ||
@@ -15968,7 +16401,9 @@
         false
       );
 
-      updateSandboxCabinetExistingWarning(cabinetValid);
+      updateSandboxCabinetExistingWarning(
+        isSandboxExistingOperation("modify") ? false : cabinetValid
+      );
 
       const genreValid = validateMultipleReferenceInput(
         genreCodeInput,
@@ -17643,43 +18078,84 @@
         placeholderOption
       );
 
+      const newCollaboratorGroup = document.createElement("optgroup");
+      newCollaboratorGroup.label = "➕ Créer un nouveau collaborateur";
+
       const newOption = document.createElement("option");
       newOption.value = "__new__";
+      newOption.className = "sandbox-add-collaborator-new-option";
       newOption.textContent = automaticCode
-        ? `Nouveau collaborateur — code automatique : ${automaticCode}`
-        : "Nouveau collaborateur";
-      sandboxAddCollaboratorSelect.appendChild(newOption);
+        ? `Créer avec le code automatique : ${automaticCode}`
+        : "Créer un nouveau collaborateur";
+      newCollaboratorGroup.appendChild(newOption);
+      sandboxAddCollaboratorSelect.appendChild(newCollaboratorGroup);
 
+      const selectedCabinetCodes =
+        getSelectedGeneratorCabinetCodes();
+      const selectedCabinetRank = new Map(
+        selectedCabinetCodes.map((code, index) => [code, index])
+      );
       const cabinetCollaborators =
-        getSandboxCollaboratorsForSelectedCabinet()
+        availableCollaborators
           .filter(collaborator =>
             !currentCodes.has(
               normalizeReferenceCode(collaborator.code)
             )
           )
-          .sort((a, b) =>
-            String(a.code).localeCompare(
-              String(b.code),
-              "fr",
-              { sensitivity: "base" }
+          .map(collaborator => ({
+            ...collaborator,
+            preferredCabinetCode: getCollaboratorPreferredCabinetCode(
+              collaborator,
+              selectedCabinetCodes
             )
-          );
+          }))
+          .sort((a, b) => {
+            const cabinetA = normalizeReferenceCode(a.preferredCabinetCode);
+            const cabinetB = normalizeReferenceCode(b.preferredCabinetCode);
+            const rankA = selectedCabinetRank.has(cabinetA)
+              ? selectedCabinetRank.get(cabinetA)
+              : Number.MAX_SAFE_INTEGER;
+            const rankB = selectedCabinetRank.has(cabinetB)
+              ? selectedCabinetRank.get(cabinetB)
+              : Number.MAX_SAFE_INTEGER;
 
-      if (cabinetCollaborators.length) {
-        const group = document.createElement("optgroup");
-        group.label = "Collaborateurs du cabinet";
+            if (rankA !== rankB) return rankA - rankB;
+            if (cabinetA !== cabinetB) {
+              if (!cabinetA) return 1;
+              if (!cabinetB) return -1;
+              return a.preferredCabinetCode.localeCompare(
+                b.preferredCabinetCode,
+                "fr",
+                { sensitivity: "base", numeric: true }
+              );
+            }
+            return a.code.localeCompare(
+              b.code,
+              "fr",
+              { sensitivity: "base", numeric: true }
+            );
+          });
 
-        cabinetCollaborators.forEach(collaborator => {
-          const option = document.createElement("option");
-          option.value = collaborator.code;
-          option.textContent = collaborator.displayName
-            ? `${collaborator.code} — ${collaborator.displayName}`
-            : collaborator.code;
-          group.appendChild(option);
-        });
+      let previousCabinetKey = null;
+      let group = null;
+      cabinetCollaborators.forEach(collaborator => {
+        const cabinetCode = collaborator.preferredCabinetCode;
+        const cabinetKey = normalizeReferenceCode(cabinetCode) || "__NO_CABINET__";
 
-        sandboxAddCollaboratorSelect.appendChild(group);
-      }
+        if (cabinetKey !== previousCabinetKey) {
+          group = document.createElement("optgroup");
+          group.label = getCollaboratorCabinetDisplayLabel(cabinetCode);
+          sandboxAddCollaboratorSelect.appendChild(group);
+          previousCabinetKey = cabinetKey;
+        }
+
+        const option = document.createElement("option");
+        option.value = collaborator.code;
+        option.textContent = collaborator.displayName
+          ? `${collaborator.code} — ${collaborator.displayName}`
+          : collaborator.code;
+        group.appendChild(option);
+      });
 
       sandboxAddCollaboratorSelect.value = "";
     }
@@ -19824,12 +20300,24 @@ ${body}
         return;
       }
 
-      clearFoldersButton.hidden = !active;
+      const modifyingSandbox = isSandboxExistingOperation("modify");
+      clearFoldersButton.hidden = !active || modifyingSandbox;
 
       if (active) {
-        const target =
-          sandboxTopActions ||
-          sandboxEditorPanel;
+        if (modifyingSandbox) {
+          if (
+            clearFoldersButton.parentElement !==
+            clearFoldersHomeMarker.parentElement
+          ) {
+            clearFoldersHomeMarker.insertAdjacentElement(
+              "afterend",
+              clearFoldersButton
+            );
+          }
+          return;
+        }
+
+        const target = sandboxTopActions || sandboxEditorPanel;
 
         if (clearFoldersButton.parentElement !== target) {
           target.appendChild(clearFoldersButton);
@@ -19858,8 +20346,12 @@ ${body}
       retrieveFoldersButton.hidden = !active || isSandboxExistingOperation("create");
 
       if (active) {
-        if (retrieveFoldersButton.parentElement !== sandboxEditorActions) {
-          sandboxEditorActions.appendChild(retrieveFoldersButton);
+        const target =
+          isSandboxExistingOperation("modify") && sandboxModificationActions
+            ? sandboxModificationActions
+            : sandboxEditorActions;
+        if (retrieveFoldersButton.parentElement !== target) {
+          target.appendChild(retrieveFoldersButton);
         }
       } else {
         retrieveFoldersButton.classList.remove("visible");
@@ -19908,7 +20400,13 @@ ${body}
           ? isSandboxConfigurationEffectivelyLocked()
           : hasGeneratedFolders;
 
-      sandboxModeControl.classList.toggle("visible", connected);
+      sandboxWorkflowCard?.classList.toggle("visible", connected);
+      sandboxWorkflowModeGroup?.classList.toggle("visible", connected);
+      const modifyWorkflowModeRadio = document.querySelector('input[name="sandboxExistingOperation"][value="modify"]');
+      sandboxWorkflowModeInputs.forEach(input => {
+        input.disabled = !connected || hasGeneratedFolders ||
+          (input.value === "modify" && Boolean(modifyWorkflowModeRadio?.disabled));
+      });
       sandboxModeToggle.disabled =
         !connected ||
         hasGeneratedFolders;
@@ -19926,7 +20424,8 @@ ${body}
       if (sandboxNewSandboxToggle) {
         sandboxNewSandboxToggle.disabled =
           !active ||
-          hasGeneratedFolders;
+          hasGeneratedFolders ||
+          isSandboxExistingOperation("modify");
       }
 
       if (active) {
@@ -19935,6 +20434,10 @@ ${body}
 
       if (!connected) {
         sandboxModeToggle.checked = false;
+        const creationWorkflowMode = sandboxWorkflowModeInputs.find(input => input.value === "create");
+        if (creationWorkflowMode) creationWorkflowMode.checked = true;
+        const creationOperationMode = document.querySelector('input[name="sandboxExistingOperation"][value="create"]');
+        if (creationOperationMode) creationOperationMode.checked = true;
         sandboxConfigurationSnapshot = null;
         sandboxCabinetData = null;
         sandboxCollaboratorData = [];
@@ -20144,8 +20647,8 @@ ${body}
         // validations rouges liées aux règles spécifiques de la sandbox.
         [
           [cabinetCodeInput, cabinetCodePicker, cabinetValidationHelp, "Saisissez un cabinet."],
-          [collaboratorLevel1CodeInput, collaboratorLevel1CodePicker, collaboratorLevel1ValidationHelp, "Facultatif — saisissez un ou plusieurs codes collaborateurs."],
-          [collaboratorLevel2CodeInput, collaboratorLevel2CodePicker, collaboratorLevel2ValidationHelp, "Facultatif — saisissez un ou plusieurs codes collaborateurs."]
+          [collaboratorLevel1CodeInput, collaboratorLevel1CodePicker, collaboratorLevel1ValidationHelp, "Facultatif — saisissez un ou plusieurs codes collaborateurs (10 caractères maximum par code)."],
+          [collaboratorLevel2CodeInput, collaboratorLevel2CodePicker, collaboratorLevel2ValidationHelp, "Facultatif — saisissez un ou plusieurs codes collaborateurs (10 caractères maximum par code)."]
         ].forEach(([input, picker, help, message]) => {
           input.value = "";
           picker.value = "";
@@ -20162,6 +20665,47 @@ ${body}
 
       updateSandboxModeUiState();
       updateTransferButtonState();
+    }
+
+    function setSandboxWorkflowMode(operation) {
+      if (!apiSessionUuid) return;
+
+      const selectedOperation = operation === "modify" ? "modify" : "create";
+      const workflowModeInput = sandboxWorkflowModeInputs.find(input => input.value === selectedOperation);
+      const operationInput = document.querySelector(`input[name="sandboxExistingOperation"][value="${selectedOperation}"]`);
+      if (workflowModeInput) workflowModeInput.checked = true;
+
+      if (!sandboxModeToggle.checked) {
+        setSandboxMode(true);
+      }
+
+      // La création démarre sur « Nouveau cabinet » ; la modification
+      // travaille toujours sur des cabinets existants.
+      const shouldUseNewCabinet = selectedOperation === "create";
+      if (
+        sandboxNewSandboxToggle &&
+        sandboxNewSandboxToggle.checked !== shouldUseNewCabinet
+      ) {
+        sandboxNewSandboxToggle.checked = shouldUseNewCabinet;
+        sandboxNewSandboxToggle.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+
+      if (operationInput && !operationInput.disabled) {
+        operationInput.checked = true;
+        operationInput.dispatchEvent(new Event("change", { bubbles: true }));
+        if (selectedOperation === "modify" && sandboxExistingCabinetSelect) {
+          // En modification, le sélecteur multi-cabinets standard fait foi.
+          // Conserver les codes déjà reportés dans cabinetCodeInput.
+          sandboxExistingCabinetSelect.value = "";
+        }
+      } else {
+        updateSandboxNewConfigurationVisibility();
+        updateGeneratorConfigurationLockState();
+        updateTransferButtonState();
+        updateRetrieveFoldersButtonState();
+      }
+
+      updateSandboxModeUiState();
     }
 
     function sanitizeFolderCodePrefix(value) {
@@ -20339,6 +20883,22 @@ ${body}
       return true;
     }
 
+    function validateCollaboratorCodeLength(input, help) {
+      const codes = parseCodeList(input.value);
+      const overlongCodes = codes.filter(code => Array.from(code).length > 10);
+
+      if (!overlongCodes.length) return true;
+
+      input.classList.remove("api-valid");
+      input.classList.add("api-invalid");
+      help.classList.remove("valid");
+      help.classList.add("invalid");
+      help.textContent =
+        `Chaque code collaborateur est limité à 10 caractères : ${overlongCodes.join(", ")}.`;
+      syncVisiblePickerValidationState(input);
+      return false;
+    }
+
     function validateMultipleCollaboratorInput(
       input,
       help,
@@ -20349,10 +20909,12 @@ ${body}
       input.classList.remove("api-valid", "api-invalid");
       help.classList.remove("valid", "invalid");
 
+      if (!validateCollaboratorCodeLength(input, help)) return false;
+
       if (!codes.length) {
         help.textContent = optional
-          ? "Facultatif — saisissez un ou plusieurs codes collaborateurs."
-          : "Saisissez au moins un code collaborateur.";
+          ? "Facultatif — saisissez un ou plusieurs codes collaborateurs (10 caractères maximum par code)."
+          : "Saisissez au moins un code collaborateur (10 caractères maximum).";
 
         if (!optional) {
           input.classList.add("api-invalid");
@@ -20560,14 +21122,16 @@ ${body}
     }
 
     function commitApiMultiSelectionChange(config) {
-      if (isSandboxModeEnabled()) {
+      const standardMultiSelectMode = usesStandardApiMultiSelects();
+      const modifyingSandbox = isSandboxExistingOperation("modify");
+      if (isSandboxModeEnabled() && !standardMultiSelectMode) {
         markSandboxReferenceEdited(config.key);
       }
 
       const selectionValid =
         validateApiMultiSelectConfig(config);
 
-      if (config.key === "cabinet") {
+      if (config.key === "cabinet" && !modifyingSandbox) {
         updateSandboxCabinetExistingWarning(selectionValid);
       }
 
@@ -20590,15 +21154,26 @@ ${body}
         updateTransferButtonState();
       }
 
-      if (isSandboxModeEnabled()) {
+      if (isSandboxModeEnabled() && !standardMultiSelectMode) {
         rebuildSandboxExportData();
       }
 
       updateGeneratorConfigurationLockState();
       renderApiMultiSelectedChips(config);
 
-      if (isSandboxModeEnabled()) {
+      if (isSandboxModeEnabled() && !standardMultiSelectMode) {
         rebuildSandboxExportData();
+      }
+
+      if (modifyingSandbox) {
+        getApiMultiSelectConfigs()
+          .filter(isCollaboratorApiMultiConfig)
+          .forEach(collaboratorConfig => {
+            if (collaboratorConfig.panel.classList.contains("open")) {
+              renderApiMultiSelectOptions(collaboratorConfig);
+            }
+          });
+        updateRetrieveFoldersButtonState();
       }
     }
 
@@ -20680,7 +21255,7 @@ ${body}
 
       config.picker.disabled = config.input.disabled;
 
-      if (isSandboxModeEnabled()) {
+      if (isSandboxModeEnabled() && !usesStandardApiMultiSelects()) {
         config.picker.value = config.input.value;
         config.chips.innerHTML = "";
         return;
@@ -20827,7 +21402,7 @@ ${body}
 
       if (
         !apiSessionUuid ||
-        isSandboxModeEnabled() ||
+        !usesStandardApiMultiSelects() ||
         !isCollaboratorApiMultiConfig(config)
       ) {
         return items;
@@ -21077,7 +21652,7 @@ ${body}
 
       const item = visibleItems[0];
 
-      if (isSandboxModeEnabled()) {
+      if (isSandboxModeEnabled() && !usesStandardApiMultiSelects()) {
         // En mode SANDBOX, la zone visible est éditable : le résultat unique
         // remplace la saisie par le code canonique réellement présent en base.
         markSandboxReferenceEdited(config.key);
@@ -21172,7 +21747,7 @@ ${body}
       const groupedCollaboratorMode =
         Boolean(
           apiSessionUuid &&
-          !isSandboxModeEnabled() &&
+          usesStandardApiMultiSelects() &&
           isCollaboratorApiMultiConfig(config)
         );
 
@@ -21459,9 +22034,13 @@ ${body}
         260,
         boundaryRight - boundaryLeft
       );
-      const panelWidth = Math.min(520, availableWidth);
+      const panelWidth = Math.min(680, availableWidth);
+      const isSandboxModification = isSandboxExistingOperation("modify");
+      const alignedPanelWidth = isSandboxModification
+        ? Math.min(multiRect.width, availableWidth)
+        : panelWidth;
 
-      panel.style.width = `${Math.round(panelWidth)}px`;
+      panel.style.width = `${Math.round(alignedPanelWidth)}px`;
       panel.style.minWidth = "0";
       panel.style.left = "0";
       panel.style.right = "auto";
@@ -21470,6 +22049,16 @@ ${body}
       // visibles les pastilles déjà sélectionnées. Pour les champs situés à
       // droite (notamment Collaborateurs niveau 2), si la place manque, la
       // liste bascule à gauche du champ plutôt que d'être coupée.
+      if (isSandboxModification) {
+        const alignedLeft = Math.max(
+          boundaryLeft,
+          Math.min(multiRect.left, boundaryRight - alignedPanelWidth)
+        );
+        panel.style.transform =
+          `translateX(${Math.round(alignedLeft - multiRect.left)}px)`;
+        return;
+      }
+
       const preferredShift = 180;
       const sideGap = 16;
       let desiredLeft = multiRect.left + preferredShift;
@@ -22222,10 +22811,11 @@ ${body}
       apiConnectActions.classList.toggle("connected", connected);
 
       if (connected) {
-        apiConnectionLeft.append(apiStatus, apiSessionTools);
-        apiConnectionRight.append(sandboxModeControl, disconnectApiButton, connectApiButton);
+        apiHeaderActions.append(apiStatus);
+        apiConnectionLeft.append(apiSessionTools);
+        apiConnectionRight.append(disconnectApiButton, connectApiButton);
       } else {
-        apiHeaderActions.append(apiStatus, sandboxModeControl, disconnectApiButton);
+        apiHeaderActions.append(apiStatus, disconnectApiButton);
         apiConnectionLeft.append(apiSessionTools);
         apiConnectionRight.append(connectApiButton);
       }
@@ -22242,6 +22832,7 @@ ${body}
 
       apiSessionUuid = null;
       apiConnectionLogin = "";
+      apiConnectionPassword = "";
       apiEnvironmentInput.value = "";
       apiLoginInput.value = "";
       apiPasswordInput.value = "";
@@ -22286,6 +22877,7 @@ ${body}
       apiLoginPanel.classList.remove("visible");
 
       apiPasswordInput.value = "";
+      hideApiPasswordValues();
 
       refreshApiMultiSelects();
       updateApiConnectionActionState();
@@ -22296,8 +22888,24 @@ ${body}
 
     function updateGeneratorActionCardVisibility() {
       const card = document.getElementById("generatorActionCard");
-      if (!card) return;
-      card.hidden = Boolean(generatorConfigCard.hidden && generatedFolders.length === 0);
+      const modifyingSandbox = isSandboxExistingOperation("modify");
+      const waitingForFolderResults =
+        !foldersRetrievedOnce &&
+        !foldersHaveBeenGenerated;
+
+      if (card) {
+        card.hidden = (modifyingSandbox && !foldersRetrievedOnce) ||
+          Boolean(
+            generatorConfigCard.hidden &&
+            generatedFolders.length === 0 &&
+            !foldersRetrievedOnce
+          );
+      }
+
+      const resultsZone = document.getElementById("folderGeneratorTableZone");
+      const warningNote = document.getElementById("folderGeneratorWarningNote");
+      if (resultsZone) resultsZone.hidden = waitingForFolderResults;
+      if (warningNote) warningNote.hidden = waitingForFolderResults;
     }
 
     function updateGeneratorConfigurationLockState() {
@@ -22334,6 +22942,19 @@ ${body}
         if (!input) return;
 
         if (isSandboxModeEnabled()) {
+          const sandboxDerivedReference =
+            isSandboxExistingOperation("create") &&
+            (
+              input === cabinetCodeInput ||
+              input === collaboratorLevel1CodeInput ||
+              input === collaboratorLevel2CodeInput
+            );
+
+          if (sandboxDerivedReference) {
+            input.disabled = true;
+            return;
+          }
+
           const existingSandboxMode =
             !isSandboxNewSandboxEnabled();
 
@@ -22343,6 +22964,7 @@ ${body}
           //   "Compte principal — Collaborateur 1".
           if (
             existingSandboxMode &&
+            !isSandboxExistingOperation("modify") &&
             (
               input === cabinetCodeInput ||
               input === collaboratorLevel1CodeInput
@@ -22402,26 +23024,22 @@ ${body}
       syncSandboxVisiblePickers();
       setSandboxValidationDisplay();
 
-      const existingSandboxMode =
+      const sandboxReferencesLocked =
         isSandboxModeEnabled() &&
-        !isSandboxNewSandboxEnabled();
-      const existingSandboxReferencesLocked =
-        existingSandboxMode &&
-        !isSandboxExistingOperation("create");
+        isSandboxExistingOperation("create");
 
-      cabinetCodePicker
-        ?.closest(".field")
-        ?.classList.toggle(
-          "sandbox-reference-locked",
-          existingSandboxReferencesLocked
-        );
-
-      collaboratorLevel1CodePicker
-        ?.closest(".field")
-        ?.classList.toggle(
-          "sandbox-reference-locked",
-          existingSandboxReferencesLocked
-        );
+      [
+        cabinetCodePicker,
+        collaboratorLevel1CodePicker,
+        collaboratorLevel2CodePicker
+      ].forEach(picker => {
+        picker
+          ?.closest(".field")
+          ?.classList.toggle(
+            "sandbox-reference-locked",
+            sandboxReferencesLocked
+          );
+      });
 
       updateSandboxModeUiState();
       renderSandboxPrimaryCollaboratorInfo();
@@ -22937,9 +23555,11 @@ ${body}
     function updateResetGeneratedFoldersButtonState() {
       if (!resetGeneratedFoldersButton) return;
 
+      const modificationListRetrieved =
+        isSandboxExistingOperation("modify") && foldersRetrievedOnce;
       resetGeneratedFoldersButton.hidden = Boolean(
-        !foldersHaveBeenGenerated ||
-        generatedFolders.length === 0
+        (!foldersHaveBeenGenerated || generatedFolders.length === 0) &&
+        !modificationListRetrieved
       );
       resetGeneratedFoldersButton.disabled =
         !clearFoldersButton || clearFoldersButton.disabled;
@@ -24190,6 +24810,17 @@ ${body}
       const isCustom = selectedEnvironment === "custom";
       const shouldShow = Boolean(apiSessionUuid) || isCustom;
       customApiUrlField.classList.toggle("visible", shouldShow);
+      const connectionIdentity = String(apiConnectionLogin || apiLoginInput.value || "").trim();
+      apiConnectionIdentityInput.value = connectionIdentity;
+      apiConnectionPasswordInput.value = apiConnectionPassword;
+      apiConnectionIdentityField.classList.toggle(
+        "visible",
+        Boolean(apiSessionUuid && connectionIdentity)
+      );
+      apiConnectionPasswordField.classList.toggle(
+        "visible",
+        Boolean(apiSessionUuid && apiConnectionPassword)
+      );
       customApiUrlInput.readOnly = !isCustom;
       customApiUrlInput.value = isCustom
         ? customApiUrlDraft
@@ -24293,6 +24924,40 @@ ${body}
       apiMessage.className = "api-message";
       if (type) apiMessage.classList.add(type);
       apiMessage.textContent = text;
+    }
+
+    function bindApiPasswordVisibilityToggle(input, button) {
+      button.addEventListener("click", () => {
+        const shouldShow = input.type === "password";
+        input.type = shouldShow ? "text" : "password";
+        button.textContent = shouldShow ? "Masquer" : "Afficher";
+        button.setAttribute("aria-pressed", String(shouldShow));
+        button.setAttribute(
+          "aria-label",
+          `${shouldShow ? "Masquer" : "Afficher"} le mot de passe`
+        );
+      });
+    }
+
+    bindApiPasswordVisibilityToggle(
+      apiPasswordInput,
+      toggleApiPasswordVisibilityButton
+    );
+    bindApiPasswordVisibilityToggle(
+      apiConnectionPasswordInput,
+      toggleApiConnectionPasswordVisibilityButton
+    );
+
+    function hideApiPasswordValues() {
+      [
+        [apiPasswordInput, toggleApiPasswordVisibilityButton],
+        [apiConnectionPasswordInput, toggleApiConnectionPasswordVisibilityButton]
+      ].forEach(([input, button]) => {
+        input.type = "password";
+        button.textContent = "Afficher";
+        button.setAttribute("aria-pressed", "false");
+        button.setAttribute("aria-label", "Afficher le mot de passe");
+      });
     }
 
     function extractUuidFromAuthentication(response, bodyText) {
@@ -24404,6 +25069,8 @@ ${body}
 
       apiSessionUuid = uuid;
       apiConnectionLogin = String(login || "").trim();
+      apiConnectionPassword = String(password || "");
+      hideApiPasswordValues();
 
       // Réinitialiser les sélections dépendantes de la base à chaque nouvelle
       // connexion / reconnexion, avant de charger les référentiels du serveur.
@@ -24413,9 +25080,7 @@ ${body}
       updateApiConnectionActionState();
       updateGeneratorConfigurationLockState();
       setApiMessage("Connexion API réussie. Chargement des cabinets, genres, titres et collaborateurs…", "success");
-      if (!isApiEnvironmentCredentialsRequired()) {
-        apiLoginPanel.classList.remove("visible");
-      }
+      apiLoginPanel.classList.remove("visible");
 
       // À chaque connexion, les statuts appartiennent au serveur courant :
       // on repart donc de "Non envoyé" avant tout contrôle.
@@ -24476,6 +25141,7 @@ ${body}
       }
 
       updateGeneratorConfigurationLockState();
+      setSandboxWorkflowMode("create");
 
       return {
         baseUrl,
@@ -26164,9 +26830,9 @@ ${body}
       cabinetValidationHelp.classList.remove("valid", "invalid");
       cabinetValidationHelp.textContent = "Saisissez un cabinet.";
       collaboratorLevel1ValidationHelp.classList.remove("valid", "invalid");
-      collaboratorLevel1ValidationHelp.textContent = "Facultatif — saisissez un ou plusieurs codes collaborateurs.";
+      collaboratorLevel1ValidationHelp.textContent = "Facultatif — saisissez un ou plusieurs codes collaborateurs (10 caractères maximum par code).";
       collaboratorLevel2ValidationHelp.classList.remove("valid", "invalid");
-      collaboratorLevel2ValidationHelp.textContent = "Facultatif — saisissez un ou plusieurs codes collaborateurs.";
+      collaboratorLevel2ValidationHelp.textContent = "Facultatif — saisissez un ou plusieurs codes collaborateurs (10 caractères maximum par code).";
 
       cabinetMultiChips.innerHTML = "";
       collaboratorLevel1MultiChips.innerHTML = "";
@@ -27149,10 +27815,12 @@ ${body}
     }
 
     function buildRetrieveFoldersFilterBody() {
-      const collaboratorCodes = [
-        ...parseCodeList(collaboratorLevel1CodeInput.value),
-        ...parseCodeList(collaboratorLevel2CodeInput.value)
-      ];
+      const collaboratorCodes = isSandboxExistingOperation("modify")
+        ? parseCodeList(collaboratorLevel1CodeInput.value)
+        : [
+            ...parseCodeList(collaboratorLevel1CodeInput.value),
+            ...parseCodeList(collaboratorLevel2CodeInput.value)
+          ];
 
       const uniqueCollaboratorCodes = [
         ...new Set(
@@ -45394,9 +46062,11 @@ ${body}
     apiEnvironmentInput.addEventListener("change", () => {
       apiLoginInput.value = "";
       apiPasswordInput.value = "";
+      hideApiPasswordValues();
       updateApiEnvironmentSelection();
       apiSessionUuid = null;
       apiConnectionLogin = "";
+      apiConnectionPassword = "";
       availableCabinets = [];
       availableGenres = [];
       availableTitles = [];
@@ -45408,9 +46078,9 @@ ${body}
       cabinetValidationHelp.textContent = "";
       genreValidationHelp.textContent = "";
       collaboratorLevel1ValidationHelp.textContent =
-        "Facultatif — saisissez un ou plusieurs codes collaborateurs.";
+        "Facultatif — saisissez un ou plusieurs codes collaborateurs (10 caractères maximum par code).";
       collaboratorLevel2ValidationHelp.textContent =
-        "Facultatif — saisissez un ou plusieurs codes collaborateurs.";
+        "Facultatif — saisissez un ou plusieurs codes collaborateurs (10 caractères maximum par code).";
       cabinetCodeInput.classList.remove("api-valid", "api-invalid");
       genreCodeInput.classList.remove("api-valid", "api-invalid");
       collaboratorLevel1CodeInput.classList.remove("api-valid", "api-invalid");
@@ -45437,6 +46107,7 @@ ${body}
       customApiUrlDraft = customApiUrlInput.value.trim();
       apiSessionUuid = null;
       apiConnectionLogin = "";
+      apiConnectionPassword = "";
       availableCabinets = [];
       availableGenres = [];
       availableTitles = [];
@@ -45499,6 +46170,7 @@ ${body}
       }
 
       updateSandboxNewConfigurationVisibility();
+      updateGeneratorConfigurationLockState();
       renderSandboxPrimaryCollaboratorInfo();
       updateRetrieveFoldersButtonState();
 
@@ -45509,6 +46181,12 @@ ${body}
       ) {
         retrieveFoldersButton.click();
       }
+    });
+
+    sandboxWorkflowModeInputs.forEach(input => {
+      input.addEventListener("change", () => {
+        if (input.checked) setSandboxWorkflowMode(input.value);
+      });
     });
 
     sandboxNewSandboxToggle?.addEventListener("change", () => {
@@ -46277,6 +46955,24 @@ ${body}
 
     sandboxMailSendButton.addEventListener("click", openSandboxMailTo);
 
+    sandboxModificationClearFiltersButton?.addEventListener("click", () => {
+      closeAllApiMultiSelects();
+
+      getApiMultiSelectConfigs()
+        .filter(config =>
+          config.key === "cabinet" ||
+          isCollaboratorApiMultiConfig(config)
+        )
+        .forEach(config => {
+          config.input.value = "";
+          config.picker.value = "";
+          if (config.search !== config.picker) {
+            config.search.value = "";
+          }
+          commitApiMultiSelectionChange(config);
+        });
+    });
+
     cabinetCodeInput.addEventListener("input", () => {
       let cabinetValid = false;
 
@@ -46356,11 +47052,18 @@ ${body}
         collaboratorLevel1CodeInput.value !==
         uppercaseCollaboratorCodes
       ) {
-        collaboratorLevel1CodeInput.value =
+      collaboratorLevel1CodeInput.value =
           uppercaseCollaboratorCodes;
       }
 
-      if (apiSessionUuid && availableCollaborators.length) {
+      const collaboratorCodesWithinLimit = validateCollaboratorCodeLength(
+        collaboratorLevel1CodeInput,
+        collaboratorLevel1ValidationHelp
+      );
+
+      if (!collaboratorCodesWithinLimit) {
+        // La validation de longueur affiche déjà le message et l’état rouge.
+      } else if (apiSessionUuid && availableCollaborators.length) {
         const valid = validateMultipleCollaboratorInput(
           collaboratorLevel1CodeInput,
           collaboratorLevel1ValidationHelp,
@@ -46380,7 +47083,7 @@ ${body}
         collaboratorLevel1ValidationHelp.className =
           "field-help api-validation-help";
         collaboratorLevel1ValidationHelp.textContent =
-          "Facultatif — saisissez un ou plusieurs codes collaborateurs.";
+          "Facultatif — saisissez un ou plusieurs codes collaborateurs (10 caractères maximum par code).";
       }
 
       saveFolderGeneratorPreferences();
@@ -46403,7 +47106,14 @@ ${body}
           uppercaseCollaboratorCodes;
       }
 
-      if (apiSessionUuid && availableCollaborators.length) {
+      const collaboratorCodesWithinLimit = validateCollaboratorCodeLength(
+        collaboratorLevel2CodeInput,
+        collaboratorLevel2ValidationHelp
+      );
+
+      if (!collaboratorCodesWithinLimit) {
+        // La validation de longueur affiche déjà le message et l’état rouge.
+      } else if (apiSessionUuid && availableCollaborators.length) {
         const valid = validateMultipleCollaboratorInput(
           collaboratorLevel2CodeInput,
           collaboratorLevel2ValidationHelp,
@@ -46423,7 +47133,7 @@ ${body}
         collaboratorLevel2ValidationHelp.className =
           "field-help api-validation-help";
         collaboratorLevel2ValidationHelp.textContent =
-          "Facultatif — saisissez un ou plusieurs codes collaborateurs.";
+          "Facultatif — saisissez un ou plusieurs codes collaborateurs (10 caractères maximum par code).";
       }
 
       saveFolderGeneratorPreferences();
