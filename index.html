@@ -460,14 +460,71 @@
     .api-connect-actions {
       display: flex;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: space-between;
       gap: 10px;
       flex-wrap: wrap;
       margin-top: 14px;
     }
 
     .api-connect-actions.connected {
-      justify-content: flex-end;
+      justify-content: space-between;
+    }
+
+    .api-connect-left,
+    .api-connect-right {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .api-connect-left { justify-content: flex-start; min-width: 0; }
+    .api-connect-right { justify-content: flex-end; margin-left: auto; }
+    @media (max-width: 900px) {
+      .api-connect-left,
+      .api-connect-right { width: 100%; }
+      .api-connect-right { justify-content: flex-start; margin-left: 0; }
+    }
+
+    .api-session-tools {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      max-width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #dbe3ef;
+      border-radius: 8px;
+      background: #fff;
+      color: #334155;
+      font-size: 12px;
+    }
+    .api-session-tools[hidden] { display: none !important; }
+    .api-session-tools code {
+      max-width: min(420px, 50vw);
+      overflow-wrap: anywhere;
+      color: #1e3a8a;
+      font: 600 12px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    .api-session-tool-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      padding: 6px 10px;
+      border: 1px solid #bfdbfe;
+      border-radius: 7px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .api-session-tool-button:hover,
+    .api-session-tool-button:focus-visible {
+      outline: none;
+      border-color: #2563eb;
+      background: #dbeafe;
     }
 
     .api-message {
@@ -7134,6 +7191,490 @@
       color: #64748b;
     }
 
+    /* Onglet GED : arborescence des rubriques et documents du dossier. */
+    .folder-editor-ged-layout {
+      display: grid;
+      grid-template-columns: minmax(220px, 25%) minmax(0, 1fr);
+      min-height: 360px;
+      border: 1px solid #dbe3ef;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .folder-editor-ged-sidebar {
+      min-width: 0;
+      padding: 14px 10px;
+      border-right: 1px solid #dbe3ef;
+      background: #f8fafc;
+      overflow: auto;
+    }
+    .folder-editor-ged-tree-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 0 4px 10px;
+    }
+    .folder-editor-ged-tree-title {
+      margin: 0 4px;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .folder-editor-ged-tree-toggle {
+      flex: 0 0 auto;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      padding: 5px 8px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .folder-editor-ged-tree-toggle:hover { background: #dbeafe; }
+    .folder-editor-ged-tree,
+    .folder-editor-ged-tree ul {
+      display: grid;
+      gap: 3px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .folder-editor-ged-tree ul {
+      margin: 3px 0 3px 15px;
+      padding-left: 8px;
+      border-left: 1px solid #cbd5e1;
+    }
+    .folder-editor-ged-tree-button {
+      display: flex;
+      width: 100%;
+      min-width: 0;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      padding: 7px 8px;
+      background: transparent;
+      color: #334155;
+      font: inherit;
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .folder-editor-ged-tree-button:hover {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+    .folder-editor-ged-tree-button.active {
+      border-color: #bfdbfe;
+      background: #dbeafe;
+      color: #1e40af;
+      font-weight: 800;
+    }
+    .folder-editor-ged-tree-label {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .folder-editor-ged-count {
+      flex: 0 0 auto;
+      border-radius: 999px;
+      padding: 2px 7px;
+      background: #e2e8f0;
+      color: #475569;
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .folder-editor-ged-tree-button.active .folder-editor-ged-count {
+      background: #fff;
+      color: #1d4ed8;
+    }
+    .folder-editor-ged-main { min-width: 0; padding: 14px; }
+    .folder-editor-ged-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .folder-editor-ged-breadcrumb {
+      min-width: 0;
+      overflow: hidden;
+      color: #475569;
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .folder-editor-ged-filters { display: flex; flex: 0 0 auto; gap: 8px; }
+    .folder-editor-ged-filters input,
+    .folder-editor-ged-filters select {
+      min-width: 150px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      padding: 8px 10px;
+      background: #fff;
+      color: #1f2937;
+      font: inherit;
+      font-size: 12px;
+    }
+    .folder-editor-ged-filters input.is-active-filter,
+    .folder-editor-ged-filters select.is-active-filter,
+    .folder-editor-ged-column-filter.is-active-filter {
+      border-color: #2563eb;
+      background-color: #dbeafe;
+      color: #1e40af;
+      font-weight: 800;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, .16);
+    }
+    .folder-editor-ged-reset-filters-button {
+      min-height: 36px;
+      padding: 7px 10px;
+      border: 1px solid #fca5a5;
+      border-radius: 7px;
+      background: #fff1f2;
+      color: #b91c1c;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .folder-editor-ged-reset-filters-button:hover:not(:disabled) {
+      border-color: #dc2626;
+      background: #dc2626;
+      color: #fff;
+    }
+    .folder-editor-ged-reset-filters-button:disabled { opacity: .5; cursor: not-allowed; }
+    .folder-editor-ged-filters select.folder-editor-ged-exercise-filter {
+      min-width: 170px;
+      border: 2px solid #2563eb;
+      background-color: #eff6ff;
+      color: #1d4ed8;
+      font-weight: 800;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+    .folder-editor-ged-filters select.folder-editor-ged-exercise-filter:hover,
+    .folder-editor-ged-filters select.folder-editor-ged-exercise-filter:focus-visible {
+      border-color: #1d4ed8;
+      background-color: #dbeafe;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, .2);
+    }
+    .folder-editor-ged-upload-button {
+      flex: 0 0 auto;
+      min-height: 36px;
+      border: 1px solid #15803d;
+      border-radius: 7px;
+      padding: 7px 11px;
+      background: #16a34a;
+      color: #fff;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .folder-editor-ged-upload-button:hover:not(:disabled) { background: #15803d; }
+    .folder-editor-ged-upload-button:disabled { opacity: .55; cursor: not-allowed; }
+    .folder-editor-ged-table-wrap {
+      width: 100%;
+      overflow: auto;
+      border: 1px solid #dbe3ef;
+      border-radius: 8px;
+    }
+    .folder-editor-ged-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid #dbe3ef;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #475569;
+      font-size: 12px;
+    }
+    .folder-editor-ged-pagination-size,
+    .folder-editor-ged-pagination-nav {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .folder-editor-ged-pagination-size select,
+    .folder-editor-ged-pagination button {
+      min-height: 32px;
+      padding: 5px 9px;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      background: #fff;
+      color: #1d4ed8;
+      font: inherit;
+    }
+    .folder-editor-ged-pagination button { cursor: pointer; }
+    .folder-editor-ged-pagination button:hover:not(:disabled) { background: #eff6ff; }
+    .folder-editor-ged-pagination button:disabled { opacity: .45; cursor: not-allowed; }
+    .folder-editor-ged-pagination-status { min-width: 125px; text-align: center; }
+    .folder-editor-ged-table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .folder-editor-ged-table th,
+    .folder-editor-ged-table td {
+      padding: 10px 11px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      vertical-align: middle;
+    }
+    .folder-editor-ged-table th {
+      position: sticky;
+      top: 0;
+      background: #eaf0f6;
+      color: #334155;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+      vertical-align: top;
+    }
+    .folder-editor-ged-column-head { display: grid; gap: 6px; min-width: 82px; }
+    .folder-editor-ged-sort-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-weight: 800;
+      text-align: left;
+      cursor: pointer;
+    }
+    .folder-editor-ged-sort-button:hover,
+    .folder-editor-ged-sort-button:focus-visible { color: #1d4ed8; outline: none; }
+    .folder-editor-ged-sort-indicator { color: #2563eb; font-size: 13px; }
+    .folder-editor-ged-column-filter {
+      box-sizing: border-box;
+      width: 100%;
+      min-width: 82px;
+      min-height: 27px;
+      padding: 4px 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      background: #fff;
+      color: #334155;
+      font: inherit;
+      font-size: 10px;
+      font-weight: 500;
+    }
+    .folder-editor-ged-column-filter:focus { border-color: #2563eb; outline: 2px solid rgba(37, 99, 235, .15); }
+    .folder-editor-ged-table tbody tr:hover { background: #f8fafc; }
+    .folder-editor-ged-document-name {
+      color: #1f2937;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+    .folder-editor-ged-document-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .folder-editor-ged-preview-button {
+      display: inline-grid;
+      flex: 0 0 auto;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      border: 1px solid #2563eb;
+      border-radius: 7px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      cursor: pointer;
+    }
+    .folder-editor-ged-preview-button:hover,
+    .folder-editor-ged-preview-button:focus-visible {
+      outline: none;
+      background: #2563eb;
+      color: #fff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .18);
+    }
+    .folder-editor-ged-download-button {
+      display: inline-grid;
+      flex: 0 0 auto;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      border: 1px solid #0f766e;
+      border-radius: 7px;
+      background: #ecfdf5;
+      color: #047857;
+      cursor: pointer;
+    }
+    .folder-editor-ged-download-button:hover:not(:disabled),
+    .folder-editor-ged-download-button:focus-visible {
+      outline: none;
+      background: #047857;
+      color: #fff;
+      box-shadow: 0 0 0 3px rgba(4, 120, 87, .18);
+    }
+    .folder-editor-ged-download-button:disabled { opacity: .55; cursor: wait; }
+    .folder-editor-ged-preview-backdrop {
+      position: fixed;
+      z-index: 100000;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(15, 23, 42, .64);
+    }
+    .folder-editor-ged-preview-dialog {
+      display: flex;
+      width: min(1200px, 96vw);
+      height: min(850px, 92vh);
+      min-height: 300px;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, .35);
+    }
+    .folder-editor-ged-preview-dialog:fullscreen,
+    .folder-editor-ged-preview-dialog.is-fullscreen {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      max-width: none;
+      max-height: none;
+      border: 0;
+      border-radius: 0;
+    }
+    .folder-editor-ged-preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .folder-editor-ged-preview-title {
+      min-width: 0;
+      overflow: hidden;
+      color: #1f2937;
+      font-size: 15px;
+      font-weight: 800;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .folder-editor-ged-preview-close {
+      flex: 0 0 auto;
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 8px;
+      background: #f1f5f9;
+      color: #1f2937;
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .folder-editor-ged-preview-header-actions {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 8px;
+    }
+    .folder-editor-ged-preview-fullscreen {
+      min-height: 36px;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 0 11px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .folder-editor-ged-preview-fullscreen:hover { background: #dbeafe; }
+    .folder-editor-ged-preview-content {
+      display: grid;
+      flex: 1;
+      min-height: 0;
+      place-items: center;
+      background: #f1f5f9;
+    }
+    .folder-editor-ged-preview-frame {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #fff;
+    }
+    .folder-editor-ged-preview-message {
+      max-width: 680px;
+      padding: 24px;
+      color: #475569;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .folder-editor-ged-delete-button {
+      display: inline-grid;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      border: 1px solid #fecaca;
+      border-radius: 7px;
+      background: #fff1f2;
+      color: #b91c1c;
+      font: inherit;
+      font-size: 19px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .folder-editor-ged-delete-button:hover:not(:disabled) {
+      border-color: #dc2626;
+      background: #dc2626;
+      color: #fff;
+    }
+    .folder-editor-ged-delete-button:disabled { opacity: .55; cursor: wait; }
+    .folder-editor-ged-delete-cell { width: 48px; text-align: center !important; }
+    .folder-editor-ged-muted { color: #64748b; }
+    .folder-editor-ged-retry {
+      display: block;
+      margin: 12px auto 0;
+      border: 1px solid #2563eb;
+      border-radius: 7px;
+      padding: 8px 14px;
+      background: #2563eb;
+      color: #fff;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .folder-editor-ged-retry:hover { background: #1d4ed8; }
+    @media (max-width: 900px) {
+      .folder-editor-ged-layout { grid-template-columns: minmax(0, 1fr); }
+      .folder-editor-ged-sidebar {
+        max-height: 220px;
+        border-right: 0;
+        border-bottom: 1px solid #dbe3ef;
+      }
+      .folder-editor-ged-toolbar { align-items: stretch; flex-direction: column; }
+      .folder-editor-ged-filters { flex-wrap: wrap; }
+    }
 
     /* Web-users i-Suite : grille en lecture seule proche de l'écran i-Suite. */
     .folder-editor-web-users-block {
@@ -7436,6 +7977,52 @@
     .folder-editor-isuite-combined-table td:nth-child(2) {
       width: 220px;
       text-align: left;
+    }
+
+    .folder-editor-isuite-module-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      padding: 4px 12px;
+      border: 1px solid #1d4ed8;
+      border-radius: 8px;
+      background: #1d4ed8;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: .15s ease;
+    }
+
+    .folder-editor-isuite-module-link:hover,
+    .folder-editor-isuite-module-link:focus-visible {
+      border-color: #1e3a8a;
+      background: #1e40af;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .22);
+      text-decoration: none;
+    }
+
+    .folder-editor-isuite-module-unavailable {
+      cursor: default;
+    }
+
+    .folder-editor-isuite-module-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      padding: 4px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #f1f5f9;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: not-allowed;
     }
 
     .folder-editor-isuite-combined-table
@@ -9214,9 +9801,19 @@
               </div>
 
               <div class="api-connect-actions">
-                <button class="primary-button" id="connectApiButton" type="button">
-                  Se connecter
-                </button>
+                <div class="api-connect-left" id="apiConnectionLeft">
+                  <div class="api-session-tools" id="apiSessionTools" hidden>
+                    <span>UUID :</span>
+                    <code id="apiSessionUuidDisplay"></code>
+                    <button class="api-session-tool-button" id="copyApiSessionUuidButton" type="button">Copier</button>
+                    <a class="api-session-tool-button" id="apiSwaggerLink" href="#" target="_blank" rel="noopener noreferrer">Swagger ↗</a>
+                  </div>
+                </div>
+                <div class="api-connect-right" id="apiConnectionRight">
+                  <button class="primary-button" id="connectApiButton" type="button">
+                    Se connecter
+                  </button>
+                </div>
               </div>
 
               <div class="api-message" id="apiMessage"></div>
@@ -13533,6 +14130,12 @@
     const apiStatus = document.getElementById("apiStatus");
     const apiHeaderActions = document.querySelector(".api-header-actions");
     const apiConnectActions = document.querySelector(".api-connect-actions");
+    const apiConnectionLeft = document.getElementById("apiConnectionLeft");
+    const apiConnectionRight = document.getElementById("apiConnectionRight");
+    const apiSessionTools = document.getElementById("apiSessionTools");
+    const apiSessionUuidDisplay = document.getElementById("apiSessionUuidDisplay");
+    const copyApiSessionUuidButton = document.getElementById("copyApiSessionUuidButton");
+    const apiSwaggerLink = document.getElementById("apiSwaggerLink");
     const connectApiButton = document.getElementById("connectApiButton");
     const disconnectApiButton = document.getElementById("disconnectApiButton");
     const apiLoginPanel = document.getElementById("apiLoginPanel");
@@ -21601,6 +22204,17 @@ ${body}
       updateCustomApiUrlVisibility();
 
       disconnectApiButton.hidden = !connected;
+      apiSessionTools.hidden = !connected;
+      apiSessionUuidDisplay.textContent = connected ? apiSessionUuid : "";
+      if (connected) {
+        try {
+          apiSwaggerLink.href = `${getSelectedApiBaseUrl().replace(/\/+$/, "")}/swagger`;
+        } catch {
+          apiSwaggerLink.href = "#";
+        }
+      } else {
+        apiSwaggerLink.href = "#";
+      }
       connectApiButton.hidden = !connected && !apiEnvironmentInput.value;
       connectApiButton.textContent = connected
         ? "Reconnecter"
@@ -21608,11 +22222,12 @@ ${body}
       apiConnectActions.classList.toggle("connected", connected);
 
       if (connected) {
-        apiConnectActions.insertBefore(apiStatus, connectApiButton);
-        apiConnectActions.insertBefore(sandboxModeControl, connectApiButton);
-        apiConnectActions.insertBefore(disconnectApiButton, connectApiButton);
+        apiConnectionLeft.append(apiStatus, apiSessionTools);
+        apiConnectionRight.append(sandboxModeControl, disconnectApiButton, connectApiButton);
       } else {
         apiHeaderActions.append(apiStatus, sandboxModeControl, disconnectApiButton);
+        apiConnectionLeft.append(apiSessionTools);
+        apiConnectionRight.append(connectApiButton);
       }
 
       updateSandboxModeUiState();
@@ -27988,6 +28603,44 @@ ${body}
           ) === tileLabel
         ) || null
       );
+    }
+
+    function getISuiteModuleCommand(tile) {
+      const label = normalizeISuiteOptionMatchValue(tile?.Libelle)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+      const commands = {
+        "I-DOSSIER": "idossier",
+        "I-DEPOT": "idepot",
+        "I-GED": "iged",
+        "I-ADMIN": "iadmin",
+        "COMPTABILITE ENTREPRISE": "comptaentreprise",
+        "I-COMPTES": "icomptes",
+        "I-BANQUE": "ibanque",
+        "I-FACTURE": "ifacture"
+      };
+
+      return commands[label] || "";
+    }
+
+    function getISuiteModuleUrl(tile) {
+      const command = getISuiteModuleCommand(tile);
+      if (!command || !apiSessionUuid) return "";
+
+      try {
+        const baseUrl = new URL(getSelectedApiBaseUrl());
+        baseUrl.pathname = baseUrl.pathname
+          .replace(/\/api\/?$/i, "")
+          .replace(/\/+$/, "") + "/isuiteexpert/";
+        baseUrl.search = "";
+        baseUrl.hash = "";
+        baseUrl.searchParams.set("UUID", apiSessionUuid);
+        baseUrl.searchParams.set("CMD", command);
+        return baseUrl.toString();
+      } catch {
+        return "";
+      }
     }
 
     async function refreshFolderOptionsWebFromSession(
@@ -40417,11 +41070,27 @@ ${body}
         const th =
           document.createElement("th");
 
-        th.textContent =
-          tile?.Libelle || "—";
-
-        th.title =
-          tile?.Libelle || "";
+        const label = String(tile?.Libelle || "—");
+        const href = getISuiteModuleUrl(tile);
+        if (href) {
+          const link = document.createElement("a");
+          link.className = "folder-editor-isuite-module-link";
+          link.href = href;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = label;
+          link.title = `Ouvrir ${label} dans i-Suite`;
+          th.appendChild(link);
+        } else {
+          th.classList.add("folder-editor-isuite-module-unavailable");
+          th.title = getISuiteModuleCommand(tile)
+            ? "Une connexion API est nécessaire pour ouvrir ce module."
+            : "Aucun paramètre CMD documenté pour cette tuile.";
+          const unavailableLabel = document.createElement("span");
+          unavailableLabel.className = "folder-editor-isuite-module-label";
+          unavailableLabel.textContent = label;
+          th.appendChild(unavailableLabel);
+        }
 
         combinedHeadRow.appendChild(th);
       });
@@ -40741,6 +41410,1000 @@ ${body}
         : "Aucun dossier suivant";
     }
 
+    function closeFolderGedPreviewOverlays() {
+      document.querySelectorAll(".folder-editor-ged-preview-backdrop").forEach(overlay => overlay.gedClose?.());
+    }
+
+    function buildFolderEditorGedSection(folder) {
+      const section = document.createElement("section");
+      section.className = "folder-editor-section folder-editor-isuite-section";
+      section.dataset.folderSection = "GED";
+      section.setAttribute("aria-label", "Documents GED du dossier");
+      const state = { status: "idle", documents: [], exercises: [], exerciseError: "", rubricPayload: null, rubricError: "", actionMessage: null, treeExpanded: false, selectedRubric: "__initial", exercise: "__all", search: "", columnFilters: { name: "", creationAge: "all", modifiedAge: "all", author: "all", type: "all", size: "all" }, sortColumn: "creation", sortDirection: "desc", page: 1, pageSize: 10, nodes: new Map(), root: null };
+      section.gedState = state;
+
+      const showStatus = (message, isError = false) => {
+        section.replaceChildren();
+        const status = document.createElement("div");
+        status.className = isError ? "folder-editor-isuite-warning" : "folder-editor-isuite-empty";
+        status.textContent = message;
+        section.appendChild(status);
+      };
+      const makeNode = (key, label, parent, path = []) => {
+        let node = state.nodes.get(key);
+        if (!node) {
+          node = { key, label, parent, path, children: [], documents: [] };
+          state.nodes.set(key, node);
+          if (parent) parent.children.push(node);
+        }
+        return node;
+      };
+      const collectRubricItems = payload => {
+        const found = [];
+        const visited = new Set();
+        const visit = (value, depth = 0) => {
+          if (!value || typeof value !== "object" || depth > 12 || visited.has(value)) return;
+          visited.add(value);
+          if (Array.isArray(value)) {
+            value.forEach(item => visit(item, depth + 1));
+            return;
+          }
+          const id = value.Id ?? value.id ?? value.IdArborescence ?? value.idArborescence;
+          const label = value.Libelle ?? value.libelle ?? value.Libellé ?? value.Label ?? value.label;
+          if (id !== undefined && id !== null && label !== undefined && label !== null && String(label).trim()) found.push(value);
+          Object.values(value).forEach(item => visit(item, depth + 1));
+        };
+        visit(payload);
+        return found;
+      };
+      const initializeTree = () => {
+        state.nodes.clear();
+        state.root = makeNode("__all", folder?.Nom || folder?.Code || "Dossier", null);
+        const rubricItems = collectRubricItems(state.rubricPayload);
+        const rubricNodes = new Map();
+        const rubricPath = item => String(item?.LibelleComplet || item?.libelleComplet || "")
+          .split(/[\\/]+/).map(part => part.trim()).filter(Boolean)
+          .filter(part => part.toLocaleLowerCase("fr") !== "racine");
+        const rubricLabel = item => String(item?.Libelle ?? item?.libelle ?? item?.Libellé ?? item?.Label ?? item?.label ?? "Rubrique sans nom").trim();
+        rubricItems.forEach(item => {
+          const id = item.Id ?? item.id ?? item.IdArborescence ?? item.idArborescence;
+          const key = `rubric:${id}`;
+          const label = rubricLabel(item);
+          if (label.toLocaleLowerCase("fr") === "racine") {
+            rubricNodes.set(String(id), state.root);
+            return;
+          }
+          const path = rubricPath(item);
+          if (!path.length || path.at(-1) !== label) path.push(label);
+          rubricNodes.set(String(id), makeNode(key, label, null, path));
+        });
+        rubricItems.forEach(item => {
+          const id = item.Id ?? item.id ?? item.IdArborescence ?? item.idArborescence;
+          const node = rubricNodes.get(String(id));
+          if (!node || node === state.root) return;
+          const parentId = item.IdArborescenceParent ?? item.idArborescenceParent ?? item.IdParentArborescence ??
+            item.IdParent ?? item.idParent ?? item.ParentId ?? item.parentId ?? item.ArborescenceParent?.Id ?? item.Parent?.Id;
+          let parent = parentId !== undefined && parentId !== null ? rubricNodes.get(String(parentId)) : null;
+          if (!parent) {
+            const path = node.path || [];
+            const parentPath = path.slice(0, -1).join("\\");
+            if (parentPath) parent = [...state.nodes.values()].find(candidate => candidate !== node && candidate.path?.join("\\") === parentPath) || null;
+          }
+          if (!parent) parent = state.root;
+          let ancestor = parent;
+          const ancestorGuard = new Set();
+          while (ancestor && !ancestorGuard.has(ancestor)) {
+            if (ancestor === node) {
+              parent = state.root;
+              break;
+            }
+            ancestorGuard.add(ancestor);
+            ancestor = ancestor.parent;
+          }
+          node.parent = parent;
+          if (!parent.children.includes(node)) parent.children.push(node);
+        });
+
+        for (const item of state.documents) {
+          const rubric = item?.Arborescence || {};
+          const path = String(rubric.LibelleComplet || "").split(/[\\/]+/)
+            .map(part => part.trim()).filter(Boolean)
+            .filter(part => part.toLocaleLowerCase("fr") !== "racine");
+          const label = String(rubric.Libelle || "Rubrique sans nom").trim();
+          if (!path.length || path.at(-1) !== label) path.push(label);
+          const nodeKeys = ["__all"];
+          const id = rubric.Id ?? rubric.id;
+          let leaf = id !== undefined && id !== null ? state.nodes.get(`rubric:${id}`) : null;
+          if (!leaf) {
+            let parent = state.root;
+            path.forEach((part, index) => {
+              const isLeaf = index === path.length - 1;
+              const key = isLeaf && id !== undefined && id !== null
+                ? `rubric:${id}`
+                : `path:${path.slice(0, index + 1).join("\\")}`;
+              parent = makeNode(key, part, parent, path.slice(0, index + 1));
+            });
+            leaf = parent;
+          }
+          let cursor = leaf;
+          while (cursor && cursor !== state.root) {
+            nodeKeys.push(cursor.key);
+            cursor = cursor.parent;
+          }
+          item.__gedNodeKeys = nodeKeys;
+          item.__gedPath = leaf.path || path;
+          // Un document GED appartient à sa rubrique terminale uniquement.
+          // Les parents gardent leur place dans l'arborescence, sans compter
+          // ni afficher les documents de leurs sous-rubriques.
+          leaf.documents.push(item);
+        }
+        if (state.selectedRubric === "__initial") {
+          const firstPopulatedRubric = [...state.nodes.values()].find(node => node !== state.root && node.documents.length);
+          state.selectedRubric = firstPopulatedRubric ? firstPopulatedRubric.key : "__all";
+        }
+      };
+      const formatSize = value => {
+        const bytes = Number(value);
+        return Number.isFinite(bytes) && bytes >= 0
+          ? `${(bytes / 1024).toLocaleString("fr-FR", { maximumFractionDigits: 2 })} Ko`
+          : "—";
+      };
+      const authorName = item => {
+        const author = item?.Document?.Collaborateur || {};
+        return [author.Prenom, author.Nom].filter(Boolean).join(" ") || "—";
+      };
+      const openDocumentPreview = async item => {
+        document.querySelectorAll(".folder-editor-ged-preview-backdrop").forEach(existing => existing.gedClose?.());
+        const overlay = document.createElement("div");
+        overlay.className = "folder-editor-ged-preview-backdrop";
+        overlay.setAttribute("role", "presentation");
+        const dialog = document.createElement("div");
+        dialog.className = "folder-editor-ged-preview-dialog";
+        dialog.setAttribute("role", "dialog");
+        dialog.setAttribute("aria-modal", "true");
+        const header = document.createElement("div");
+        header.className = "folder-editor-ged-preview-header";
+        const title = document.createElement("div");
+        title.className = "folder-editor-ged-preview-title";
+        title.textContent = item?.Document?.Nom || "Aperçu du document";
+        const headerActions = document.createElement("div");
+        headerActions.className = "folder-editor-ged-preview-header-actions";
+        const fullscreen = document.createElement("button");
+        fullscreen.type = "button";
+        fullscreen.className = "folder-editor-ged-preview-fullscreen";
+        fullscreen.textContent = "⛶ Plein écran";
+        fullscreen.setAttribute("aria-label", "Afficher le document en plein écran");
+        const close = document.createElement("button");
+        close.type = "button";
+        close.className = "folder-editor-ged-preview-close";
+        close.setAttribute("aria-label", "Fermer l’aperçu");
+        close.textContent = "×";
+        headerActions.append(fullscreen, close);
+        header.append(title, headerActions);
+        const content = document.createElement("div");
+        content.className = "folder-editor-ged-preview-content";
+        const message = document.createElement("div");
+        message.className = "folder-editor-ged-preview-message";
+        message.textContent = "Chargement de l’aperçu…";
+        content.appendChild(message);
+        dialog.append(header, content);
+        overlay.appendChild(dialog);
+        let objectUrl = "";
+        const syncFullscreenButton = () => {
+          const isFullscreen = document.fullscreenElement === dialog || dialog.classList.contains("is-fullscreen");
+          fullscreen.textContent = isFullscreen ? "⛶ Quitter le plein écran" : "⛶ Plein écran";
+          fullscreen.setAttribute("aria-label", isFullscreen ? "Quitter le plein écran" : "Afficher le document en plein écran");
+        };
+        const onFullscreenChange = () => syncFullscreenButton();
+        const onKeyDown = event => {
+          if (event.key === "Escape") {
+            if (dialog.classList.contains("is-fullscreen")) {
+              dialog.classList.remove("is-fullscreen");
+              syncFullscreenButton();
+              event.preventDefault();
+              event.stopPropagation();
+              return;
+            }
+            if (document.fullscreenElement === dialog) return;
+            event.preventDefault();
+            event.stopPropagation();
+            overlay.gedClose();
+          }
+        };
+        overlay.gedClose = () => {
+          document.removeEventListener("keydown", onKeyDown, true);
+          document.removeEventListener("fullscreenchange", onFullscreenChange);
+          if (document.fullscreenElement === dialog) document.exitFullscreen?.().catch(() => {});
+          if (objectUrl) URL.revokeObjectURL(objectUrl);
+          overlay.remove();
+        };
+        fullscreen.addEventListener("click", async () => {
+          try {
+            if (document.fullscreenElement === dialog) {
+              await document.exitFullscreen();
+            } else if (dialog.requestFullscreen) {
+              await dialog.requestFullscreen();
+            } else {
+              dialog.classList.toggle("is-fullscreen");
+              syncFullscreenButton();
+            }
+          } catch {
+            dialog.classList.toggle("is-fullscreen");
+            syncFullscreenButton();
+          }
+        });
+        close.addEventListener("click", overlay.gedClose);
+        overlay.addEventListener("click", event => {
+          if (event.target === overlay) overlay.gedClose();
+        });
+        document.addEventListener("keydown", onKeyDown, true);
+        document.addEventListener("fullscreenchange", onFullscreenChange);
+        document.body.appendChild(overlay);
+        close.focus();
+
+        try {
+          const baseUrl = getSelectedApiBaseUrl();
+          if (!baseUrl || !apiSessionUuid) throw new Error("La connexion API n’est pas disponible.");
+          await selectFolderSessionForData(baseUrl, apiSessionUuid, folder?.Code);
+          const documentId = item?.Id ?? item?.id;
+          if (documentId === undefined || documentId === null || documentId === "") {
+            throw new Error("L’identifiant du document GED est absent.");
+          }
+          const endpoint = `/v1/ged/documents/${encodeURIComponent(documentId)}/apercu`;
+          const response = await fetch(`${baseUrl}${endpoint}`, {
+            method: "GET",
+            headers: { "Accept": "application/pdf, image/*, text/*, application/octet-stream, */*", "UUID": apiSessionUuid }
+          });
+          const blob = await response.blob();
+          if (!overlay.isConnected) return;
+          if (!response.ok) {
+            const detail = (await blob.text()).trim().slice(0, 350);
+            throw new Error(detail ? `${endpoint} : erreur ${response.status} — ${detail}` : `${endpoint} : erreur ${response.status}`);
+          }
+          let mimeType = String(response.headers.get("Content-Type") || blob.type || "").split(";")[0].trim().toLowerCase();
+          if (!mimeType || mimeType === "application/octet-stream") {
+            const signature = await blob.slice(0, 5).text();
+            if (signature.startsWith("%PDF-")) mimeType = "application/pdf";
+          }
+          const previewBlob = mimeType ? new Blob([blob], { type: mimeType }) : blob;
+          objectUrl = URL.createObjectURL(previewBlob);
+          if (overlay.isConnected) overlay.dataset.objectUrl = objectUrl;
+          content.replaceChildren();
+          const frame = document.createElement("iframe");
+          frame.className = "folder-editor-ged-preview-frame";
+          frame.title = `Aperçu de ${item?.Document?.Nom || "document GED"}`;
+          if (mimeType === "text/html" || mimeType === "image/svg+xml") frame.setAttribute("sandbox", "allow-same-origin");
+          frame.src = objectUrl;
+          content.appendChild(frame);
+        } catch (error) {
+          if (!overlay.isConnected) return;
+          content.replaceChildren();
+          const errorMessage = document.createElement("div");
+          errorMessage.className = "folder-editor-ged-preview-message";
+          errorMessage.textContent = error?.message || "Impossible de charger l’aperçu du document.";
+          content.appendChild(errorMessage);
+        }
+      };
+      const deleteDocument = async (item, button) => {
+        const documentId = item?.Id ?? item?.id;
+        if (documentId === undefined || documentId === null || documentId === "") {
+          state.actionMessage = { type: "error", text: "L’identifiant du document GED est absent." };
+          render();
+          return;
+        }
+        const documentName = item?.Document?.Nom || `document ${documentId}`;
+        if (!window.confirm(`Confirmez-vous la suppression du document « ${documentName} » ?`)) return;
+        button.disabled = true;
+        button.textContent = "…";
+        try {
+          const baseUrl = getSelectedApiBaseUrl();
+          if (!baseUrl || !apiSessionUuid) throw new Error("La connexion API n’est pas disponible.");
+          await selectFolderSessionForData(baseUrl, apiSessionUuid, folder?.Code);
+          const endpoint = `/v1/ged/documents?ids=${encodeURIComponent(documentId)}`;
+          const response = await fetch(`${baseUrl}${endpoint}`, {
+            method: "DELETE",
+            headers: { "Accept": "application/json, text/plain, */*", "UUID": apiSessionUuid }
+          });
+          const responseText = await response.text();
+          if (!response.ok) {
+            const detail = responseText.trim().slice(0, 350);
+            throw new Error(detail ? `${endpoint} : erreur ${response.status} — ${detail}` : `${endpoint} : erreur ${response.status}`);
+          }
+          const selectedRubric = state.selectedRubric;
+          state.documents = state.documents.filter(candidate => String(candidate?.Id ?? candidate?.id) !== String(documentId));
+          const selectedStillContainsDocuments = state.documents.some(candidate =>
+            candidate.__gedNodeKeys?.includes(selectedRubric)
+          );
+          state.selectedRubric = selectedStillContainsDocuments ? selectedRubric : "__all";
+          state.actionMessage = { type: "success", text: `Le document « ${documentName} » a été supprimé.` };
+          initializeTree();
+          render();
+        } catch (error) {
+          state.actionMessage = { type: "error", text: error?.message || "Impossible de supprimer le document GED." };
+          render();
+        }
+      };
+      const downloadDocument = async (item, button) => {
+        const documentId = item?.Id ?? item?.id;
+        if (documentId === undefined || documentId === null || documentId === "") {
+          state.actionMessage = { type: "error", text: "L’identifiant du document GED est absent." };
+          render();
+          return;
+        }
+        button.disabled = true;
+        button.title = "Téléchargement en cours…";
+        try {
+          const baseUrl = getSelectedApiBaseUrl();
+          if (!baseUrl || !apiSessionUuid) throw new Error("La connexion API n’est pas disponible.");
+          await selectFolderSessionForData(baseUrl, apiSessionUuid, folder?.Code);
+          const endpoint = `/v1/ged/documents/${encodeURIComponent(documentId)}/fichier`;
+          const response = await fetch(`${baseUrl}${endpoint}`, {
+            method: "GET",
+            headers: { "Accept": "application/octet-stream, */*", "UUID": apiSessionUuid }
+          });
+          const blob = await response.blob();
+          if (!response.ok) {
+            const detail = (await blob.text()).trim().slice(0, 350);
+            throw new Error(detail ? `${endpoint} : erreur ${response.status} — ${detail}` : `${endpoint} : erreur ${response.status}`);
+          }
+          const disposition = response.headers.get("Content-Disposition") || "";
+          let fileName = "";
+          const encodedName = disposition.match(/filename\*\s*=\s*UTF-8''([^;]+)/i)?.[1];
+          if (encodedName) {
+            try { fileName = decodeURIComponent(encodedName.trim().replace(/^"|"$/g, "")); } catch { fileName = ""; }
+          }
+          if (!fileName) fileName = disposition.match(/filename\s*=\s*"?([^";]+)"?/i)?.[1]?.trim() || "";
+          if (!fileName) {
+            const info = item?.Document || {};
+            const name = String(info.Nom || `document-${documentId}`);
+            const extension = String(info.Extension || "").replace(/^\./, "");
+            fileName = extension && !name.toLowerCase().endsWith(`.${extension.toLowerCase()}`)
+              ? `${name}.${extension}`
+              : name;
+          }
+          fileName = fileName.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || `document-${documentId}`;
+          const objectUrl = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = objectUrl;
+          link.download = fileName;
+          link.hidden = true;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+        } catch (error) {
+          state.actionMessage = { type: "error", text: error?.message || "Impossible de télécharger le document GED." };
+          render();
+        } finally {
+          button.disabled = false;
+          button.title = "Télécharger le document";
+        }
+      };
+      const uploadDocument = async (file, button, rubricId) => {
+        if (!file) return;
+        button.disabled = true;
+        button.textContent = "Envoi…";
+        try {
+          const baseUrl = getSelectedApiBaseUrl();
+          if (!baseUrl || !apiSessionUuid) throw new Error("La connexion API n’est pas disponible.");
+          await selectFolderSessionForData(baseUrl, apiSessionUuid, folder?.Code);
+          const formData = new FormData();
+          formData.append("file", file, file.name);
+          formData.append("idArboged", String(rubricId));
+          if (state.exercise !== "__all" && state.exercise !== "__empty") {
+            const selectedExercise = state.exercises.find(exercise => String(exercise.Code).trim() === state.exercise);
+            if (!selectedExercise) throw new Error(`L’exercice « ${state.exercise} » est introuvable dans GET /v1/exercices.`);
+            const rawEndDate = String(selectedExercise.DateFin || "").trim();
+            let dateExercice = "";
+            let dateParts = rawEndDate.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+            if (dateParts) {
+              dateExercice = `${dateParts[1]}-${dateParts[2].padStart(2, "0")}-${dateParts[3].padStart(2, "0")}`;
+            } else {
+              dateParts = rawEndDate.match(/^(\d{1,2})[/.\-](\d{1,2})[/.\-](\d{4})/);
+              if (dateParts) dateExercice = `${dateParts[3]}-${dateParts[2].padStart(2, "0")}-${dateParts[1].padStart(2, "0")}`;
+            }
+            if (!dateExercice) throw new Error(`La date de fin de l’exercice « ${state.exercise} » est absente ou invalide.`);
+            formData.append("DateExercice", dateExercice);
+          }
+          const endpoint = "/v1/ged/documents";
+          const response = await fetch(`${baseUrl}${endpoint}`, {
+            method: "POST",
+            headers: { "Accept": "text/plain, application/json, */*", "UUID": apiSessionUuid },
+            body: formData
+          });
+          const responseText = await response.text();
+          if (!response.ok) {
+            const detail = responseText.trim().slice(0, 350);
+            throw new Error(detail ? `${endpoint} : erreur ${response.status} — ${detail}` : `${endpoint} : erreur ${response.status}`);
+          }
+          state.actionMessage = { type: "success", text: `Le document « ${file.name} » a été ajouté à la rubrique sélectionnée.` };
+          await load(true);
+        } catch (error) {
+          state.actionMessage = { type: "error", text: error?.message || "Impossible d’ajouter le document GED." };
+          render();
+        } finally {
+          button.disabled = false;
+          button.textContent = "+ Ajouter un document";
+        }
+      };
+      const render = () => {
+        const currentNode = state.nodes.get(state.selectedRubric) || state.root;
+        const scoped = state.selectedRubric === "__all" ? state.documents : (currentNode?.documents || state.documents);
+        const matchesExercise = item => {
+          const code = String(item?.CodeExercice ?? "").trim();
+          if (state.exercise === "__empty") return !code;
+          return state.exercise === "__all" || code === state.exercise;
+        };
+        const countForExercise = node => {
+          const documents = node?.key === "__all" ? state.documents : (node?.documents || []);
+          return documents.filter(matchesExercise).length;
+        };
+        const cutoffDate = new Date();
+        cutoffDate.setFullYear(cutoffDate.getFullYear() - 1);
+        cutoffDate.setHours(0, 0, 0, 0);
+        const cutoffTimestamp = cutoffDate.getTime();
+        const matchesDateAge = (value, filter) => {
+          if (filter === "all") return true;
+          const timestamp = getFolderCreationDateTimestamp(value);
+          if (timestamp === null) return false;
+          return filter === "older" ? timestamp < cutoffTimestamp : timestamp >= cutoffTimestamp;
+        };
+        const matchesColumnFilters = item => {
+          const documentInfo = item?.Document || {};
+          const name = String(documentInfo.Nom || "").toLocaleLowerCase("fr");
+          const author = authorName(item).toLocaleLowerCase("fr");
+          const type = String(documentInfo.Extension || "").replace(/^\./, "").toLocaleUpperCase("fr");
+          const nameNeedle = state.columnFilters.name.trim().toLocaleLowerCase("fr");
+          if (nameNeedle && !name.includes(nameNeedle)) return false;
+          if (!matchesDateAge(documentInfo.DateCreation, state.columnFilters.creationAge)) return false;
+          if (!matchesDateAge(documentInfo.DateHeureModification, state.columnFilters.modifiedAge)) return false;
+          if (state.columnFilters.author !== "all" && author !== state.columnFilters.author.toLocaleLowerCase("fr")) return false;
+          if (state.columnFilters.type !== "all" && type !== state.columnFilters.type) return false;
+          const size = Number(documentInfo.Taille);
+          if (state.columnFilters.size !== "all") {
+            if (!Number.isFinite(size)) return false;
+            const megabyte = 1024 * 1024;
+            if (state.columnFilters.size === "over10" && size <= 10 * megabyte) return false;
+            if (state.columnFilters.size === "1to10" && (size < megabyte || size > 10 * megabyte)) return false;
+            if (state.columnFilters.size === "under1" && size >= megabyte) return false;
+          }
+          return true;
+        };
+        const needle = state.search.trim().toLocaleLowerCase("fr");
+        const filtered = scoped.filter(item => {
+          if (!matchesExercise(item)) return false;
+          if (!matchesColumnFilters(item)) return false;
+          const searchText = [item?.Document?.Nom, item?.Document?.Sujet, item?.Document?.Commentaire,
+            authorName(item), item?.Document?.Extension].join(" ").toLocaleLowerCase("fr");
+          return !needle || searchText.includes(needle);
+        });
+        const sortValue = item => {
+          const documentInfo = item?.Document || {};
+          switch (state.sortColumn) {
+            case "name": return String(documentInfo.Nom || "").toLocaleLowerCase("fr");
+            case "creation": return getFolderCreationDateTimestamp(documentInfo.DateCreation) ?? -Infinity;
+            case "modified": return getFolderCreationDateTimestamp(documentInfo.DateHeureModification) ?? -Infinity;
+            case "exercise": return String(item?.CodeExercice ?? "").toLocaleLowerCase("fr");
+            case "author": return authorName(item).toLocaleLowerCase("fr");
+            case "type": return String(documentInfo.Extension || "").toLocaleLowerCase("fr");
+            case "size": return Number(documentInfo.Taille) || 0;
+            default: return "";
+          }
+        };
+        filtered.sort((a, b) => {
+          const first = sortValue(a);
+          const second = sortValue(b);
+          const comparison = typeof first === "number" && typeof second === "number"
+            ? first - second
+            : String(first).localeCompare(String(second), "fr", { numeric: true, sensitivity: "base" });
+          return state.sortDirection === "asc" ? comparison : -comparison;
+        });
+        const pageSize = state.pageSize === "all" ? Math.max(filtered.length, 1) : Number(state.pageSize) || 20;
+        const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
+        state.page = Math.min(Math.max(1, state.page), pageCount);
+        const pageItems = state.pageSize === "all"
+          ? filtered
+          : filtered.slice((state.page - 1) * pageSize, state.page * pageSize);
+
+        section.replaceChildren();
+        if (state.rubricError) {
+          const warning = document.createElement("div");
+          warning.className = "folder-editor-isuite-warning";
+          warning.textContent = `${state.rubricError} L’arborescence affichée est construite à partir des documents retournés.`;
+          section.appendChild(warning);
+        }
+        if (state.exerciseError) {
+          const warning = document.createElement("div");
+          warning.className = "folder-editor-isuite-warning";
+          warning.textContent = state.exerciseError;
+          section.appendChild(warning);
+        }
+        if (state.actionMessage) {
+          const message = document.createElement("div");
+          message.className = state.actionMessage.type === "error"
+            ? "folder-editor-isuite-warning"
+            : "folder-editor-isuite-info";
+          message.textContent = state.actionMessage.text;
+          section.appendChild(message);
+        }
+        const layout = document.createElement("div");
+        layout.className = "folder-editor-ged-layout";
+        const sidebar = document.createElement("aside");
+        sidebar.className = "folder-editor-ged-sidebar";
+        const treeHeader = document.createElement("div");
+        treeHeader.className = "folder-editor-ged-tree-header";
+        const treeTitle = document.createElement("div");
+        treeTitle.className = "folder-editor-ged-tree-title";
+        treeTitle.textContent = "Rubriques";
+        const treeToggle = document.createElement("button");
+        treeToggle.type = "button";
+        treeToggle.className = "folder-editor-ged-tree-toggle";
+        treeToggle.textContent = state.treeExpanded ? "Replier tout" : "Déplier tout";
+        treeToggle.setAttribute("aria-expanded", state.treeExpanded ? "true" : "false");
+        treeToggle.addEventListener("click", () => {
+          state.treeExpanded = !state.treeExpanded;
+          if (!state.treeExpanded && state.selectedRubric !== "__all" && countForExercise(state.nodes.get(state.selectedRubric)) === 0) {
+            const firstPopulatedRubric = [...state.nodes.values()].find(node => node !== state.root && countForExercise(node) > 0);
+            if (firstPopulatedRubric) state.selectedRubric = firstPopulatedRubric.key;
+          }
+          state.page = 1;
+          render();
+        });
+        treeHeader.append(treeTitle, treeToggle);
+        sidebar.appendChild(treeHeader);
+        const tree = document.createElement("ul");
+        tree.className = "folder-editor-ged-tree";
+        const allDocumentsItem = document.createElement("li");
+        const allDocumentsButton = document.createElement("button");
+        allDocumentsButton.type = "button";
+        allDocumentsButton.className = "folder-editor-ged-tree-button" + (state.selectedRubric === "__all" ? " active" : "");
+        allDocumentsButton.title = "Afficher tous les documents du dossier";
+        const allDocumentsLabel = document.createElement("span");
+        allDocumentsLabel.className = "folder-editor-ged-tree-label";
+        allDocumentsLabel.textContent = "Ensemble des documents";
+        allDocumentsButton.appendChild(allDocumentsLabel);
+        const allDocumentsCountValue = countForExercise(state.root);
+        if (allDocumentsCountValue > 0) {
+          const allDocumentsCount = document.createElement("span");
+          allDocumentsCount.className = "folder-editor-ged-count";
+          allDocumentsCount.textContent = String(allDocumentsCountValue);
+          allDocumentsButton.appendChild(allDocumentsCount);
+        }
+        allDocumentsButton.addEventListener("click", () => {
+          state.selectedRubric = "__all";
+          state.page = 1;
+          render();
+        });
+        allDocumentsItem.appendChild(allDocumentsButton);
+        tree.appendChild(allDocumentsItem);
+        const renderedNodes = new Set();
+        const appendTreeNode = (node, target, depth = 0, showChildren = state.treeExpanded) => {
+          if (renderedNodes.has(node)) return;
+          renderedNodes.add(node);
+          const li = document.createElement("li");
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "folder-editor-ged-tree-button" + (state.selectedRubric === node.key ? " active" : "");
+          button.title = node.label;
+          const label = document.createElement("span");
+          label.className = "folder-editor-ged-tree-label";
+          label.textContent = node.label;
+          const documentCount = countForExercise(node);
+          const count = document.createElement("span");
+          count.className = "folder-editor-ged-count";
+          count.textContent = String(documentCount);
+          button.appendChild(label);
+          if (documentCount > 0) button.appendChild(count);
+          button.addEventListener("click", () => { state.selectedRubric = node.key; state.page = 1; render(); });
+          li.appendChild(button);
+          if (node.children.length && showChildren && (depth === 0 || state.treeExpanded)) {
+            const children = document.createElement("ul");
+            node.children.forEach(child => appendTreeNode(child, children, depth + 1, true));
+            li.appendChild(children);
+          }
+          target.appendChild(li);
+        };
+        if (state.treeExpanded) {
+          state.root.children.forEach(child => appendTreeNode(child, tree, 0, true));
+        } else {
+          const populatedRubrics = [...state.nodes.values()]
+            .filter(node => node !== state.root && countForExercise(node) > 0)
+            .sort((a, b) => (a.path || []).join("\\").localeCompare((b.path || []).join("\\"), "fr"));
+          if (populatedRubrics.length) {
+            populatedRubrics.forEach(node => appendTreeNode(node, tree, 0, false));
+          } else {
+            const empty = document.createElement("li");
+            empty.className = "folder-editor-ged-muted";
+            empty.textContent = "Aucune rubrique ne contient de document.";
+            empty.style.padding = "8px";
+            tree.appendChild(empty);
+          }
+        }
+        sidebar.appendChild(tree);
+
+        const main = document.createElement("div");
+        main.className = "folder-editor-ged-main";
+        const toolbar = document.createElement("div");
+        toolbar.className = "folder-editor-ged-toolbar";
+        const breadcrumb = document.createElement("div");
+        breadcrumb.className = "folder-editor-ged-breadcrumb";
+        breadcrumb.textContent = [state.root.label, ...(currentNode?.path || [])].filter(Boolean).join("  ›  ");
+        const filters = document.createElement("div");
+        filters.className = "folder-editor-ged-filters";
+        const search = document.createElement("input");
+        search.type = "search";
+        search.placeholder = "Rechercher un document";
+        search.setAttribute("aria-label", "Rechercher un document GED");
+        search.value = state.search;
+        search.classList.toggle("is-active-filter", Boolean(state.search.trim()));
+        search.addEventListener("input", () => {
+          state.search = search.value;
+          state.page = 1;
+          const caret = search.selectionStart;
+          render();
+          const nextSearch = section.querySelector('input[type="search"]');
+          nextSearch?.focus();
+          if (caret !== null) nextSearch?.setSelectionRange(caret, caret);
+        });
+        const exercise = document.createElement("select");
+        exercise.className = "folder-editor-ged-exercise-filter";
+        exercise.classList.toggle("is-active-filter", state.exercise !== "__all");
+        exercise.setAttribute("aria-label", "Filtrer par exercice");
+        const options = [["__all", "Exercices : Tous"], ["__empty", "Aucun"]];
+        [...new Set((state.exercises.length
+          ? state.exercises.map(item => String(item?.Code ?? "").trim())
+          : state.documents.map(item => String(item?.CodeExercice ?? "").trim())
+        ).filter(Boolean))]
+          .sort((a, b) => b.localeCompare(a, "fr", { numeric: true }))
+          .forEach(code => options.push([code, code]));
+        options.forEach(([value, labelText]) => {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = labelText;
+          exercise.appendChild(option);
+        });
+        exercise.value = state.exercise;
+        exercise.addEventListener("change", () => { state.exercise = exercise.value; state.page = 1; render(); });
+        const hasActiveFilters = Boolean(state.search.trim()) || state.exercise !== "__all" ||
+          Object.entries(state.columnFilters).some(([key, value]) => value !== (key === "name" ? "" : "all"));
+        const resetFiltersButton = document.createElement("button");
+        resetFiltersButton.type = "button";
+        resetFiltersButton.className = "folder-editor-ged-reset-filters-button";
+        resetFiltersButton.textContent = "Réinitialiser les filtres";
+        resetFiltersButton.disabled = !hasActiveFilters;
+        resetFiltersButton.title = hasActiveFilters ? "Effacer tous les filtres GED actifs" : "Aucun filtre actif";
+        resetFiltersButton.addEventListener("click", () => {
+          state.search = "";
+          state.exercise = "__all";
+          state.columnFilters = { name: "", creationAge: "all", modifiedAge: "all", author: "all", type: "all", size: "all" };
+          state.page = 1;
+          render();
+        });
+        const selectedRubricId = currentNode?.key?.startsWith("rubric:")
+          ? currentNode.key.slice("rubric:".length)
+          : "";
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.hidden = true;
+        fileInput.setAttribute("aria-label", "Choisir un document à ajouter");
+        const uploadButton = document.createElement("button");
+        uploadButton.type = "button";
+        uploadButton.className = "folder-editor-ged-upload-button";
+        uploadButton.textContent = "+ Ajouter un document";
+        uploadButton.disabled = !selectedRubricId;
+        uploadButton.title = selectedRubricId
+          ? "Ajouter un document dans cette rubrique"
+          : "Sélectionnez une rubrique GED pour ajouter un document";
+        uploadButton.addEventListener("click", () => fileInput.click());
+        fileInput.addEventListener("change", () => {
+          const file = fileInput.files?.[0];
+          fileInput.value = "";
+          if (file && selectedRubricId) uploadDocument(file, uploadButton, selectedRubricId);
+        });
+        filters.append(search, exercise, resetFiltersButton, uploadButton, fileInput);
+        toolbar.append(breadcrumb, filters);
+        main.appendChild(toolbar);
+
+        const tableWrap = document.createElement("div");
+        tableWrap.className = "folder-editor-ged-table-wrap";
+        const table = document.createElement("table");
+        table.className = "folder-editor-ged-table";
+        const thead = document.createElement("thead");
+        const heading = document.createElement("tr");
+        const updateColumnFilter = (key, value, restoreInput = false, caret = null) => {
+          state.columnFilters[key] = value;
+          state.page = 1;
+          render();
+          const nextFilter = section.querySelector(`[data-ged-column-filter="${key}"]`);
+          nextFilter?.focus();
+          if (restoreInput && caret !== null) nextFilter?.setSelectionRange(caret, caret);
+        };
+        const createColumnSelect = (key, label, options) => {
+          const select = document.createElement("select");
+          select.className = "folder-editor-ged-column-filter";
+          select.dataset.gedColumnFilter = key;
+          select.classList.toggle("is-active-filter", state.columnFilters[key] !== "all");
+          select.setAttribute("aria-label", label);
+          options.forEach(([value, optionLabel]) => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = optionLabel;
+            select.appendChild(option);
+          });
+          select.value = state.columnFilters[key];
+          select.addEventListener("change", () => updateColumnFilter(key, select.value));
+          return select;
+        };
+        const columnDefinitions = [
+          { label: "Nom du document", key: "name", filter: "name" },
+          { label: "Création", key: "creation", filter: "creationAge" },
+          { label: "Créat/Modif", key: "modified", filter: "modifiedAge" },
+          { label: "Exercice", key: "exercise" },
+          { label: "Auteur", key: "author", filter: "author" },
+          { label: "Type", key: "type", filter: "type" },
+          { label: "Taille", key: "size", filter: "size" },
+          { label: "Action", key: "action", sortable: false }
+        ];
+        const dateAgeOptions = [["all", "Toutes les dates"], ["older", "Plus d’un an"], ["newer", "Moins d’un an"]];
+        const exerciseScopedDocuments = scoped.filter(matchesExercise);
+        const authors = [...new Set(exerciseScopedDocuments.map(authorName).filter(Boolean))]
+          .sort((a, b) => a.localeCompare(b, "fr", { sensitivity: "base" }));
+        const types = [...new Set(exerciseScopedDocuments.map(item => String(item?.Document?.Extension || "").replace(/^\./, "").toLocaleUpperCase("fr")).filter(Boolean))]
+          .sort((a, b) => a.localeCompare(b, "fr", { numeric: true }));
+        columnDefinitions.forEach(column => {
+          const th = document.createElement("th");
+          if (column.sortable === false) {
+            th.textContent = column.label;
+            heading.appendChild(th);
+            return;
+          }
+          th.setAttribute("aria-sort", state.sortColumn === column.key
+            ? (state.sortDirection === "asc" ? "ascending" : "descending")
+            : "none");
+          const headerContent = document.createElement("div");
+          headerContent.className = "folder-editor-ged-column-head";
+          const sortButton = document.createElement("button");
+          sortButton.type = "button";
+          sortButton.className = "folder-editor-ged-sort-button";
+          sortButton.setAttribute("aria-label", `Trier par ${column.label}`);
+          const title = document.createElement("span");
+          title.textContent = column.label;
+          const indicator = document.createElement("span");
+          indicator.className = "folder-editor-ged-sort-indicator";
+          indicator.setAttribute("aria-hidden", "true");
+          indicator.textContent = state.sortColumn === column.key ? (state.sortDirection === "asc" ? "↑" : "↓") : "↕";
+          sortButton.append(title, indicator);
+          sortButton.addEventListener("click", () => {
+            if (state.sortColumn === column.key) state.sortDirection = state.sortDirection === "asc" ? "desc" : "asc";
+            else { state.sortColumn = column.key; state.sortDirection = "asc"; }
+            state.page = 1;
+            render();
+          });
+          headerContent.appendChild(sortButton);
+          if (column.filter === "name") {
+            const input = document.createElement("input");
+            input.type = "search";
+            input.className = "folder-editor-ged-column-filter";
+            input.dataset.gedColumnFilter = "name";
+            input.classList.toggle("is-active-filter", Boolean(state.columnFilters.name.trim()));
+            input.placeholder = "Filtrer le nom";
+            input.setAttribute("aria-label", "Filtrer par nom de document");
+            input.value = state.columnFilters.name;
+            input.addEventListener("input", () => updateColumnFilter("name", input.value, true, input.selectionStart));
+            headerContent.appendChild(input);
+          } else if (column.filter === "creationAge" || column.filter === "modifiedAge") {
+            headerContent.appendChild(createColumnSelect(column.filter, `Filtrer ${column.label.toLocaleLowerCase("fr")}`, dateAgeOptions));
+          } else if (column.filter === "author") {
+            headerContent.appendChild(createColumnSelect("author", "Filtrer par auteur", [["all", "Tous les auteurs"], ...authors.map(author => [author, author])]));
+          } else if (column.filter === "type") {
+            headerContent.appendChild(createColumnSelect("type", "Filtrer par type", [["all", "Tous les types"], ...types.map(type => [type, type])]));
+          } else if (column.filter === "size") {
+            headerContent.appendChild(createColumnSelect("size", "Filtrer par taille", [
+              ["all", "Toutes les tailles"], ["over10", "Plus de 10 Mo"], ["1to10", "Entre 1 et 10 Mo"], ["under1", "Moins de 1 Mo"]
+            ]));
+          }
+          th.appendChild(headerContent);
+          heading.appendChild(th);
+        });
+        thead.appendChild(heading);
+        table.appendChild(thead);
+        const tbody = document.createElement("tbody");
+        if (!filtered.length) {
+          const row = document.createElement("tr");
+          const cell = document.createElement("td");
+          cell.colSpan = 8;
+          cell.className = "folder-editor-ged-muted";
+          cell.textContent = "Aucun document dans cette rubrique pour les filtres sélectionnés.";
+          row.appendChild(cell);
+          tbody.appendChild(row);
+        } else {
+          pageItems.forEach(item => {
+            const row = document.createElement("tr");
+            const documentInfo = item?.Document || {};
+            const values = [documentInfo.Nom || "—", formatFolderCreationDate(documentInfo.DateCreation),
+              formatFolderCreationDate(documentInfo.DateHeureModification), item?.CodeExercice || "—",
+              authorName(item), String(documentInfo.Extension || "—").replace(/^\./, "").toUpperCase(),
+              formatSize(documentInfo.Taille)];
+            values.forEach((value, index) => {
+              const cell = document.createElement("td");
+              if (index === 0) {
+                const documentCell = document.createElement("div");
+                documentCell.className = "folder-editor-ged-document-cell";
+                const previewButton = document.createElement("button");
+                previewButton.type = "button";
+                previewButton.className = "folder-editor-ged-preview-button";
+                previewButton.title = "Visualiser le document";
+                previewButton.setAttribute("aria-label", `Visualiser ${String(value)}`);
+                const eye = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                eye.setAttribute("viewBox", "0 0 24 24");
+                eye.setAttribute("width", "16");
+                eye.setAttribute("height", "16");
+                eye.setAttribute("fill", "none");
+                eye.setAttribute("stroke", "currentColor");
+                eye.setAttribute("stroke-width", "2");
+                eye.setAttribute("stroke-linecap", "round");
+                eye.setAttribute("stroke-linejoin", "round");
+                const eyePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                eyePath.setAttribute("d", "M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z");
+                const eyePupil = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                eyePupil.setAttribute("cx", "12");
+                eyePupil.setAttribute("cy", "12");
+                eyePupil.setAttribute("r", "3");
+                eye.append(eyePath, eyePupil);
+                previewButton.appendChild(eye);
+                previewButton.addEventListener("click", () => openDocumentPreview(item));
+                const downloadButton = document.createElement("button");
+                downloadButton.type = "button";
+                downloadButton.className = "folder-editor-ged-download-button";
+                downloadButton.title = "Télécharger le document";
+                downloadButton.setAttribute("aria-label", `Télécharger ${String(value)}`);
+                const downloadIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                downloadIcon.setAttribute("viewBox", "0 0 24 24");
+                downloadIcon.setAttribute("width", "16");
+                downloadIcon.setAttribute("height", "16");
+                downloadIcon.setAttribute("fill", "none");
+                downloadIcon.setAttribute("stroke", "currentColor");
+                downloadIcon.setAttribute("stroke-width", "2");
+                downloadIcon.setAttribute("stroke-linecap", "round");
+                downloadIcon.setAttribute("stroke-linejoin", "round");
+                const downloadPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                downloadPath.setAttribute("d", "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M7 10l5 5 5-5 M12 15V3");
+                downloadIcon.appendChild(downloadPath);
+                downloadButton.appendChild(downloadIcon);
+                downloadButton.addEventListener("click", () => downloadDocument(item, downloadButton));
+                const documentName = document.createElement("span");
+                documentName.className = "folder-editor-ged-document-name";
+                documentName.textContent = String(value);
+                documentCell.append(previewButton, downloadButton, documentName);
+                cell.appendChild(documentCell);
+              } else {
+                cell.textContent = String(value);
+              }
+              row.appendChild(cell);
+            });
+            const actionCell = document.createElement("td");
+            actionCell.className = "folder-editor-ged-delete-cell";
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.className = "folder-editor-ged-delete-button";
+            deleteButton.textContent = "−";
+            deleteButton.title = "Supprimer le document";
+            deleteButton.setAttribute("aria-label", `Supprimer ${documentInfo.Nom || "le document"}`);
+            deleteButton.addEventListener("click", () => deleteDocument(item, deleteButton));
+            actionCell.appendChild(deleteButton);
+            row.appendChild(actionCell);
+            tbody.appendChild(row);
+          });
+        }
+        table.appendChild(tbody);
+        tableWrap.appendChild(table);
+        main.appendChild(tableWrap);
+        const pagination = document.createElement("div");
+        pagination.className = "folder-editor-ged-pagination";
+        const pageSizeControl = document.createElement("label");
+        pageSizeControl.className = "folder-editor-ged-pagination-size";
+        pageSizeControl.appendChild(document.createTextNode("Documents par page"));
+        const pageSizeSelect = document.createElement("select");
+        pageSizeSelect.setAttribute("aria-label", "Nombre de documents par page");
+        [[10, "10"], [20, "20"], [50, "50"], ["all", "Tous"]].forEach(([value, labelText]) => {
+          const option = document.createElement("option");
+          option.value = String(value);
+          option.textContent = labelText;
+          pageSizeSelect.appendChild(option);
+        });
+        pageSizeSelect.value = String(state.pageSize);
+        pageSizeSelect.addEventListener("change", () => {
+          state.pageSize = pageSizeSelect.value === "all" ? "all" : Number(pageSizeSelect.value);
+          state.page = 1;
+          render();
+        });
+        pageSizeControl.appendChild(pageSizeSelect);
+        const startIndex = filtered.length ? (state.page - 1) * pageSize + 1 : 0;
+        const endIndex = state.pageSize === "all" ? filtered.length : Math.min(state.page * pageSize, filtered.length);
+        const paginationStatus = document.createElement("span");
+        paginationStatus.className = "folder-editor-ged-pagination-status";
+        paginationStatus.setAttribute("aria-live", "polite");
+        paginationStatus.textContent = `${startIndex}–${endIndex} sur ${filtered.length} · Page ${state.page} / ${pageCount}`;
+        const paginationNav = document.createElement("div");
+        paginationNav.className = "folder-editor-ged-pagination-nav";
+        const addPageButton = (labelText, title, page, disabled) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = labelText;
+          button.title = title;
+          button.setAttribute("aria-label", title);
+          button.disabled = disabled;
+          button.addEventListener("click", () => { state.page = page; render(); });
+          paginationNav.appendChild(button);
+        };
+        addPageButton("«", "Première page", 1, state.page <= 1);
+        addPageButton("‹", "Page précédente", Math.max(1, state.page - 1), state.page <= 1);
+        addPageButton("›", "Page suivante", Math.min(pageCount, state.page + 1), state.page >= pageCount);
+        addPageButton("»", "Dernière page", pageCount, state.page >= pageCount);
+        pagination.append(pageSizeControl, paginationStatus, paginationNav);
+        main.appendChild(pagination);
+        layout.append(sidebar, main);
+        section.appendChild(layout);
+      };
+      const load = async (force = false) => {
+        if (!force && (state.status === "loading" || state.status === "loaded")) return;
+        state.status = "loading";
+        showStatus("Chargement des documents GED du dossier…");
+        try {
+          const baseUrl = getSelectedApiBaseUrl();
+          if (!baseUrl || !apiSessionUuid) throw new Error("La connexion API n’est pas disponible.");
+          await selectFolderSessionForData(baseUrl, apiSessionUuid, folder?.Code);
+          const endpoint = "/v1/ged/documents/filtrer";
+          const [documentResult, rubricResult, exerciseResult] = await Promise.allSettled([
+            fetch(`${baseUrl}${endpoint}`, {
+              method: "POST",
+              headers: { "Accept": "application/json, text/plain, */*", "UUID": apiSessionUuid,
+                "Content-Type": "application/json-patch+json" },
+              body: JSON.stringify({})
+            }),
+            fetchFolderRelatedJson(baseUrl, apiSessionUuid, "/v1/ged/arborescence?documents=false&criteres=false"),
+            fetchFolderRelatedJson(baseUrl, apiSessionUuid, "/v1/exercices")
+          ]);
+          if (documentResult.status === "rejected") throw documentResult.reason;
+          const response = documentResult.value;
+          const responseText = await response.text();
+          if (!response.ok) {
+            const detail = responseText.trim().slice(0, 350);
+            throw new Error(detail ? `${endpoint} : erreur ${response.status} — ${detail}` : `${endpoint} : erreur ${response.status}`);
+          }
+          let payload = [];
+          if (responseText.trim()) {
+            try { payload = JSON.parse(responseText); }
+            catch { throw new Error(`${endpoint} : la réponse reçue n’est pas un JSON exploitable.`); }
+          }
+          state.documents = extractApiArray(payload, ["Documents", "documents", "Items", "items"]);
+          state.rubricPayload = rubricResult.status === "fulfilled" ? rubricResult.value : null;
+          state.rubricError = rubricResult.status === "rejected"
+            ? `La liste globale des rubriques est indisponible (${rubricResult.reason?.message || "erreur API"}).`
+            : "";
+          state.exercises = exerciseResult.status === "fulfilled" ? mapRetrievedExercises(exerciseResult.value) : [];
+          state.exerciseError = exerciseResult.status === "rejected"
+            ? `La liste des exercices est indisponible (${exerciseResult.reason?.message || "erreur API"}). Le filtre utilise les codes d’exercice des documents.`
+            : "";
+          state.status = "loaded";
+          initializeTree();
+          render();
+        } catch (error) {
+          state.status = "error";
+          showStatus(error?.message || "Impossible de récupérer les documents GED.", true);
+          const retry = document.createElement("button");
+          retry.type = "button";
+          retry.className = "folder-editor-ged-retry";
+          retry.textContent = "Réessayer";
+          retry.addEventListener("click", () => load(true));
+          section.appendChild(retry);
+        }
+      };
+      section.gedLoad = load;
+      showStatus("Ouvrez l’onglet GED pour charger les documents du dossier.");
+      return section;
+    }
+
     async function navigateFolderEditor(direction) {
       if (!Number.isInteger(currentFolderEditorIndex)) return;
       const entries = getVisibleFolderEntries().length
@@ -40769,6 +42432,7 @@ ${body}
       }
     }
     async function openFolderEditor(folderIndex, preferredTabTitle = "") {
+      closeFolderGedPreviewOverlays();
       const folder = generatedFolders[folderIndex];
       if (!folder) return;
 
@@ -41490,6 +43154,34 @@ ${body}
           section: isuiteSection,
           title: "i-Suite"
         });
+
+        const gedSection = buildFolderEditorGedSection(folder);
+        const gedSectionId = "folderEditorSection_ged";
+        gedSection.id = gedSectionId;
+        gedSection.setAttribute("role", "tabpanel");
+
+        const gedTab = document.createElement("button");
+        gedTab.type = "button";
+        gedTab.className = "folder-editor-tab";
+        gedTab.textContent = "GED";
+        gedTab.setAttribute("role", "tab");
+        gedTab.setAttribute("aria-controls", gedSectionId);
+        gedTab.setAttribute("aria-selected", "false");
+        gedTab.addEventListener("click", () => {
+          tabs.querySelectorAll(".folder-editor-tab").forEach(item => {
+            item.classList.remove("active");
+            item.setAttribute("aria-selected", "false");
+          });
+          folderEditorForm.querySelectorAll(".folder-editor-section").forEach(item => item.classList.remove("active"));
+          gedTab.classList.add("active");
+          gedTab.setAttribute("aria-selected", "true");
+          gedSection.classList.add("active");
+          gedSection.gedLoad?.();
+        });
+
+        tabs.appendChild(gedTab);
+        folderEditorForm.appendChild(gedSection);
+        renderedSections.push({ tab: gedTab, section: gedSection, title: "GED" });
       }
 
       // Tout champ futur ou spécifique reste accessible dans l'onglet Divers,
@@ -41988,6 +43680,7 @@ ${body}
     }
 
     function closeFolderEditor() {
+      closeFolderGedPreviewOverlays();
       setFolderEditorFullscreen(false);
       folderEditorExitActionButton.hidden = true;
       folderEditorModal.classList.remove("open");
@@ -43596,6 +45289,38 @@ ${body}
     disconnectApiButton.addEventListener("click", () => {
       disconnectApiSession();
       window.location.reload();
+    });
+
+    copyApiSessionUuidButton.addEventListener("click", async () => {
+      if (!apiSessionUuid) return;
+      try {
+        let copied = false;
+        if (navigator.clipboard?.writeText) {
+          try {
+            await navigator.clipboard.writeText(apiSessionUuid);
+            copied = true;
+          } catch {
+            // Utiliser le mécanisme de secours pour les pages locales ou non sécurisées.
+          }
+        }
+        if (!copied) {
+          const helper = document.createElement("textarea");
+          helper.value = apiSessionUuid;
+          helper.setAttribute("readonly", "");
+          helper.style.position = "fixed";
+          helper.style.opacity = "0";
+          document.body.appendChild(helper);
+          helper.select();
+          copied = document.execCommand("copy");
+          helper.remove();
+        }
+        if (!copied) throw new Error("Copie impossible");
+        copyApiSessionUuidButton.textContent = "Copié ✓";
+        window.setTimeout(() => { copyApiSessionUuidButton.textContent = "Copier"; }, 1800);
+      } catch {
+        copyApiSessionUuidButton.textContent = "Échec de la copie";
+        window.setTimeout(() => { copyApiSessionUuidButton.textContent = "Copier"; }, 2200);
+      }
     });
 
     async function submitApiConnection(button, forceFormCredentials = false) {
