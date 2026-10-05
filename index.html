@@ -4482,6 +4482,368 @@
       display: block;
     }
 
+    .folder-editor-accounting-loading-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      border-radius: 0 0 10px 10px;
+      padding: 24px;
+      background: rgba(241, 245, 249, .78);
+      backdrop-filter: blur(2px);
+    }
+    .folder-editor-accounting-loading-overlay[hidden] { display: none; }
+    .folder-editor-accounting-loading-panel {
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+      max-width: min(420px, 100%);
+      border: 1px solid #cbdcf1;
+      border-radius: 14px;
+      padding: 22px 26px;
+      background: #fff;
+      color: #173f70;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, .16);
+    }
+    .folder-editor-accounting-loading-spinner {
+      width: 34px;
+      height: 34px;
+      border: 4px solid #dbeafe;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: folder-accounting-spin .8s linear infinite;
+    }
+    .folder-editor-accounting-loading-message { font-weight: 750; }
+    .folder-editor-accounting-loading-cancel {
+      border: 1px solid #cbd8e9;
+      border-radius: 9px;
+      padding: 9px 16px;
+      background: #fff;
+      color: #173f70;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .folder-editor-accounting-loading-cancel:hover { background: #f1f5f9; }
+    @keyframes folder-accounting-spin { to { transform: rotate(360deg); } }
+
+    .folder-editor-accounting-card {
+      overflow: hidden;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, .08);
+    }
+
+    .folder-editor-accounting-data-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 14px;
+      border: 1px solid #b8d4f6;
+      border-radius: 12px;
+      padding: 18px;
+      background: linear-gradient(110deg, #f4f8ff, #fff);
+      box-shadow: 0 4px 14px rgba(15, 23, 42, .06);
+    }
+
+    .folder-editor-accounting-data-title { color: #173f70; font-size: 16px; font-weight: 800; }
+    .folder-editor-accounting-data-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .folder-editor-accounting-data-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #8bb9f2;
+      border-radius: 999px;
+      padding: 10px 16px;
+      background: #e8f2ff;
+      color: #174f91;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .folder-editor-accounting-data-link:hover { background: #d7e9ff; }
+    .folder-accounting-entry-form { display: grid; gap: 16px; overflow: auto; padding: 20px; }
+    .folder-accounting-entry-choice { display: flex; align-items: center; gap: 10px; border: 1px solid #dce6f2; border-radius: 12px; padding: 14px; background: #f5f8fc; font-weight: 700; cursor: pointer; }
+    .folder-accounting-entry-choice:has(input:checked) { border-color: #6ca4ed; background: #eaf3ff; color: #174f91; }
+    .folder-accounting-entry-count { display: grid; gap: 6px; max-width: 260px; font-weight: 700; }
+    .folder-accounting-entry-count input { width: 100%; border: 1px solid #cbd8e9; border-radius: 9px; padding: 10px 12px; font: inherit; }
+    .folder-accounting-settle-option { display: flex; align-items: center; gap: 10px; width: fit-content; color: #173f70; font-weight: 700; cursor: pointer; }
+    .folder-accounting-settle-option input { width: 18px; height: 18px; accent-color: #2563eb; }
+    .folder-accounting-entry-status { min-height: 20px; margin: 0; color: #526a84; white-space: pre-line; }
+    .folder-accounting-entry-status.is-error { color: #b42323; }
+    .folder-accounting-entry-status.is-ok { color: #15803d; }
+    .folder-accounting-entry-footer { display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #e2e8f0; padding: 14px 18px; }
+    .folder-accounting-entry-footer button { border: 1px solid #cbd8e9; border-radius: 9px; padding: 10px 15px; background: #fff; color: #173f70; font: inherit; font-weight: 750; cursor: pointer; }
+    .folder-accounting-entry-footer button.primary { border-color: #2563eb; background: #2563eb; color: #fff; }
+    .folder-accounting-entry-footer button:disabled { opacity: .55; cursor: wait; }
+
+    @media (max-width: 620px) {
+      .folder-editor-accounting-data-card { align-items: flex-start; flex-direction: column; }
+      .folder-editor-accounting-data-actions { width: 100%; }
+    }
+
+    .folder-editor-accounting-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      background: linear-gradient(105deg, #102b50, #173f70);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .folder-editor-accounting-json-button {
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 999px;
+      padding: 7px 12px;
+      background: rgba(255,255,255,.12);
+      color: #fff;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .folder-editor-accounting-body { padding: 14px; }
+    .folder-editor-accounting-status { margin: 0 0 10px; color: #64748b; font-size: 13px; }
+    .folder-editor-accounting-status.is-ok { color: #15803d; }
+    .folder-editor-accounting-status.is-error { color: #b91c1c; }
+
+    .folder-editor-accounting-overview,
+    .folder-editor-accounting-items {
+      display: grid;
+      gap: 10px;
+    }
+
+    .folder-editor-accounting-overview { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 10px; }
+    .folder-editor-accounting-items { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .folder-editor-accounting-overview-item,
+    .folder-editor-accounting-item {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid #dce6f2;
+      border-radius: 12px;
+      padding: 13px 15px;
+      background: #eef4fa;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .folder-editor-accounting-item {
+      min-height: 62px;
+      border-color: #79a9e8;
+      background: #e7f0fb;
+      color: #123e70;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .folder-editor-accounting-item:hover,
+    .folder-editor-accounting-item[aria-expanded="true"] { background: #dceafb; }
+
+    .folder-editor-accounting-item.is-disabled,
+    .folder-editor-accounting-item:disabled {
+      border-color: #d5dce5;
+      background: #f1f4f7;
+      color: #98a2b3;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .folder-editor-accounting-item.is-disabled .folder-editor-accounting-item-chevron,
+    .folder-editor-accounting-item:disabled .folder-editor-accounting-item-chevron {
+      background: #aeb8c5;
+      box-shadow: none;
+    }
+
+    .folder-editor-accounting-item.is-disabled .folder-editor-accounting-badge,
+    .folder-editor-accounting-item:disabled .folder-editor-accounting-badge {
+      border-color: #d5dce5;
+      background: #e8edf2;
+      color: #8792a1;
+    }
+
+    .folder-editor-accounting-item:focus-visible,
+    .folder-editor-accounting-json-button:focus-visible {
+      outline: 3px solid rgba(59,130,246,.35);
+      outline-offset: 2px;
+    }
+
+    .folder-editor-accounting-item-label { display: flex; align-items: center; gap: 12px; }
+    .folder-editor-accounting-item-chevron {
+      width: 32px;
+      height: 32px;
+      flex: 0 0 32px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #2462aa;
+      color: #fff;
+      box-shadow: 0 2px 5px rgba(15,23,42,.18);
+    }
+
+    .folder-editor-accounting-item-count { font-size: 16px; font-weight: 800; }
+    .folder-editor-accounting-badge { border: 1px solid #a7e3b9; border-radius: 999px; padding: 4px 10px; background: #edf9f1; color: #15803d; font-size: 12px; font-weight: 800; }
+    .folder-editor-accounting-badge.is-off { border-color: #e2e8f0; background: #f1f5f9; color: #64748b; }
+
+    .folder-editor-accounting-details {
+      max-height: 360px;
+      margin: 12px 0 0;
+      overflow: auto;
+      border: 1px solid #dce6f2;
+      border-radius: 8px;
+      padding: 12px;
+      background: #f8fafc;
+      color: #334155;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .folder-editor-accounting-details[hidden] { display: none !important; }
+
+    .folder-accounting-detail-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 50000;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(15, 23, 42, .48);
+      backdrop-filter: blur(2px);
+    }
+
+    .folder-accounting-detail-dialog {
+      width: min(1500px, calc(100vw - 32px));
+      max-height: calc(100vh - 44px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid #dbe3ef;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 28px 90px rgba(0,0,0,.35);
+    }
+
+    .folder-accounting-detail-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 18px;
+      background: linear-gradient(110deg, #102b50, #173f70);
+      color: #fff;
+    }
+
+    .folder-accounting-detail-title { min-width: 0; font-size: 17px; font-weight: 800; }
+    .folder-accounting-detail-actions { display: flex; align-items: center; gap: 9px; }
+    .folder-accounting-detail-actions button,
+    .folder-accounting-detail-reset,
+    .folder-accounting-account-tab {
+      border: 1px solid #cbd8e9;
+      border-radius: 9px;
+      padding: 9px 13px;
+      background: #fff;
+      color: #173f70;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .folder-accounting-detail-actions button { border-color: rgba(255,255,255,.3); background: rgba(255,255,255,.11); color: #fff; }
+    .folder-accounting-detail-actions button:hover { background: rgba(255,255,255,.2); }
+    .folder-accounting-detail-content { min-height: 0; overflow: auto; }
+    .folder-accounting-detail-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: #eef4fa; }
+    .folder-accounting-detail-count { border-radius: 999px; padding: 8px 13px; background: #dbe6f4; color: #173f70; font-size: 13px; font-weight: 800; }
+    .folder-accounting-detail-table-wrap { overflow: auto; }
+    .folder-accounting-detail-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    .folder-accounting-detail-table th,
+    .folder-accounting-detail-table td { padding: 11px 14px; border-bottom: 1px solid #dbe3ef; text-align: left; vertical-align: middle; white-space: nowrap; }
+    .folder-accounting-detail-table th { background: #fff; color: #111827; font-size: 13px; font-weight: 800; }
+    .folder-accounting-detail-table .filter-row td { padding: 8px 10px; background: #eef4fa; }
+    .folder-accounting-detail-table .filter-row input { width: 100%; min-width: 96px; border: 1px solid #cbd8e9; border-radius: 9px; padding: 9px 10px; font: inherit; }
+    .folder-accounting-detail-table tr.is-blocked { background: #fff0f0; color: #b42323; }
+    .folder-accounting-detail-table tr.is-forbidden { background: #fff0f0; color: #b42323; }
+    .folder-accounting-detail-table .is-true { color: #16834d; font-size: 18px; font-weight: 800; }
+    .folder-accounting-detail-table .is-false { color: #b42323; font-size: 18px; font-weight: 800; }
+    .folder-accounting-account-tabs { display: flex; align-items: center; gap: 10px; margin: 12px 16px 0; padding: 12px 16px; border: 1px solid #dce6f2; border-radius: 14px; background: #eef4fa; color: #4b5563; font-weight: 750; }
+    .folder-accounting-account-tab { display: inline-flex; align-items: center; gap: 9px; border-radius: 14px; padding: 9px 14px; font-size: 14px; }
+    .folder-accounting-account-tab-count { display: inline-grid; min-width: 24px; height: 24px; place-items: center; border-radius: 999px; padding: 0 6px; background: #e8edf4; color: #334155; font-size: 12px; }
+    .folder-accounting-account-tab.active { border-color: #173f70; background: #173f70; color: #fff; box-shadow: 0 3px 9px rgba(15, 42, 79, .2); }
+    .folder-accounting-account-tab.active .folder-accounting-account-tab-count { background: rgba(255,255,255,.2); color: #fff; }
+    .folder-accounting-account-code { border: 0; padding: 0; background: transparent; color: #174d87; font: 700 14px ui-monospace, SFMono-Regular, Consolas, monospace; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+    .folder-accounting-account-code:hover { color: #2563eb; }
+    .folder-accounting-tier-badge { display: inline-flex; align-items: center; margin-left: 8px; border: 1px solid #a8c7ed; border-radius: 999px; padding: 4px 10px; background: #eaf2fc; color: #1f5b9c; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
+    .folder-accounting-tier-badge:hover { background: #dceafb; }
+    .folder-account-detail-overlay { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; padding: 18px; background: rgba(15, 23, 42, .48); backdrop-filter: blur(2px); }
+    .folder-account-detail-dialog { width: min(1450px, 100%); max-height: 100%; display: flex; flex-direction: column; overflow: hidden; border: 1px solid #dbe3ef; border-radius: 16px; background: #fff; box-shadow: 0 24px 70px rgba(0,0,0,.32); }
+    .folder-account-detail-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 18px; background: linear-gradient(110deg, #102b50, #173f70); color: #fff; }
+    .folder-account-detail-header h2 { margin: 0; font-size: 18px; }
+    .folder-account-detail-subtitle { margin-top: 4px; color: #d4e2f3; font-size: 13px; }
+    .folder-account-detail-close { border: 1px solid rgba(255,255,255,.35); border-radius: 10px; padding: 9px 16px; background: rgba(255,255,255,.12); color: #fff; font: inherit; font-weight: 750; cursor: pointer; }
+    .folder-account-detail-body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; overflow: auto; padding: 14px; }
+    .folder-account-detail-summary { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(160px, .45fr) minmax(240px, 1.35fr) auto auto; gap: 10px; }
+    .folder-account-detail-summary-card, .folder-account-detail-badge { min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 4px; border: 1px solid #dce6f2; border-radius: 14px; padding: 12px 15px; background: #eef4fa; }
+    .folder-account-detail-summary-card small { color: #526a84; font-size: 12px; font-weight: 700; }
+    .folder-account-detail-summary-card strong { overflow-wrap: anywhere; color: #173f70; font-size: 18px; }
+    .folder-account-detail-badge { align-items: center; min-width: 140px; border-color: #a7e3b9; background: #edf9f1; color: #087c3c; font-size: 12px; font-weight: 900; }
+    .folder-account-detail-badge.is-inactive { border-color: #fecaca; background: #fff0f0; color: #b42323; }
+    .folder-account-detail-section { min-width: 0; overflow: hidden; border: 1px solid #dce6f2; border-radius: 14px; }
+    .folder-account-detail-section.wide { grid-column: 1 / -1; }
+    .folder-account-detail-section h3 { margin: 0; border-bottom: 1px solid #dce6f2; padding: 11px 14px; background: #eef4fa; color: #111827; font-size: 14px; }
+    .folder-account-detail-fields { display: grid; grid-template-columns: minmax(150px, .6fr) minmax(0, 1fr); }
+    .folder-account-detail-fields span { min-width: 0; padding: 9px 12px; border-bottom: 1px solid #e2e8f0; overflow-wrap: anywhere; }
+    .folder-account-detail-fields span:nth-child(odd) { background: #f8fafc; color: #52606f; font-weight: 750; }
+    .folder-account-detail-fields span:nth-child(even) { color: #111827; font-weight: 600; }
+    .folder-account-detail-fields span.account-setting-active { background: #edf9f1; box-shadow: inset 3px 0 0 #21a05a; }
+    .folder-account-detail-fields span.account-setting-inactive { background: #fff0f0; box-shadow: inset 3px 0 0 #d63c3c; }
+    .folder-account-detail-tiers-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 14px; }
+    .folder-account-detail-tier-card { min-width: 0; display: flex; flex-direction: column; gap: 5px; border: 1px solid #dce6f2; border-radius: 13px; padding: 12px 14px; background: #fff; }
+    .folder-account-detail-tier-card strong { color: #52606f; font-size: 12px; }
+    .folder-account-detail-tier-card span { color: #111827; font-weight: 700; overflow-wrap: anywhere; white-space: pre-line; }
+    .folder-account-detail-tier-card.highlight { grid-column: 1 / -1; background: #eef5ff; border-color: #91b9e2; }
+    .folder-account-detail-tier-card.address { grid-column: 1 / -1; }
+    .folder-account-detail-associated { width: 100%; border-collapse: collapse; }
+    .folder-account-detail-associated th, .folder-account-detail-associated td { padding: 9px 12px; border-top: 1px solid #dce6f2; text-align: left; }
+    .folder-account-detail-associated th { background: #eef4fa; color: #52606f; font-size: 12px; }
+    .folder-account-detail-empty { padding: 16px; color: #64748b; }
+    .folder-accounting-detail-empty { padding: 30px; color: #64748b; text-align: center; }
+
+    @media (max-width: 640px) {
+      .folder-accounting-detail-backdrop { padding: 8px; }
+      .folder-accounting-detail-dialog { width: calc(100vw - 16px); max-height: calc(100vh - 16px); }
+      .folder-accounting-detail-header { align-items: flex-start; flex-direction: column; }
+      .folder-accounting-detail-actions { width: 100%; justify-content: flex-end; }
+      .folder-accounting-account-tabs { align-items: stretch; flex-direction: column; margin: 8px; padding: 8px; }
+      .folder-account-detail-overlay { padding: 8px; }
+      .folder-account-detail-body { grid-template-columns: 1fr; }
+      .folder-account-detail-summary { grid-template-columns: 1fr 1fr; }
+      .folder-account-detail-section.wide, .folder-account-detail-summary { grid-column: 1; }
+      .folder-account-detail-tiers-grid { grid-template-columns: 1fr; }
+      .folder-account-detail-tier-card.highlight, .folder-account-detail-tier-card.address { grid-column: 1; }
+    }
+
+    @media (max-width: 900px) {
+      .folder-editor-accounting-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .folder-editor-accounting-items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 620px) {
+      .folder-editor-accounting-overview,
+      .folder-editor-accounting-items { grid-template-columns: 1fr; }
+    }
+
     .folder-editor-groups {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -5878,6 +6240,10 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
+    }
+
+    .accounting-json-hidden {
+      display: none !important;
     }
 
     #sendJsonButton.sending {
@@ -27907,7 +28273,8 @@ ${body}
     async function fetchFolderRelatedJson(
       baseUrl,
       uuid,
-      endpoint
+      endpoint,
+      signal
     ) {
       const response = await fetch(
         `${baseUrl}${endpoint}`,
@@ -27916,7 +28283,8 @@ ${body}
           headers: {
             "Accept": "application/json, text/plain, */*",
             "UUID": uuid
-          }
+          },
+          signal
         }
       );
 
@@ -29410,7 +29778,8 @@ ${body}
     async function selectFolderSessionForData(
       baseUrl,
       uuid,
-      folderCode
+      folderCode,
+      signal
     ) {
       const code = normalizeReferenceCode(
         folderCode
@@ -29427,7 +29796,8 @@ ${body}
             "UUID": uuid,
             "Content-Type": "application/json-patch+json"
           },
-          body: JSON.stringify(code)
+          body: JSON.stringify(code),
+          signal
         }
       );
 
@@ -34582,6 +34952,10 @@ ${body}
         ]
       },
       {
+        title: "Comptabilité",
+        groups: []
+      },
+      {
         title: "Divers",
         groups: [
           {
@@ -35760,6 +36134,1600 @@ ${body}
       });
 
       section.appendChild(groups);
+      return section;
+    }
+
+    function buildFolderEditorAccountingSection(folder, retrievedFromApi) {
+      const section = document.createElement("section");
+      section.className = "folder-editor-section";
+      section.dataset.folderSection = "Comptabilité";
+      section.style.position = "relative";
+      let accountingLoadController = null;
+
+      const card = document.createElement("div");
+      card.className = "folder-editor-accounting-card";
+      const header = document.createElement("div");
+      header.className = "folder-editor-accounting-header";
+      const title = document.createElement("span");
+      title.textContent = "Paramétrage comptable";
+      const jsonButton = document.createElement("button");
+      jsonButton.type = "button";
+      jsonButton.className = "folder-editor-accounting-json-button";
+      jsonButton.textContent = "{ } JSON";
+      header.append(title, jsonButton);
+
+      const body = document.createElement("div");
+      body.className = "folder-editor-accounting-body";
+      const status = document.createElement("p");
+      status.className = "folder-editor-accounting-status";
+      status.setAttribute("aria-live", "polite");
+      status.textContent = retrievedFromApi
+        ? "Ouvrez cet onglet pour récupérer le paramétrage comptable."
+        : "Disponible après récupération du dossier depuis l’API.";
+      const overview = document.createElement("div");
+      overview.className = "folder-editor-accounting-overview";
+      const items = document.createElement("div");
+      items.className = "folder-editor-accounting-items";
+      body.append(status, overview, items);
+      card.append(header, body);
+      section.appendChild(card);
+
+      const dataCard = document.createElement("div");
+      dataCard.className = "folder-editor-accounting-data-card";
+      const dataTitle = document.createElement("div");
+      dataTitle.className = "folder-editor-accounting-data-title";
+      dataTitle.textContent = "Données comptables";
+      const dataActions = document.createElement("div");
+      dataActions.className = "folder-editor-accounting-data-actions";
+      const addEntriesButton = document.createElement("button");
+      addEntriesButton.type = "button";
+      addEntriesButton.className = "folder-editor-accounting-data-link";
+      addEntriesButton.textContent = "＋ Ajouter des écritures";
+      addEntriesButton.setAttribute("aria-label", "Générer des écritures comptables d’achat ou de vente");
+      const diagApiButton = document.createElement("button");
+      diagApiButton.type = "button";
+      diagApiButton.className = "folder-editor-accounting-data-link";
+      diagApiButton.textContent = "🩺 DiagAPI";
+      diagApiButton.setAttribute("aria-label", "Ouvrir DiagAPI en mode comptabilité");
+      diagApiButton.addEventListener("click", () => {
+        try {
+          if (!apiSessionUuid) throw new Error("Connectez-vous à une API avant d’ouvrir DiagAPI.");
+          const apiUrl = new URL(getSelectedApiBaseUrl());
+          const cnxMatch = apiUrl.pathname.match(/\/([^/]+)\/api\/?$/i);
+          if (!cnxMatch) throw new Error("Le segment CNX est introuvable dans l’URL de l’API.");
+          const diagApiUrl = new URL("https://sbarreau-acd.github.io/api/");
+          diagApiUrl.search = new URLSearchParams({
+            UUID: apiSessionUuid,
+            CNX: cnxMatch[1],
+            REFERER: apiUrl.origin,
+            MODE: "COMPTA"
+          }).toString();
+          window.open(diagApiUrl.toString(), "_blank", "noopener,noreferrer");
+        } catch (error) {
+          window.alert(error?.message || "Impossible de construire le lien DiagAPI.");
+        }
+      });
+      dataActions.append(addEntriesButton, diagApiButton);
+      dataCard.append(dataTitle, dataActions);
+      section.appendChild(dataCard);
+
+      const loadingOverlay = document.createElement("div");
+      loadingOverlay.className = "folder-editor-accounting-loading-overlay";
+      loadingOverlay.hidden = true;
+      loadingOverlay.setAttribute("aria-busy", "true");
+      const loadingPanel = document.createElement("div");
+      loadingPanel.className = "folder-editor-accounting-loading-panel";
+      const loadingSpinner = document.createElement("span");
+      loadingSpinner.className = "folder-editor-accounting-loading-spinner";
+      loadingSpinner.setAttribute("aria-hidden", "true");
+      const loadingMessage = document.createElement("div");
+      loadingMessage.className = "folder-editor-accounting-loading-message";
+      loadingMessage.setAttribute("role", "status");
+      loadingMessage.textContent = "Chargement de la comptabilité en cours… Veuillez patienter.";
+      const cancelLoadingButton = document.createElement("button");
+      cancelLoadingButton.type = "button";
+      cancelLoadingButton.className = "folder-editor-accounting-loading-cancel";
+      cancelLoadingButton.textContent = "Annuler le chargement";
+      cancelLoadingButton.addEventListener("click", () => accountingLoadController?.abort());
+      loadingPanel.append(loadingSpinner, loadingMessage, cancelLoadingButton);
+      loadingOverlay.appendChild(loadingPanel);
+      section.appendChild(loadingOverlay);
+
+      const summaries = {};
+      const addOverview = (key, label, value = "—", asBadge = false) => {
+        const item = document.createElement("div");
+        item.className = "folder-editor-accounting-overview-item";
+        const name = document.createElement("span");
+        name.textContent = label;
+        const result = document.createElement(asBadge ? "span" : "strong");
+        if (asBadge) result.className = "folder-editor-accounting-badge";
+        result.textContent = value;
+        item.append(name, result);
+        overview.appendChild(item);
+        summaries[key] = result;
+        return result;
+      };
+      addOverview("published", "Dossier publié sur iSuite", "—", true);
+      addOverview("length", "Longueur des comptes");
+      addOverview("invoice", "Gestion du numéro de facture", "—", true);
+      addOverview("schedule", "Gestion de l’échéancier", "—", true);
+
+      const detailPayloads = {};
+      const addDetailItem = (key, label, value = "—", badge = false, subtitle = "") => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "folder-editor-accounting-item";
+        button.setAttribute("aria-expanded", "false");
+        const left = document.createElement("span");
+        left.className = "folder-editor-accounting-item-label";
+        const chevron = document.createElement("span");
+        chevron.className = "folder-editor-accounting-item-chevron";
+        chevron.textContent = "▶";
+        const labelWrap = document.createElement("span");
+        const labelText = document.createElement("strong");
+        labelText.textContent = label;
+        labelWrap.appendChild(labelText);
+        if (subtitle) {
+          const sub = document.createElement("span");
+          sub.style.cssText = "display:block;margin-top:3px;color:#526a84;font-size:12px;font-weight:600;";
+          sub.textContent = subtitle;
+          labelWrap.appendChild(sub);
+        }
+        left.append(chevron, labelWrap);
+        const result = document.createElement(badge ? "span" : "strong");
+        result.className = badge
+          ? "folder-editor-accounting-badge"
+          : "folder-editor-accounting-item-count";
+        result.textContent = value;
+        button.append(left, result);
+        button.addEventListener("click", () => {
+          if (button.disabled) return;
+          openDetailWindow(key, detailPayloads[key]);
+        });
+        if (key === "quantities" || key === "analytics") {
+          button.disabled = true;
+          button.classList.add("is-disabled");
+        }
+        items.appendChild(button);
+        summaries[key] = result;
+        return result;
+      };
+      addDetailItem("codesTva", "Codes TVA");
+      addDetailItem("quantities", "Gestion des quantités", "—", true);
+      addDetailItem("analytics", "Gestion de l’analytique", "—", true);
+      addDetailItem("exercises", "Exercices");
+      addDetailItem("journals", "Journaux");
+      addDetailItem("accounts", "Comptes");
+
+      const accountingData = {};
+      const openCreateEntriesDialog = () => {
+        if (!retrievedFromApi || !folder?.Code) {
+          window.alert("Récupérez d’abord un dossier existant depuis l’API.");
+          return;
+        }
+        if (!apiSessionUuid) {
+          window.alert("Connectez-vous à une API avant d’ajouter des écritures.");
+          return;
+        }
+        const backdrop = document.createElement("div");
+        backdrop.className = "folder-accounting-detail-backdrop";
+        backdrop.style.zIndex = "52000";
+        const dialog = document.createElement("section");
+        dialog.className = "folder-accounting-detail-dialog";
+        dialog.style.width = "min(560px, calc(100vw - 32px))";
+        dialog.setAttribute("role", "dialog");
+        dialog.setAttribute("aria-modal", "true");
+        const dialogHeader = document.createElement("header");
+        dialogHeader.className = "folder-accounting-detail-header";
+        const dialogTitle = document.createElement("div");
+        dialogTitle.className = "folder-accounting-detail-title";
+        dialogTitle.textContent = "Ajouter des écritures";
+        const closeButton = document.createElement("button");
+        closeButton.type = "button";
+        closeButton.textContent = "Fermer";
+        dialogHeader.append(dialogTitle, closeButton);
+        const form = document.createElement("form");
+        form.className = "folder-accounting-entry-form";
+        const instruction = document.createElement("p");
+        instruction.className = "folder-editor-accounting-status";
+        instruction.style.margin = "0";
+        instruction.textContent = "Choisissez un ou plusieurs types de factures et le nombre à générer pour chacun.";
+        const typeField = document.createElement("div");
+        typeField.style.cssText = "display:grid;gap:8px;";
+        const choices = [];
+        [["achat", "Écritures d’achat"], ["vente", "Écritures de vente"]].forEach(item => {
+          const choice = document.createElement("label");
+          choice.className = "folder-accounting-entry-choice";
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.value = item[0];
+          checkbox.checked = true;
+          const text = document.createElement("span");
+          text.textContent = item[1];
+          choice.append(checkbox, text);
+          typeField.appendChild(choice);
+          choices.push(checkbox);
+        });
+        const countLabel = document.createElement("label");
+        countLabel.className = "folder-accounting-entry-count";
+        countLabel.appendChild(document.createTextNode("Nombre de factures par type"));
+        const countInput = document.createElement("input");
+        countInput.type = "number";
+        countInput.min = "1";
+        countInput.max = "1000";
+        countInput.step = "1";
+        countInput.value = "5";
+        countInput.required = true;
+        countLabel.appendChild(countInput);
+        const settleOption = document.createElement("label");
+        settleOption.className = "folder-accounting-settle-option";
+        const settleInput = document.createElement("input");
+        settleInput.type = "checkbox";
+        settleInput.checked = true;
+        const settleText = document.createElement("span");
+        settleText.textContent = "Régler les factures";
+        settleOption.append(settleInput, settleText);
+        const reconcileOption = document.createElement("label");
+        reconcileOption.className = "folder-accounting-settle-option";
+        const reconcileInput = document.createElement("input");
+        reconcileInput.type = "checkbox";
+        reconcileInput.checked = true;
+        const reconcileText = document.createElement("span");
+        reconcileText.textContent = "Lettrer les comptes";
+        reconcileOption.append(reconcileInput, reconcileText);
+        settleInput.addEventListener("change", () => {
+          reconcileInput.disabled = !settleInput.checked;
+          if (!settleInput.checked) reconcileInput.checked = false;
+        });
+        const status = document.createElement("p");
+        status.className = "folder-accounting-entry-status";
+        status.setAttribute("role", "status");
+        status.style.whiteSpace = "pre-line";
+        status.style.maxHeight = "min(40vh, 320px)";
+        status.style.overflowY = "auto";
+        status.style.overflowWrap = "anywhere";
+        const footer = document.createElement("div");
+        footer.className = "folder-accounting-entry-footer";
+        const cancelButton = document.createElement("button");
+        cancelButton.type = "button";
+        cancelButton.textContent = "Annuler";
+        const submitButton = document.createElement("button");
+        submitButton.type = "submit";
+        submitButton.className = "primary";
+        submitButton.textContent = "Générer les écritures";
+        footer.append(cancelButton, submitButton);
+        form.append(instruction, typeField, countLabel, settleOption, reconcileOption, status, footer);
+        dialog.append(dialogHeader, form);
+        backdrop.appendChild(dialog);
+        document.body.appendChild(backdrop);
+
+        let busy = false;
+        const close = (force = false) => {
+          if (busy && !force) return;
+          document.removeEventListener("keydown", onKeyDown, true);
+          backdrop.remove();
+        };
+        const onKeyDown = event => {
+          if (event.key !== "Escape") return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          close();
+        };
+        backdrop.closeAccountingDetail = close;
+        document.addEventListener("keydown", onKeyDown, true);
+        closeButton.addEventListener("click", close);
+        cancelButton.addEventListener("click", close);
+        backdrop.addEventListener("mousedown", event => { if (event.target === backdrop) close(); });
+
+        const apiJson = async (baseUrl, endpoint, method = "GET", payload, contentType = "application/json") => {
+          const response = await fetch(baseUrl + endpoint, {
+            method,
+            headers: {
+              "Accept": "application/json, text/plain, */*",
+              "UUID": apiSessionUuid,
+              ...(payload === undefined ? {} : { "Content-Type": contentType })
+            },
+            ...(payload === undefined ? {} : { body: JSON.stringify(payload) })
+          });
+          const text = await response.text();
+          if (!response.ok) {
+            const methodError = response.status === 405
+              ? " — La méthode POST n’est pas autorisée sur cette route. Vérifiez le chemin de création des comptes et la version de l’API."
+              : "";
+            throw new Error(endpoint + " : erreur " + response.status + methodError + (text.trim() ? " — " + text.trim().slice(0, 300) : ""));
+          }
+          if (!text.trim()) return null;
+          try { return JSON.parse(text); } catch { return text; }
+        };
+        const getEntryCodeStorageKey = (baseUrl, folderCode) =>
+          "accountingEntryCodes:" + baseUrl.replace(/\/$/, "") + ":" + String(folderCode ?? "").trim().toUpperCase();
+        const rememberEntryCodes = (responsePayload, storageKey) => {
+          const returnedCodes = [];
+          const visit = value => {
+            if (Array.isArray(value)) {
+              value.forEach(visit);
+              return;
+            }
+            if (!value || typeof value !== "object") return;
+            for (const [key, child] of Object.entries(value)) {
+              if (key.toLowerCase() === "codeecriture" && (typeof child === "number" || typeof child === "string") && String(child).trim()) {
+                returnedCodes.push(child);
+              } else if (child && typeof child === "object") {
+                visit(child);
+              }
+            }
+          };
+          visit(responsePayload);
+          if (!returnedCodes.length) return;
+          let savedCodes = [];
+          try {
+            const raw = localStorage.getItem(storageKey);
+            const parsed = raw ? JSON.parse(raw) : [];
+            if (Array.isArray(parsed)) savedCodes = parsed;
+          } catch (error) {
+            console.warn("Impossible de lire les codes d’écriture mémorisés.", error);
+          }
+          const seen = new Set(savedCodes.map(code => String(code)));
+          for (const code of returnedCodes) {
+            if (!seen.has(String(code))) {
+              savedCodes.push(code);
+              seen.add(String(code));
+            }
+          }
+          accountingData.codeEcritures = savedCodes;
+          try {
+            localStorage.setItem(storageKey, JSON.stringify(savedCodes));
+          } catch (error) {
+            console.warn("Impossible d’enregistrer les codes d’écriture retournés par l’API.", error);
+          }
+          return returnedCodes;
+        };
+        const resolveGedFolderId = payload => {
+          const toId = value => {
+            if (value && typeof value === "object") value = value.Id ?? value.id ?? value.Code ?? value.code;
+            if (value === null || value === undefined || String(value).trim() === "") return null;
+            const id = Number(value);
+            return Number.isInteger(id) && id >= 0 ? id : null;
+          };
+          const visit = (value, insideGed = false) => {
+            if (Array.isArray(value)) {
+              for (const item of value) { const id = visit(item, insideGed); if (id !== null) return id; }
+              return null;
+            }
+            if (!value || typeof value !== "object") return insideGed ? toId(value) : null;
+            for (const [key, child] of Object.entries(value)) {
+              const normalized = key.toLowerCase().replace(/[^a-z0-9]/g, "");
+              const gedKey = normalized.includes("arboged") ||
+                (normalized.includes("rubrique") && normalized.includes("ged")) ||
+                (normalized.includes("arborescence") && normalized.includes("ged"));
+              if (gedKey) {
+                const id = toId(child);
+                if (id !== null) return id;
+                const nestedId = visit(child, true);
+                if (nestedId !== null) return nestedId;
+              } else if (insideGed && normalized === "id") {
+                const id = toId(child);
+                if (id !== null) return id;
+              }
+              const nestedId = visit(child, insideGed);
+              if (nestedId !== null) return nestedId;
+            }
+            return null;
+          };
+          const directId = typeof payload === "number" || typeof payload === "string" ? toId(payload) : null;
+          const id = directId !== null ? directId : visit(payload);
+          if (id === null) throw new Error("Le plan de classement ne contient pas de numéro de rubrique GED exploitable.");
+          return id;
+        };
+        const uploadInvoiceGedDocument = async (baseUrl, idArboged, year) => {
+          const pdfFiles = [1, 2, 3, 4].map(number => ({
+            name: "Facture00" + number + ".pdf",
+            url: "https://sbarreau-acd.github.io/outils/Facture00" + number + ".pdf"
+          }));
+          const pdf = pdfFiles[randomInt(0, pdfFiles.length - 1)];
+          const pdfResponse = await fetch(pdf.url);
+          if (!pdfResponse.ok) throw new Error("Téléchargement de " + pdf.name + " impossible (erreur " + pdfResponse.status + ").");
+          const pdfBlob = await pdfResponse.blob();
+          if (pdfBlob.type && pdfBlob.type !== "application/pdf") throw new Error("Le fichier " + pdf.name + " reçu n’est pas au format PDF.");
+          const formData = new FormData();
+          formData.append("file", pdfBlob, pdf.name);
+          formData.append("idArboged", String(idArboged));
+          formData.append("DateExercice", String(year));
+          formData.append("Diffusable", "true");
+          const response = await fetch(baseUrl + "/v1/ged/documents", {
+            method: "POST",
+            headers: { "Accept": "text/plain", "UUID": apiSessionUuid },
+            body: formData
+          });
+          const responseText = await response.text();
+          if (!response.ok) {
+            throw new Error("/v1/ged/documents : erreur " + response.status + (responseText.trim() ? " — " + responseText.trim().slice(0, 300) : ""));
+          }
+          let documentInfo;
+          try { documentInfo = JSON.parse(responseText); } catch { throw new Error("La réponse de l’API GED ne contient pas de JSON exploitable."); }
+          const documentId = toDocumentId(documentInfo?.Id ?? documentInfo?.Document?.Id ?? documentInfo?.id);
+          if (documentId === null) throw new Error("Le document a été envoyé, mais l’API GED n’a pas retourné son identifiant.");
+          return { id: documentId, name: pdf.name };
+        };
+        const toDocumentId = value => {
+          if (value === null || value === undefined || String(value).trim() === "") return null;
+          const id = Number(value);
+          return Number.isInteger(id) && id >= 0 ? id : null;
+        };
+        const apiArray = (payload, keys) => readArray(payload, keys);
+        const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+        const randomDigits = length => Array.from({ length }, () => String(randomInt(0, 9))).join("");
+        const makeSiren = () => {
+          for (let attempt = 0; attempt < 100; attempt += 1) {
+            const candidate = String(randomInt(1, 9)) + randomDigits(8);
+            const sum = [...candidate].reverse().reduce((total, digit, index) => {
+              let number = Number(digit);
+              if (index % 2 === 1) { number *= 2; if (number > 9) number -= 9; }
+              return total + number;
+            }, 0);
+            if (sum % 10 === 0) return candidate;
+          }
+          throw new Error("Impossible de générer un SIREN de test.");
+        };
+        const makeNic = siren => {
+          for (let attempt = 0; attempt < 100; attempt += 1) {
+            const prefix = randomDigits(4);
+            for (let check = 0; check <= 9; check += 1) {
+              const candidate = prefix + check;
+              const siret = siren + candidate;
+              const sum = [...siret].reverse().reduce((total, digit, index) => {
+                let number = Number(digit);
+                if (index % 2 === 1) { number *= 2; if (number > 9) number -= 9; }
+                return total + number;
+              }, 0);
+              if (sum % 10 === 0) return candidate;
+            }
+          }
+          throw new Error("Impossible de générer un NIC de test valide.");
+        };
+        const companyName = () => {
+          const first = ["Atelier", "Services", "Comptoir", "Groupe", "Établissements", "Société"];
+          const second = ["Azur", "Mistral", "Horizon", "Atlas", "Rivoli", "Étoile", "Camille", "Nova"];
+          return first[randomInt(0, first.length - 1)] + " " + second[randomInt(0, second.length - 1)] + " " + randomInt(10, 999) + " SAS";
+        };
+        const generatePartnerAccount = async (baseUrl, endpoint, prefix, existingCodes) => {
+          let code = "";
+          for (let attempt = 0; attempt < 100; attempt += 1) {
+            code = prefix + Array.from({ length: 9 }, () => "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"[randomInt(0, 35)]).join("");
+            if (!existingCodes.has(code)) break;
+            code = "";
+          }
+          if (!code) throw new Error("Impossible de générer un code de compte " + prefix + " unique.");
+          const name = companyName();
+          const siren = makeSiren();
+          const nic = makeNic(siren);
+          const key = String((12 + 3 * (Number(siren) % 97)) % 97).padStart(2, "0");
+          await apiJson(baseUrl, endpoint, "POST", {
+            Code: code,
+            Lib: name,
+            Let: "O",
+            TiersAssocie: {
+              RaisonSociale: name,
+              Telephone: "01 99 " + randomDigits(2) + " " + randomDigits(2) + " " + randomDigits(2),
+              Email: "contact-" + code.toLowerCase() + "@example.test",
+              Siren: siren,
+              Nic: nic,
+              NumeroIntracom: "FR" + key + siren
+            },
+            Analytique: false
+          });
+          existingCodes.add(code);
+          return code;
+        };
+        const accountCode = (prefix, suffix, length) => {
+          const countLength = Number(length);
+          if (!Number.isInteger(countLength) || countLength < prefix.length + 1) {
+            throw new Error("Longueur des comptes invalide (" + length + ") pour le compte " + prefix + "…" + suffix + ".");
+          }
+          return prefix + "0".repeat(countLength - prefix.length - 1) + suffix;
+        };
+        const getCodes = (payload, keys) => new Set(apiArray(payload, keys).map(item => String(item?.Code ?? "").trim()).filter(Boolean));
+        const ensureGeneralAccount = async (baseUrl, codes, code, label, lettrable) => {
+          if (codes.has(code)) return;
+          const letValue = ["OUI", "O", true].includes(lettrable) ? "O" : "N";
+          await apiJson(baseUrl, "/v1/compta/comptes/generaux", "POST", { Code: code, Lib: label, Let: letValue, Analytique: false });
+          codes.add(code);
+        };
+        const parseExerciseDate = value => {
+          const text = String(value ?? "").trim();
+          let match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+          if (match) return { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) };
+          match = text.match(/^(\d{1,2})[/.](\d{1,2})[/.](\d{4})$/);
+          if (match) return { year: Number(match[3]), month: Number(match[2]), day: Number(match[1]) };
+          return null;
+        };
+        const randomInvoiceDate = (start, end) => {
+          const firstMonth = start.year * 12 + start.month - 1;
+          const lastMonth = end.year * 12 + end.month - 1;
+          if (lastMonth < firstMonth) throw new Error("Les dates de début et de fin de l’exercice sont incohérentes.");
+          const selectedMonth = randomInt(firstMonth, lastMonth);
+          const year = Math.floor(selectedMonth / 12);
+          const month = selectedMonth % 12 + 1;
+          const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+          const firstDay = selectedMonth === firstMonth ? start.day : 1;
+          const lastDay = selectedMonth === lastMonth ? Math.min(end.day, daysInMonth) : daysInMonth;
+          if (!Number.isInteger(firstDay) || !Number.isInteger(lastDay) || firstDay < 1 || firstDay > lastDay) {
+            throw new Error("Les dates de l’exercice ne permettent pas de générer une date de facture valide.");
+          }
+          const day = randomInt(firstDay, lastDay);
+          return year + "-" + String(month).padStart(2, "0") + "-" + String(day).padStart(2, "0");
+        };
+        const createDueLines = (amountHt, date) => {
+          const vat = Math.round(amountHt * 0.2 * 100) / 100;
+          const gross = Math.round((amountHt + vat) * 100) / 100;
+          const firstDue = Math.round(gross * 0.3 * 100) / 100;
+          const datePlus20 = new Date(date + "T12:00:00Z");
+          datePlus20.setUTCDate(datePlus20.getUTCDate() + 20);
+          return [
+            { Date: date + "T00:00:00.000Z", Montant: firstDue, Reglement: "V" },
+            { Date: datePlus20.toISOString().slice(0, 10) + "T00:00:00.000Z", Montant: Math.round((gross - firstDue) * 100) / 100, Reglement: "V" }
+          ];
+        };
+        const createEntryLines = (kind, amountHt, date, piece, invoice, label, partnerCode, accountCodes, taxCode) => {
+          const vat = Math.round(amountHt * 0.2 * 100) / 100;
+          const gross = Math.round((amountHt + vat) * 100) / 100;
+          const dueLines = createDueLines(amountHt, date);
+          const makeLine = (code, amount, side, partner) => ({
+            Jour: Number(date.slice(-2)),
+            NumeroPiece: piece,
+            NumeroFacture: invoice,
+            Compte: code,
+            Libelle: label,
+            Credit: side === "credit" ? amount : 0,
+            Debit: side === "debit" ? amount : 0,
+            ...(partner ? { ModeReglement: "V" } : {}),
+            ...(partner ? { Echeances: dueLines } : {})
+          });
+          const revenueOrExpenseCode = accountCodes[randomInt(0, 1)];
+          if (kind === "achat") {
+            return [
+              makeLine(partnerCode, gross, "credit", true),
+              makeLine(taxCode, vat, "debit", false),
+              makeLine(revenueOrExpenseCode, amountHt, "debit", false)
+            ];
+          }
+          return [
+            makeLine(partnerCode, gross, "debit", true),
+            makeLine(taxCode, vat, "credit", false),
+            makeLine(revenueOrExpenseCode, amountHt, "credit", false)
+          ];
+        };
+        const getField = (row, names) => {
+          if (!row || typeof row !== "object") return undefined;
+          const normalizedNames = new Set(names.map(name => name.toLowerCase()));
+          const entry = Object.entries(row).find(([key]) => normalizedNames.has(key.toLowerCase()));
+          return entry?.[1];
+        };
+        const getApiResultError = payload => {
+          const inspect = value => {
+            if (Array.isArray(value)) {
+              for (const item of value) { const error = inspect(item); if (error) return error; }
+              return "";
+            }
+            if (!value || typeof value !== "object") return "";
+            const returnCode = getField(value, ["codeRetour"]);
+            const description = String(getField(value, ["description"]) ?? "").trim();
+            const errors = getField(value, ["listeErreurs"]);
+            const letteringErrors = getField(value, ["ErreursRetoursLettrage"]);
+            const allErrors = [
+              ...(Array.isArray(errors) ? errors : errors ? [errors] : []),
+              ...(Array.isArray(letteringErrors) ? letteringErrors : letteringErrors ? [letteringErrors] : [])
+            ];
+            if ((returnCode !== undefined && String(returnCode).trim() !== "1") || allErrors.length > 0 || /^(ko|erreur|error)\b/i.test(description)) {
+              const errorDetails = allErrors.length
+                ? " — " + allErrors.map(item => {
+                    if (typeof item === "string") return item;
+                    const error = getField(item, ["Erreur", "Code", "Nom"]);
+                    const detail = getField(item, ["Description", "Message"]);
+                    return [error, detail].filter(Boolean).join(" : ") || JSON.stringify(item);
+                  }).join(" ; ")
+                : "";
+              return "codeRetour " + (returnCode ?? "inconnu") + (description ? " — " + description : "") + errorDetails;
+            }
+            for (const child of Object.values(value)) {
+              if (child && typeof child === "object") { const error = inspect(child); if (error) return error; }
+            }
+            return "";
+          };
+          return inspect(payload);
+        };
+        const parseAmount = value => {
+          if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+          const normalized = String(value ?? "0").trim().replace(/\s/g, "").replace(",", ".");
+          const amount = Number(normalized);
+          return Number.isFinite(amount) ? amount : 0;
+        };
+        const getLedgerRows = payload => {
+          const rows = [];
+          const seen = new Set();
+          const visit = value => {
+            if (Array.isArray(value)) {
+              value.forEach(visit);
+              return;
+            }
+            if (!value || typeof value !== "object") return;
+            const lineId = getField(value, ["LigneEcritureId"]);
+            if (lineId !== undefined && lineId !== null && String(lineId).trim()) {
+              const key = String(lineId);
+              if (!seen.has(key)) rows.push(value);
+              seen.add(key);
+              return;
+            }
+            Object.values(value).forEach(visit);
+          };
+          visit(payload);
+          return rows;
+        };
+        const getBalancedGroups = rows => {
+          const groups = new Map();
+          for (const row of rows) {
+            const lineId = getField(row, ["LigneEcritureId"]);
+            const account = String(getField(row, ["Cpt", "Compte", "CodeCompte", "CompteCode", "NumeroCompte"]) ?? "").trim().toUpperCase();
+            const invoice = String(getField(row, ["Facture", "NumeroFacture", "NoFacture"]) ?? "").trim();
+            if (!account || !invoice) continue;
+            const key = account + "\u0000" + invoice;
+            if (!groups.has(key)) groups.set(key, { account, invoice, lineIds: [], debit: 0, credit: 0 });
+            const group = groups.get(key);
+            group.lineIds.push(lineId);
+            group.debit += parseAmount(getField(row, ["DebE", "Debit", "MontantDebit"]));
+            group.credit += parseAmount(getField(row, ["CreE", "Credit", "MontantCredit"]));
+          }
+          return [...groups.values()].filter(group => group.lineIds.length > 0 && Math.abs(group.debit - group.credit) < 0.005);
+        };
+        const reconcileGeneratedEntries = async (baseUrl, kind, entryIds, dateStart, dateEnd, onLettered) => {
+          if (!entryIds.length) return { matched: 0, eligible: 0, letters: 0, errors: ["Aucun codeEcriture n’a été retourné par l’API."] };
+          const isClient = kind === "vente";
+          const endpoint = isClient ? "/v2/compta/grandlivre/clients" : "/v2/compta/grandlivre/fournisseurs";
+          const prefix = isClient ? "C" : "F";
+          const payload = await apiJson(baseUrl, endpoint, "POST", {
+            CptDebut: prefix,
+            CptFin: isClient ? "CZZZZZZZZZZZ" : "FZZZZZZZZZZZ",
+            DateDebut: dateStart,
+            DateFin: dateEnd,
+            Lettrage: { Type: "tous", RecupererLettragePartiel: true },
+            EcrituresIds: entryIds,
+            RecupererAnalytique: true,
+            RecupererEcheances: true,
+            RecupererANouveau: true,
+            RecupererEcritureId: true
+          }, "application/json-patch+json");
+          const ledgerError = getApiResultError(payload);
+          if (ledgerError) return { matched: 0, eligible: 0, letters: 0, errors: [endpoint + " : " + ledgerError] };
+          const rows = getLedgerRows(payload);
+          const groups = getBalancedGroups(rows);
+          const errors = [];
+          let letters = 0;
+          for (const group of groups) {
+            try {
+              const response = await apiJson(baseUrl, "/v1/compta/ecriture/lettrage", "POST", {
+                CodesLignesEcriture: group.lineIds
+              }, "application/json-patch+json");
+              const apiError = getApiResultError(response);
+              if (apiError) {
+                errors.push(group.account + " / " + group.invoice + " : " + apiError);
+              } else {
+                letters += 1;
+                onLettered?.(kind);
+              }
+            } catch (error) {
+              errors.push(group.account + " / " + group.invoice + " : " + (error?.message || "Erreur API inconnue"));
+            }
+          }
+          return { matched: rows.length, eligible: groups.length, letters, errors };
+        };
+
+        form.addEventListener("submit", async event => {
+          event.preventDefault();
+          if (busy || !form.reportValidity()) return;
+          const quantity = Number(countInput.value);
+          if (!Number.isInteger(quantity) || quantity < 1 || quantity > 1000) {
+            countInput.setCustomValidity("Saisissez un nombre entier entre 1 et 1 000.");
+            countInput.reportValidity();
+            countInput.setCustomValidity("");
+            return;
+          }
+          const selectedKinds = choices.filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
+          if (!selectedKinds.length) {
+            status.textContent = "Sélectionnez au moins un type de facture.";
+            status.classList.add("is-error");
+            return;
+          }
+          if (reconcileInput.checked && !settleInput.checked) {
+            reconcileInput.checked = false;
+          }
+          busy = true;
+          submitButton.disabled = cancelButton.disabled = closeButton.disabled = true;
+          status.classList.remove("is-error", "is-ok");
+          const generationCounts = { achat: 0, vente: 0, settlements: 0, reconciled: { achat: 0, vente: 0 } };
+          const reconciliationErrors = [];
+          const reconcileAccounts = reconcileInput.checked;
+          let letteringStarted = false;
+          const totalReconciled = () => generationCounts.reconciled.achat + generationCounts.reconciled.vente;
+          const formatGenerationSummary = () => {
+            const lines = [
+              "Factures d’achat envoyées : " + generationCounts.achat,
+              "Factures de vente envoyées : " + generationCounts.vente,
+              "Écritures de règlement générées : " + generationCounts.settlements,
+              "Lettrages confirmés : " + totalReconciled() + " (fournisseurs : " + generationCounts.reconciled.achat + " ; clients : " + generationCounts.reconciled.vente + ")"
+            ];
+            if (!reconcileAccounts) lines.push("Lettrage demandé : non");
+            else lines.push("Retours API en erreur de lettrage : " + (letteringStarted ? reconciliationErrors.length : "lettrage non exécuté"));
+            lines.push(...reconciliationErrors.map(message => "• " + message));
+            return lines.join("\n");
+          };
+          try {
+            status.textContent = "Préparation des journaux et des comptes nécessaires…";
+            const baseUrl = getSelectedApiBaseUrl();
+            await selectFolderSessionForData(baseUrl, apiSessionUuid, folder?.Code);
+            const settleInvoices = settleInput.checked;
+            const generatedEntryIds = { achat: new Set(), vente: new Set() };
+            let exerciseDateRange = null;
+            for (const kind of selectedKinds) {
+            const partnerGetEndpoint = kind === "achat"
+              ? "/v1/compta/comptes/fournisseurs?recupPostes=true&recupParamMultiHT=true"
+              : "/v1/compta/comptes/clients?recupPostes=true&recupParamMultiHT=true";
+            const loaded = await Promise.all([
+              apiJson(baseUrl, "/v1/compta/dossier"),
+              apiJson(baseUrl, "/v1/compta/exercices"),
+              apiJson(baseUrl, "/v1/compta/journal"),
+              apiJson(baseUrl, "/v1/compta/comptes/generaux?recupPostes=true"),
+              apiJson(baseUrl, partnerGetEndpoint)
+            ]);
+            const config = loaded[0] || {};
+            const exercises = apiArray(loaded[1], ["Exercices", "exercices", "Items", "items"]);
+            const exercise = exercises.find(item => parseBool(item?.Courant) === true) || exercises[0];
+            const exerciseStart = parseExerciseDate(exercise?.DateDebut);
+            const exerciseEnd = parseExerciseDate(exercise?.DateFin);
+            if (!exerciseStart || !exerciseEnd) throw new Error("Les dates de début et de fin de l’exercice comptable sont introuvables ou invalides.");
+            exerciseDateRange = { start: exercise.DateDebut, end: exercise.DateFin };
+            const length = Number(config.LongueurComptes);
+            if (!Number.isInteger(length)) throw new Error("La longueur des comptes est absente du paramétrage comptable.");
+            const journalCode = kind === "achat" ? "AC" : "VE";
+            const journalRows = apiArray(loaded[2], ["Journaux", "journaux", "Items", "items"]);
+            const journalCodes = new Set(journalRows.map(item => String(item?.Code ?? "").trim().toUpperCase()));
+            if (!journalCodes.has(journalCode)) {
+              await apiJson(baseUrl, "/v1/compta/journal", "POST", {
+                Code: journalCode,
+                Libelle: kind === "achat" ? "Achats" : "Ventes",
+                Nature: kind === "achat" ? "Achat" : "vente",
+                TypeDeSaisie: "P"
+              });
+              journalCodes.add(journalCode);
+            }
+            const generalCodes = getCodes(loaded[3], ["Comptes", "comptes", "Items", "items"]);
+            const bankCode = settleInvoices ? accountCode("512", 1, length) : null;
+            if (settleInvoices) {
+              await ensureGeneralAccount(baseUrl, generalCodes, bankCode, "Banque 1", "NON");
+              if (!journalCodes.has("BQ")) {
+                await apiJson(baseUrl, "/v1/compta/journal", "POST", {
+                  Code: "BQ",
+                  Libelle: "Banque 1",
+                  Nature: "Tresorerie",
+                  TypeDeSaisie: "B"
+                });
+                journalCodes.add("BQ");
+              }
+            }
+            const partnerRows = apiArray(loaded[4], ["Comptes", "comptes", "Items", "items"]);
+            const partnerCodes = getCodes(loaded[4], ["Comptes", "comptes", "Items", "items"]);
+            const generalPrefix = kind === "achat" ? "607" : "707";
+            const taxPrefix = kind === "achat" ? "44566" : "4457";
+            const expenseRevenueCodes = [1, 2].map(index => accountCode(generalPrefix, index, length));
+            const taxCode = accountCode(taxPrefix, 1, length);
+            await ensureGeneralAccount(baseUrl, generalCodes, expenseRevenueCodes[0], kind === "achat" ? "Achat de marchandise 1" : "Vente de marchandise 1", "NON");
+            await ensureGeneralAccount(baseUrl, generalCodes, expenseRevenueCodes[1], kind === "achat" ? "Achat de marchandise 2" : "Vente de marchandise 2", "NON");
+            await ensureGeneralAccount(baseUrl, generalCodes, taxCode, kind === "achat" ? "TVA déductible" : "TVA collectée", "OUI");
+            const partnerEndpoint = kind === "achat" ? "/v1/compta/comptes/fournisseur" : "/v1/compta/comptes/client";
+            const partnerPrefix = kind === "achat" ? "F" : "C";
+            const partners = partnerRows.filter(item => {
+              const code = String(item?.Code ?? "").trim().toUpperCase();
+              const tiers = item?.TiersAssocie ?? item?.Tiers ?? {};
+              const email = String(tiers?.Email ?? "").trim().toLowerCase();
+              return new RegExp("^" + partnerPrefix + "[A-Z0-9]{9}$").test(code) &&
+                email === "contact-" + code.toLowerCase() + "@example.test";
+            }).slice(0, 3).map(item => String(item.Code).trim().toUpperCase());
+            while (partners.length < 3) {
+              partners.push(await generatePartnerAccount(baseUrl, partnerEndpoint, kind === "achat" ? "F" : "C", partnerCodes));
+            }
+
+            status.textContent = "Récupération du plan de classement du journal " + journalCode + "…";
+            const classementPlan = await apiJson(baseUrl, "/v1/compta/planClassementEcriture/" + journalCode);
+            const gedFolderId = resolveGedFolderId(classementPlan);
+            const entryCodeStorageKey = getEntryCodeStorageKey(baseUrl, folder?.Code);
+            try {
+              const savedCodes = JSON.parse(localStorage.getItem(entryCodeStorageKey) || "[]");
+              accountingData.codeEcritures = Array.isArray(savedCodes) ? savedCodes : [];
+            } catch {
+              accountingData.codeEcritures = [];
+            }
+            status.textContent = "Comptes prêts. Envoi de " + quantity + " écriture(s)…";
+            for (let index = 0; index < quantity; index += 1) {
+              const date = randomInvoiceDate(exerciseStart, exerciseEnd);
+              const invoiceYear = Number(date.slice(0, 4));
+              const invoiceMonth = Number(date.slice(5, 7));
+              const partnerIndex = randomInt(0, 2);
+              const labels = kind === "achat"
+                ? ["Achat de fournitures", "Achat de matériel", "Achat de marchandises", "Approvisionnement"]
+                : ["Vente de marchandises", "Prestation de services", "Vente de produits", "Facturation client"];
+              const label = labels[randomInt(0, labels.length - 1)];
+              const sequence = String(index + 1).padStart(4, "0") + randomDigits(2);
+              const piece = journalCode + invoiceYear + String(invoiceMonth).padStart(2, "0") + sequence;
+              const invoice = (kind === "achat" ? "FA" : "FV") + "-" + invoiceYear + String(invoiceMonth).padStart(2, "0") + "-" + randomDigits(6);
+              const amountHt = randomInt(1000, 10000);
+              const dueLines = createDueLines(amountHt, date);
+              status.textContent = "Dépôt de la facture " + (index + 1) + " / " + quantity + " dans la GED…";
+              const gedDocument = await uploadInvoiceGedDocument(baseUrl, gedFolderId, invoiceYear);
+              const invoiceResponse = await apiJson(baseUrl, "/v1/compta/ecriture", "POST", {
+                Journal: journalCode,
+                Mois: invoiceMonth,
+                Annee: invoiceYear,
+                ReferenceGed: gedDocument.id,
+                LignesEcriture: createEntryLines(kind, amountHt, date, piece, invoice, label, partners[partnerIndex], expenseRevenueCodes, taxCode)
+              });
+              generationCounts[kind] += 1;
+              rememberEntryCodes(invoiceResponse, entryCodeStorageKey).forEach(code => generatedEntryIds[kind].add(code));
+              if (settleInvoices) {
+                for (let dueIndex = 0; dueIndex < dueLines.length; dueIndex += 1) {
+                  const due = dueLines[dueIndex];
+                  const dueDate = new Date(due.Date);
+                  const settlementLabel = "Regl. fact " + invoice + " échéance " + (dueIndex + 1);
+                  const bankIsDebit = kind === "vente";
+                  const settlementResponse = await apiJson(baseUrl, "/v1/compta/ecritures", "POST", [{
+                    Journal: "BQ",
+                    Mois: dueDate.getUTCMonth() + 1,
+                    Annee: dueDate.getUTCFullYear(),
+                    LignesEcriture: [
+                      {
+                        Jour: dueDate.getUTCDate(),
+                        NumeroPiece: piece,
+                        NumeroFacture: invoice,
+                        Compte: bankCode,
+                        Libelle: settlementLabel,
+                        Credit: bankIsDebit ? 0 : due.Montant,
+                        Debit: bankIsDebit ? due.Montant : 0
+                      },
+                      {
+                        Jour: dueDate.getUTCDate(),
+                        NumeroPiece: piece,
+                        NumeroFacture: invoice,
+                        Compte: partners[partnerIndex],
+                        Libelle: settlementLabel,
+                        Credit: bankIsDebit ? due.Montant : 0,
+                        Debit: bankIsDebit ? 0 : due.Montant,
+                        ModeReglement: "V"
+                      }
+                    ]
+                  }]);
+                  generationCounts.settlements += 1;
+                  rememberEntryCodes(settlementResponse, entryCodeStorageKey).forEach(code => generatedEntryIds[kind].add(code));
+                  status.textContent = "Facture " + (index + 1) + " / " + quantity + " — règlement échéance " + (dueIndex + 1) + " / " + dueLines.length + "…";
+                }
+              } else {
+                status.textContent = "Envoi des écritures… " + (index + 1) + " / " + quantity;
+              }
+            }
+            }
+            if (reconcileAccounts) {
+              letteringStarted = true;
+              for (const kind of selectedKinds) {
+                status.textContent = "Récupération des écritures à lettrer pour les " + (kind === "achat" ? "fournisseurs" : "clients") + "…";
+                try {
+                  const result = await reconcileGeneratedEntries(
+                    baseUrl,
+                    kind,
+                    [...generatedEntryIds[kind]],
+                    exerciseDateRange.start,
+                    exerciseDateRange.end,
+                    matchedKind => { generationCounts.reconciled[matchedKind] += 1; }
+                  );
+                  for (const message of result.errors) {
+                    reconciliationErrors.push((kind === "achat" ? "Fournisseurs" : "Clients") + " — " + message);
+                  }
+                  if (result.eligible === 0 && result.errors.length === 0) {
+                    reconciliationErrors.push((kind === "achat" ? "Fournisseurs" : "Clients") + " — aucune facture équilibrée trouvée dans le grand livre.");
+                  }
+                } catch (error) {
+                  reconciliationErrors.push((kind === "achat" ? "Fournisseurs" : "Clients") + " — " + (error?.message || "Erreur API inconnue"));
+                }
+              }
+            }
+            status.textContent = "Génération terminée.\n" + formatGenerationSummary();
+            status.classList.toggle("is-error", reconciliationErrors.length > 0);
+            status.classList.toggle("is-ok", reconciliationErrors.length === 0);
+            cancelButton.textContent = "Fermer";
+            submitButton.hidden = true;
+          } catch (error) {
+            status.textContent = (error?.message || "La génération des écritures a échoué.") + "\n\nÉtat actuel :\n" + formatGenerationSummary();
+            status.classList.add("is-error");
+          } finally {
+            busy = false;
+            submitButton.disabled = cancelButton.disabled = closeButton.disabled = false;
+          }
+        });
+        countInput.focus();
+      };
+      addEntriesButton.addEventListener("click", openCreateEntriesDialog);
+      jsonButton.addEventListener("click", () => {
+        const data = accountingData.config || accountingData;
+        openJsonModal(data, "GET /v1/compta/dossier", "/v1/compta/dossier", null, {
+          method: "GET",
+          hideApiResult: true,
+          hideSendJsonButton: true
+        });
+      });
+
+      const setBadge = (badge, value) => {
+        const bool = value === true ? true : value === false ? false : null;
+        badge.textContent = bool === null ? "N/A" : bool ? "OK" : "Non";
+        badge.classList.toggle("is-off", bool !== true);
+        const detailButton = badge.closest(".folder-editor-accounting-item");
+        if (detailButton) {
+          detailButton.disabled = bool !== true;
+          detailButton.classList.toggle("is-disabled", bool !== true);
+        }
+      };
+      const parseBool = value => {
+        if (value === true || value === false) return value;
+        if (typeof value === "number") return value !== 0;
+        if (typeof value !== "string") return null;
+        const normalized = value.trim().toLowerCase();
+        if (["true", "1", "oui", "yes", "o", "y"].includes(normalized)) return true;
+        if (["false", "0", "non", "no", "n"].includes(normalized)) return false;
+        return null;
+      };
+      const readArray = (payload, keys) => {
+        if (Array.isArray(payload)) return payload;
+        if (!payload || typeof payload !== "object") return [];
+        for (const key of keys) if (Array.isArray(payload[key])) return payload[key];
+        return extractApiArray(payload, keys);
+      };
+      const compactDate = value => {
+        const dateText = String(value || "").trim();
+        const match = dateText.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        return match ? `${match[3]}/${match[2]}/${match[1].slice(-2)}` : dateText;
+      };
+
+      function openDetailWindow(kind, payload) {
+        document.querySelectorAll(".folder-accounting-detail-backdrop").forEach(item => item.closeAccountingDetail?.());
+        const config = {
+          codesTva: { title: "Codes TVA", endpoint: "/v1/compta/paramètres/codesTVA", columns: [["Code", ["Code"]], ["Libellé", ["Libelle", "Libellé"]], ["Taux", ["Taux"]], ["Cpt TVA déductible", ["CompteTVADeductible", "CptTVADeductible", "CompteTVADed"]], ["Cpt TVA collectée", ["CompteTVACollectee", "CptTVACollectee", "CompteTVACol"]]] },
+          quantities: { title: "Gestion des quantités", endpoint: "/v1/compta/paramètres/quantite", columns: [["Code", ["Code"]], ["Libellé", ["Libelle", "Libellé"]], ["PrixUnitMin", ["PrixUnitMin"]], ["PrixUnitMax", ["PrixUnitMax"]], ["QuantiteMin", ["QuantiteMin"]], ["QuantiteMax", ["QuantiteMax"]], ["NbreDecimale", ["NbreDecimale"]]] },
+          analytics: { title: "Paramétrage analytique", endpoint: "/v1/compta/paramètres/analytique", columns: [["SEC_LIB", ["SEC_LIB"]], ["SEC_N1", ["SEC_N1"]], ["SEC_N2", ["SEC_N2"]], ["SEC_N3", ["SEC_N3"]]] },
+          exercises: { title: "Exercices comptables", endpoint: "/v1/compta/exercices", columns: [["Exercice", ["Code", "Annee", "Année"]], ["Date début", ["DateDebut"]], ["Date fin", ["DateFin"]], ["Courant", ["Courant"]]] },
+          journals: { title: "Journaux comptables", endpoint: "/v1/compta/journal", columns: [["Code", ["Code"]], ["Libellé", ["Libelle", "Libellé"]], ["Nature", ["Nature"]], ["TypeDeSaisie", ["TypeDeSaisie"]], ["CompteDeTresorerie", ["CompteDeTresorerie"]], ["Date blocage", ["DateBloquage"]], ["Rubrique GED", ["IdRubriqueGed"]], ["NumeroFacture", ["NumeroFacture"]]] },
+          accounts: { title: "Comptes", endpoint: "/v1/compta/comptes/generaux?recupPostes=true", columns: [["Code", ["Code"]], ["Libellé", ["Lib"]], ["TVA", ["CodeTVA", "CompteHorsTaxe"]], ["Lettrable", ["Let"]], ["Analytique", ["ActivationAnalytique"]], ["Quantités", ["Qte"]], ["Inactif", ["CptInactif"]], ["Interdit", ["CptInterdit"]]] }
+        }[kind] || { title: "Détail comptable", endpoint: "", columns: [] };
+
+        const backdrop = document.createElement("div");
+        backdrop.className = "folder-accounting-detail-backdrop";
+        const dialog = document.createElement("section");
+        dialog.className = "folder-accounting-detail-dialog";
+        dialog.setAttribute("role", "dialog");
+        dialog.setAttribute("aria-modal", "true");
+        const headerEl = document.createElement("header");
+        headerEl.className = "folder-accounting-detail-header";
+        const titleEl = document.createElement("div");
+        titleEl.className = "folder-accounting-detail-title";
+        titleEl.textContent = config.title;
+        const actions = document.createElement("div");
+        actions.className = "folder-accounting-detail-actions";
+        const jsonAction = document.createElement("button");
+        jsonAction.type = "button";
+        jsonAction.textContent = "{ } JSON";
+        const closeAction = document.createElement("button");
+        closeAction.type = "button";
+        closeAction.textContent = "Fermer";
+        actions.append(jsonAction, closeAction);
+        headerEl.append(titleEl, actions);
+
+        const content = document.createElement("div");
+        content.className = "folder-accounting-detail-content";
+        let activeAccount = "accountsGeneral";
+        let activeData = payload;
+        let activeEndpoint = config.endpoint;
+        let activeTitle = config.title;
+        let columns = config.columns;
+        let accountTabs = null;
+
+        const setRowsForAccount = (key, label, endpoint) => {
+          activeAccount = key;
+          activeData = payload?.[key];
+          activeEndpoint = endpoint;
+          activeTitle = label;
+          columns = config.columns;
+          renderTable();
+          accountTabs?.querySelectorAll("button").forEach(button => {
+            button.classList.toggle("active", button.dataset.accountType === key);
+          });
+          titleEl.textContent = label;
+        };
+
+        if (kind === "accounts") {
+          accountTabs = document.createElement("div");
+          accountTabs.className = "folder-accounting-account-tabs";
+          const showLabel = document.createElement("span");
+          showLabel.textContent = "Afficher :";
+          accountTabs.appendChild(showLabel);
+          [
+            ["accountsGeneral", "Généraux", "/v1/compta/comptes/generaux?recupPostes=true"],
+            ["accountsClients", "Clients", "/v1/compta/comptes/clients?recupPostes=true&recupParamMultiHT=true"],
+            ["accountsSuppliers", "Fournisseurs", "/v1/compta/comptes/fournisseurs?recupPostes=true&recupParamMultiHT=true"]
+          ].forEach(([key, label, endpoint]) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "folder-accounting-account-tab";
+            button.dataset.accountType = key;
+            const name = document.createElement("span");
+            name.textContent = label;
+            const badge = document.createElement("span");
+            badge.className = "folder-accounting-account-tab-count";
+            badge.textContent = String(readArray(payload?.[key], ["Comptes", "comptes", "Items", "items"]).length);
+            button.append(name, badge);
+            button.addEventListener("click", () => setRowsForAccount(key, `Comptes ${label.toLowerCase()}`, endpoint));
+            accountTabs.appendChild(button);
+          });
+          content.appendChild(accountTabs);
+        }
+
+        const toolbar = document.createElement("div");
+        toolbar.className = "folder-accounting-detail-toolbar";
+        const count = document.createElement("span");
+        count.className = "folder-accounting-detail-count";
+        const reset = document.createElement("button");
+        reset.type = "button";
+        reset.className = "folder-accounting-detail-reset";
+        reset.textContent = "Réinitialiser les filtres";
+        toolbar.append(count, reset);
+        content.appendChild(toolbar);
+
+        const tableWrap = document.createElement("div");
+        tableWrap.className = "folder-accounting-detail-table-wrap";
+        const table = document.createElement("table");
+        table.className = "folder-accounting-detail-table";
+        const head = document.createElement("thead");
+        const bodyRows = document.createElement("tbody");
+        table.append(head, bodyRows);
+        tableWrap.appendChild(table);
+        content.appendChild(tableWrap);
+        dialog.append(headerEl, content);
+        backdrop.appendChild(dialog);
+        document.body.appendChild(backdrop);
+
+        const normalizedData = value => {
+          const list = Array.isArray(value) ? value : readArray(value, ["Data", "data", "Items", "items", "Result", "results"]);
+          if (kind !== "analytics") return list;
+          const flat = [];
+          const walk = rows => (Array.isArray(rows) ? rows : []).forEach(row => {
+            flat.push(row);
+            walk(row?.Sections);
+          });
+          walk(list);
+          return flat;
+        };
+        const getValue = (row, keys) => {
+          for (const key of keys) {
+            if (row && row[key] !== undefined && row[key] !== null) {
+              const value = row[key];
+              return typeof value === "object" ? JSON.stringify(value) : String(value);
+            }
+          }
+          return "";
+        };
+        const displayValue = (row, keys, label) => {
+          if (kind === "accounts") {
+            if (label === "TVA") {
+              const vatCode = getValue(row, ["CodeTVA"]);
+              const taxFreeCode = getValue(row, ["CompteHorsTaxe"]);
+              return [vatCode, taxFreeCode ? `HT ${taxFreeCode}` : ""].filter(Boolean).join(" · ");
+            }
+            if (["Lettrable", "Analytique", "Quantités", "Inactif", "Interdit"].includes(label)) {
+              const enabled = parseBool(getValue(row, keys)) === true;
+              if (!enabled) return "";
+              return label === "Interdit" ? "✕" : "✓";
+            }
+          }
+          const value = getValue(row, keys);
+          if (label === "Date blocage" && value) {
+            const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (match) return `${match[3]}/${match[2]}/${match[1]}`;
+          }
+          if (label === "Courant" || label === "NumeroFacture") {
+            return parseBool(value) === true ? "✓" : "";
+          }
+          return value;
+        };
+
+        const hasAccountTiersInfo = tiers => {
+          if (!tiers || typeof tiers !== "object") return false;
+          const meaningful = value => value !== null && value !== undefined && String(value).trim() !== "" && value !== 0;
+          const values = [tiers.Code, tiers.RaisonSociale, tiers.Siren, tiers.Siret, tiers.Titre, tiers.Telephone, tiers.Email, tiers.Fax, tiers.NumeroIntracom];
+          if (values.some(meaningful)) return true;
+          const address = tiers.Adresse;
+          return Boolean(address && typeof address === "object" && [address.Numero, address.Nature, address.Complement, address.Hameau, address.CodePostal, address.Pays, address.Bureau].some(meaningful));
+        };
+
+        const openAccountDetail = (account, focusTiers = false) => {
+          const detailOverlay = document.createElement("div");
+          detailOverlay.className = "folder-account-detail-overlay";
+          const detailDialog = document.createElement("section");
+          detailDialog.className = "folder-account-detail-dialog";
+          detailDialog.setAttribute("role", "dialog");
+          detailDialog.setAttribute("aria-modal", "true");
+          const detailHeader = document.createElement("header");
+          detailHeader.className = "folder-account-detail-header";
+          const headerText = document.createElement("div");
+          const accountCode = getValue(account, ["Code"]);
+          const accountLabel = getValue(account, ["Lib", "Libelle", "Libellé"]);
+          const typeLabel = ({
+            accountsGeneral: "Compte général",
+            accountsClients: "Compte client",
+            accountsSuppliers: "Compte fournisseur"
+          })[activeAccount] || "Compte";
+          const detailTitle = document.createElement("h2");
+          detailTitle.textContent = `Détail du compte ${accountCode}`;
+          const detailSubtitle = document.createElement("div");
+          detailSubtitle.className = "folder-account-detail-subtitle";
+          detailSubtitle.textContent = [typeLabel, accountLabel].filter(Boolean).join(" · ");
+          headerText.append(detailTitle, detailSubtitle);
+          const detailClose = document.createElement("button");
+          detailClose.type = "button";
+          detailClose.className = "folder-account-detail-close";
+          detailClose.textContent = "Fermer";
+          detailHeader.append(headerText, detailClose);
+
+          const detailBody = document.createElement("div");
+          detailBody.className = "folder-account-detail-body";
+          const valueText = value => {
+            if (value === null || value === undefined || value === "") return "—";
+            if (typeof value === "boolean") return value ? "Oui" : "Non";
+            if (Array.isArray(value)) return value.length ? value.map(item => typeof item === "object" ? JSON.stringify(item) : String(item)).join(", ") : "—";
+            if (typeof value === "object") {
+              const summary = value.Lib ?? value.Libelle ?? value.Libellé ?? value.Code;
+              return summary !== undefined ? String(summary) : JSON.stringify(value);
+            }
+            if (["O", "OUI", "TRUE", "1"].includes(String(value).trim().toUpperCase())) return "Oui";
+            if (["N", "NON", "FALSE", "0"].includes(String(value).trim().toUpperCase())) return "Non";
+            return String(value);
+          };
+          const makeFields = fields => {
+            const grid = document.createElement("div");
+            grid.className = "folder-account-detail-fields";
+            fields.forEach(([label, value]) => {
+              const key = document.createElement("span");
+              key.textContent = label;
+              const val = document.createElement("span");
+              val.textContent = valueText(value);
+              if (label === "Gestion des quantités" || label === "Analytique") {
+                val.classList.add(parseBool(value) === true ? "account-setting-active" : "account-setting-inactive");
+              }
+              grid.append(key, val);
+            });
+            return grid;
+          };
+          const addSection = (label, fields, wide = false) => {
+            const panel = document.createElement("section");
+            panel.className = `folder-account-detail-section${wide ? " wide" : ""}`;
+            panel.dataset.accountSection = label;
+            const heading = document.createElement("h3");
+            heading.textContent = label;
+            panel.appendChild(heading);
+            if (!fields.length) {
+              const empty = document.createElement("div");
+              empty.className = "folder-account-detail-empty";
+              empty.textContent = "Aucune information retournée.";
+              panel.appendChild(empty);
+            } else {
+              panel.appendChild(makeFields(fields));
+            }
+            detailBody.appendChild(panel);
+            return panel;
+          };
+
+          const inactive = parseBool(getValue(account, ["CptInactif"])) === true;
+          const forbidden = parseBool(getValue(account, ["CptInterdit"])) === true;
+          const summary = document.createElement("div");
+          summary.className = "folder-account-detail-summary";
+          [["Compte", accountCode], ["Libellé", accountLabel]].forEach(([label, value]) => {
+            const box = document.createElement("div");
+            box.className = "folder-account-detail-summary-card";
+            const small = document.createElement("small");
+            small.textContent = label;
+            const strong = document.createElement("strong");
+            strong.textContent = value || "—";
+            box.append(small, strong);
+            summary.appendChild(box);
+          });
+          [[inactive ? "COMPTE INACTIF" : "COMPTE ACTIF", inactive], [forbidden ? "COMPTE INTERDIT" : "COMPTE AUTORISÉ", forbidden]].forEach(([label, isBad]) => {
+            const badge = document.createElement("div");
+            badge.className = `folder-account-detail-badge${isBad ? " is-inactive" : ""}`;
+            badge.textContent = label;
+            summary.appendChild(badge);
+          });
+          detailBody.appendChild(summary);
+
+          addSection("Identification", [
+            ["Catégorie", account.Categ],
+            ["Collectif", account.Coll],
+            ["Compte collectif", account.CptCptCol],
+            ["Régularisation / échéance", account.RegEc]
+          ]);
+          addSection("Paramétrage comptable", [
+            ["Lettrable", account.Let],
+            ["Gestion des quantités", account.Qte],
+            ["Unité de quantité 1", account.UniteQte1],
+            ["Unité de quantité 2", account.UniteQte2],
+            ["Analytique", account.ActivationAnalytique],
+            ["Clé de répartition", account.CleRepartition],
+            ["Code TVA", account.CodeTVA],
+            ["Compte hors taxe", account.CompteHorsTaxe]
+          ]);
+          const posteFields = account.Poste && typeof account.Poste === "object"
+            ? Object.entries(account.Poste).map(([key, value]) => [key === "Libelle" ? "Libellé" : key, value])
+            : [];
+          addSection("Poste", posteFields);
+          const multiFields = account.ParametrageMultiHT && typeof account.ParametrageMultiHT === "object"
+            ? Object.entries(account.ParametrageMultiHT).filter(([key]) => key !== "ComptesAssocies").map(([key, value]) => [key, value])
+            : [];
+          const associatedAccounts = Array.isArray(account.ParametrageMultiHT?.ComptesAssocies) ? account.ParametrageMultiHT.ComptesAssocies : [];
+          const multiPanel = addSection("Paramétrage Multi HT", multiFields);
+          if (associatedAccounts.length) {
+            const associatedTable = document.createElement("table");
+            associatedTable.className = "folder-account-detail-associated";
+            const thead = document.createElement("thead");
+            const headRow = document.createElement("tr");
+            ["Compte associé", "Fréquence", "Ordre"].forEach(label => {
+              const th = document.createElement("th");
+              th.textContent = label;
+              headRow.appendChild(th);
+            });
+            thead.appendChild(headRow);
+            const tbody = document.createElement("tbody");
+            associatedAccounts.forEach(item => {
+              const tr = document.createElement("tr");
+              [item?.Code, item?.Frequence, item?.Ordre].forEach(value => {
+                const td = document.createElement("td");
+                td.textContent = valueText(value);
+                tr.appendChild(td);
+              });
+              tbody.appendChild(tr);
+            });
+            associatedTable.append(thead, tbody);
+            multiPanel.appendChild(associatedTable);
+          }
+
+          if (hasAccountTiersInfo(account.Tiers)) {
+            const tiers = account.Tiers;
+            const tiersPanel = addSection("Tiers", [], true);
+            const tiersGrid = document.createElement("div");
+            tiersGrid.className = "folder-account-detail-tiers-grid";
+            const address = tiers.Adresse && typeof tiers.Adresse === "object" ? tiers.Adresse : {};
+            const addressLines = [
+              [address.Numero, address.Nature, address.Complement].map(value => String(value ?? "").trim()).filter(Boolean).join(" "),
+              String(address.Hameau ?? "").trim(),
+              [address.CodePostal, address.Bureau].map(value => String(value ?? "").trim()).filter(Boolean).join(" "),
+              String(address.Pays ?? "").trim()
+            ].filter(Boolean);
+            const addTierCard = (label, value, extraClass = "") => {
+              const card = document.createElement("div");
+              card.className = `folder-account-detail-tier-card${extraClass ? ` ${extraClass}` : ""}`;
+              const heading = document.createElement("strong");
+              heading.textContent = label;
+              const content = document.createElement("span");
+              content.textContent = valueText(value);
+              card.append(heading, content);
+              tiersGrid.appendChild(card);
+            };
+            [
+              ["Code tiers", tiers.Code],
+              ["Personne morale", tiers.PersonneMorale],
+              ["Titre", tiers.Titre]
+            ].forEach(([label, value]) => addTierCard(label, value));
+            addTierCard("Raison sociale", tiers.RaisonSociale, "highlight");
+            [
+              ["SIREN", tiers.Siren],
+              ["SIRET", tiers.Siret],
+              ["N° TVA intracommunautaire", tiers.NumeroIntracom],
+              ["Téléphone", tiers.Telephone],
+              ["Fax", tiers.Fax],
+              ["Email", tiers.Email]
+            ].forEach(([label, value]) => addTierCard(label, value));
+            addTierCard("Adresse", addressLines.length ? addressLines.join("\n") : tiers.Adresse, "address");
+            tiersPanel.appendChild(tiersGrid);
+          }
+
+          const knownKeys = new Set([
+            "Code", "Categ", "Lib", "Let", "RegEc", "Qte", "Coll", "CptCptCol", "CodeTVA",
+            "CompteHorsTaxe", "Poste", "ParametrageMultiHT", "CptInactif", "CptInterdit",
+            "UniteQte1", "UniteQte2", "ActivationAnalytique", "CleRepartition", "Tiers"
+          ]);
+          const extraFields = Object.entries(account).filter(([key]) => !knownKeys.has(key));
+          if (extraFields.length) addSection("Autres données retournées par l’API", extraFields, true);
+
+          detailDialog.append(detailHeader, detailBody);
+          detailOverlay.appendChild(detailDialog);
+          backdrop.appendChild(detailOverlay);
+          const closeDetail = () => detailOverlay.remove();
+          detailClose.addEventListener("click", closeDetail);
+          detailOverlay.addEventListener("mousedown", event => { if (event.target === detailOverlay) closeDetail(); });
+          detailClose.focus();
+          if (focusTiers) {
+            const tiersPanel = detailBody.querySelector('[data-account-section="Tiers"]');
+            tiersPanel?.scrollIntoView({ block: "start" });
+          }
+        };
+        let filters = [];
+        let sortIndex = -1;
+        let sortDirection = 1;
+        const renderTable = () => {
+          const rows = normalizedData(activeData);
+          head.innerHTML = "";
+          bodyRows.innerHTML = "";
+          filters = [];
+          const headerRow = document.createElement("tr");
+          columns.forEach(([label], index) => {
+            const th = document.createElement("th");
+            const sort = document.createElement("button");
+            sort.type = "button";
+            sort.textContent = `${label} ${sortIndex === index ? (sortDirection === 1 ? "↑" : "↓") : "↕"}`;
+            sort.style.cssText = "border:0;padding:0;background:transparent;color:inherit;font:inherit;font-weight:inherit;cursor:pointer;white-space:nowrap;";
+            sort.addEventListener("click", () => {
+              sortDirection = sortIndex === index ? -sortDirection : 1;
+              sortIndex = index;
+              renderTable();
+            });
+            th.appendChild(sort);
+            headerRow.appendChild(th);
+          });
+          head.appendChild(headerRow);
+
+          const filterRow = document.createElement("tr");
+          filterRow.className = "filter-row";
+          columns.forEach((column, index) => {
+            const td = document.createElement("td");
+            const input = document.createElement("input");
+            input.type = "search";
+            input.placeholder = "Contient ou <>exclure";
+            input.setAttribute("aria-label", `Filtrer ${column[0]}`);
+            input.addEventListener("input", () => { filters[index] = input.value.trim(); renderBody(); });
+            filters[index] = "";
+            td.appendChild(input);
+            filterRow.appendChild(td);
+          });
+          head.appendChild(filterRow);
+
+          const renderBody = () => {
+            bodyRows.innerHTML = "";
+            const visibleRows = rows.filter(row => columns.every(([label, keys], index) => {
+              const filter = String(filters[index] || "").toLowerCase();
+              if (!filter) return true;
+              const value = displayValue(row, keys, label).toLowerCase();
+              if (filter.startsWith("<>")) return !value.includes(filter.slice(2).trim());
+              return value.includes(filter);
+            }));
+            if (sortIndex >= 0) {
+              const [label, keys] = columns[sortIndex];
+              visibleRows.sort((a, b) => displayValue(a, keys, label).localeCompare(displayValue(b, keys, label), "fr", { numeric: true }) * sortDirection);
+            }
+            count.textContent = `${visibleRows.length} ligne(s) trouvée(s)`;
+            if (!visibleRows.length) {
+              const tr = document.createElement("tr");
+              const td = document.createElement("td");
+              td.colSpan = Math.max(columns.length, 1);
+              td.className = "folder-accounting-detail-empty";
+              td.textContent = "Aucune donnée à afficher.";
+              tr.appendChild(td);
+              bodyRows.appendChild(tr);
+              return;
+            }
+            visibleRows.forEach(row => {
+              const tr = document.createElement("tr");
+              if (kind === "journals" && getValue(row, ["DateBloquage"])) tr.classList.add("is-blocked");
+              if (kind === "accounts" && parseBool(getValue(row, ["CptInterdit"])) === true) tr.classList.add("is-forbidden");
+              columns.forEach(([label, keys]) => {
+                const td = document.createElement("td");
+                const value = displayValue(row, keys, label);
+                if (kind === "accounts" && label === "Code" && value) {
+                  const codeButton = document.createElement("button");
+                  codeButton.type = "button";
+                  codeButton.className = "folder-accounting-account-code";
+                  codeButton.textContent = value;
+                  codeButton.setAttribute("aria-label", `Afficher le détail du compte ${value}`);
+                  codeButton.addEventListener("click", () => openAccountDetail(row));
+                  td.appendChild(codeButton);
+                } else if (kind === "accounts" && label === "Libellé") {
+                  td.appendChild(document.createTextNode(value));
+                  if (hasAccountTiersInfo(row?.Tiers)) {
+                    const tierBadge = document.createElement("button");
+                    tierBadge.type = "button";
+                    tierBadge.className = "folder-accounting-tier-badge";
+                    tierBadge.textContent = "Tiers";
+                    tierBadge.title = "Afficher les informations du tiers associé";
+                    tierBadge.setAttribute("aria-label", `Afficher les informations du tiers associé au compte ${getValue(row, ["Code"])}`);
+                    tierBadge.addEventListener("click", () => openAccountDetail(row, true));
+                    td.appendChild(tierBadge);
+                  }
+                } else {
+                  td.textContent = value;
+                }
+                if (value === "✓") td.classList.add("is-true");
+                if (value === "✕") td.classList.add("is-false");
+                tr.appendChild(td);
+              });
+              bodyRows.appendChild(tr);
+            });
+          };
+          reset.onclick = () => {
+            filterRow.querySelectorAll("input").forEach(input => { input.value = ""; });
+            filters = filters.map(() => "");
+            renderBody();
+          };
+          renderBody();
+        };
+
+        const close = () => {
+          document.removeEventListener("keydown", onKeyDown, true);
+          backdrop.remove();
+        };
+        backdrop.closeAccountingDetail = close;
+        const onKeyDown = event => {
+          if (event.key !== "Escape") return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          const accountDetail = backdrop.querySelector(".folder-account-detail-overlay");
+          if (accountDetail) {
+            accountDetail.remove();
+            return;
+          }
+          close();
+        };
+        closeAction.addEventListener("click", close);
+        backdrop.addEventListener("mousedown", event => { if (event.target === backdrop) close(); });
+        document.addEventListener("keydown", onKeyDown, true);
+        jsonAction.addEventListener("click", () => {
+          const data = kind === "accounts" ? activeData : payload;
+          close();
+          openJsonModal(data, `GET ${activeEndpoint}`, activeEndpoint, null, {
+            method: "GET",
+            hideApiResult: true,
+            hideSendJsonButton: true
+          });
+        });
+
+        if (kind === "accounts") setRowsForAccount("accountsGeneral", "Comptes généraux", activeEndpoint);
+        else renderTable();
+        closeAction.focus();
+      }
+
+      let loaded = false;
+      section.loadAccounting = async () => {
+        if (loaded || accountingLoadController) return;
+        if (!retrievedFromApi) return;
+        if (!apiSessionUuid) {
+          status.textContent = "Connectez-vous à l’API pour récupérer le paramétrage comptable.";
+          status.classList.add("is-error");
+          return;
+        }
+        loaded = true;
+        const loadController = new AbortController();
+        accountingLoadController = loadController;
+        section.dataset.accountingLoading = "true";
+        loadingOverlay.hidden = false;
+        status.textContent = "Récupération du paramétrage comptable…";
+        status.classList.remove("is-error", "is-ok");
+        try {
+          const baseUrl = getSelectedApiBaseUrl();
+          await selectFolderSessionForData(baseUrl, apiSessionUuid, folder?.Code, loadController.signal);
+          let errors = 0;
+          const configRequest = await Promise.allSettled([
+            fetchFolderRelatedJson(baseUrl, apiSessionUuid, "/v1/compta/dossier", loadController.signal)
+          ]);
+          if (loadController.signal.aborted) throw new DOMException("Chargement annulé.", "AbortError");
+          if (configRequest[0].status === "fulfilled") accountingData.config = configRequest[0].value;
+          else {
+            accountingData.config = { erreur: configRequest[0].reason?.message || "Erreur API" };
+            errors += 1;
+          }
+
+          const config = accountingData.config && typeof accountingData.config === "object" ? accountingData.config : {};
+          const quantitiesEnabled = parseBool(config.GestionQuantites);
+          const analyticsConfig = config.Analytique && typeof config.Analytique === "object"
+            ? config.Analytique.Parametrage && typeof config.Analytique.Parametrage === "object"
+              ? config.Analytique.Parametrage.Active ?? config.Analytique.Active
+              : config.Analytique.Active
+            : config.Analytique;
+          const analyticsEnabled = parseBool(analyticsConfig);
+          const requests = [
+            ["codesTva", "/v1/compta/paramètres/codesTVA", ["CodesTVA", "codesTVA", "Items", "items"]],
+            ...(quantitiesEnabled === true ? [["quantities", "/v1/compta/paramètres/quantite", ["Quantites", "quantites", "Items", "items"]]] : []),
+            ...(analyticsEnabled === true ? [["analytics", "/v1/compta/paramètres/analytique", ["Sections", "sections", "Items", "items"]]] : []),
+            ["exercises", "/v1/compta/exercices", ["Exercices", "exercices", "Items", "items"]],
+            ["journals", "/v1/compta/journal", ["Journaux", "journaux", "Items", "items"]],
+            ["accountsGeneral", "/v1/compta/comptes/generaux?recupPostes=true", ["Comptes", "comptes", "Items", "items"]],
+            ["accountsClients", "/v1/compta/comptes/clients?recupPostes=true&recupParamMultiHT=true", ["Comptes", "comptes", "Items", "items"]],
+            ["accountsSuppliers", "/v1/compta/comptes/fournisseurs?recupPostes=true&recupParamMultiHT=true", ["Comptes", "comptes", "Items", "items"]]
+          ];
+          const results = await Promise.allSettled(requests.map(([, endpoint]) => fetchFolderRelatedJson(baseUrl, apiSessionUuid, endpoint, loadController.signal)));
+          if (loadController.signal.aborted) throw new DOMException("Chargement annulé.", "AbortError");
+          requests.forEach(([key], index) => {
+            const result = results[index];
+            if (result.status === "fulfilled") accountingData[key] = result.value;
+            else {
+              accountingData[key] = { erreur: result.reason?.message || "Erreur API" };
+              errors += 1;
+            }
+          });
+
+          if (quantitiesEnabled !== true) accountingData.quantities = { GestionQuantites: quantitiesEnabled };
+          if (analyticsEnabled !== true) accountingData.analytics = { Analytique: analyticsEnabled };
+          setBadge(summaries.published, parseBool(config.PublieSurISuite));
+          summaries.length.textContent = config.LongueurComptes ?? "—";
+          setBadge(summaries.invoice, parseBool(config.GestionNumeroFacture));
+          setBadge(summaries.schedule, parseBool(config.GestionEcheancier));
+          setBadge(summaries.quantities, quantitiesEnabled);
+          setBadge(summaries.analytics, analyticsEnabled);
+
+          const values = {};
+          requests.forEach(([key, , arrayKeys]) => {
+            if (arrayKeys.length && !accountingData[key]?.erreur) {
+              values[key] = readArray(accountingData[key], arrayKeys);
+            }
+          });
+          detailPayloads.codesTva = accountingData.codesTva;
+          detailPayloads.quantities = quantitiesEnabled === false
+            ? { GestionQuantites: false }
+            : accountingData.quantities;
+          detailPayloads.analytics = parseBool(analyticsConfig) === false
+            ? { Analytique: false }
+            : accountingData.analytics;
+          detailPayloads.exercises = accountingData.exercises;
+          detailPayloads.journals = accountingData.journals;
+          detailPayloads.accounts = {
+            accountsGeneral: accountingData.accountsGeneral,
+            accountsClients: accountingData.accountsClients,
+            accountsSuppliers: accountingData.accountsSuppliers
+          };
+          summaries.codesTva.textContent = values.codesTva ? String(values.codesTva.length) : "—";
+          summaries.journals.textContent = values.journals ? String(values.journals.length) : "—";
+          const accountLists = ["accountsGeneral", "accountsClients", "accountsSuppliers"]
+            .filter(key => Array.isArray(values[key]));
+          summaries.accounts.textContent = accountLists.length
+            ? String(accountLists.reduce((total, key) => total + values[key].length, 0))
+            : "—";
+          const exercises = values.exercises || [];
+          const currentExercise = exercises.find(item => parseBool(item?.Courant) === true) || exercises[0];
+          const exerciseItem = summaries.exercises.closest(".folder-editor-accounting-item");
+          summaries.exercises.textContent = values.exercises ? String(exercises.length) : "—";
+          if (currentExercise) {
+            const subtitle = exerciseItem?.querySelector(".folder-editor-accounting-item-label span span");
+            if (subtitle) subtitle.textContent = `${compactDate(currentExercise.DateDebut)} → ${compactDate(currentExercise.DateFin)}`;
+          }
+
+          status.textContent = errors
+            ? `Paramétrage récupéré avec ${errors} donnée(s) indisponible(s).`
+            : "Paramétrage récupéré.";
+          status.classList.add(errors ? "is-error" : "is-ok");
+          accountingData.erreurs = errors;
+        } catch (error) {
+          loaded = false;
+          if (loadController.signal.aborted || error?.name === "AbortError") {
+            status.textContent = "Chargement annulé. Cliquez à nouveau sur l’onglet Comptabilité pour réessayer.";
+            status.classList.remove("is-error", "is-ok");
+          } else {
+            status.textContent = error?.message || "Impossible de récupérer le paramétrage comptable.";
+            status.classList.add("is-error");
+          }
+        } finally {
+          loadingOverlay.hidden = true;
+          delete section.dataset.accountingLoading;
+          if (accountingLoadController === loadController) accountingLoadController = null;
+        }
+      };
+
       return section;
     }
 
@@ -43101,6 +45069,7 @@ ${body}
     }
     async function openFolderEditor(folderIndex, preferredTabTitle = "") {
       closeFolderGedPreviewOverlays();
+      document.querySelectorAll(".folder-accounting-detail-backdrop").forEach(item => item.closeAccountingDetail?.());
       const folder = generatedFolders[folderIndex];
       if (!folder) return;
 
@@ -43259,9 +45228,11 @@ ${body}
         groupEntries.forEach(group => {
           group.entries.forEach(([key]) => knownKeys.add(key));
         });
-        if (!groupEntries.length) return;
+        if (!groupEntries.length && sectionConfig.title !== "Comptabilité") return;
 
-        const section = buildFolderEditorSection(sectionConfig.title, groupEntries);
+        const section = sectionConfig.title === "Comptabilité"
+          ? buildFolderEditorAccountingSection(folder, retrievedFromApi)
+          : buildFolderEditorSection(sectionConfig.title, groupEntries);
         const sectionId = `folderEditorSection_${sectionIndex}`;
         section.id = sectionId;
         section.setAttribute("role", "tabpanel");
@@ -43285,6 +45256,13 @@ ${body}
           tab.classList.add("active");
           tab.setAttribute("aria-selected", "true");
           section.classList.add("active");
+
+          section.loadAccounting?.();
+
+          if (section.dataset.accountingLoading === "true") {
+            section.querySelector(".folder-editor-accounting-loading-cancel")?.focus();
+            return;
+          }
 
           const firstEditable = section.querySelector("input:not(:disabled), select:not(:disabled), textarea:not(:disabled)");
           if (firstEditable) firstEditable.focus();
@@ -44349,6 +46327,7 @@ ${body}
 
     function closeFolderEditor() {
       closeFolderGedPreviewOverlays();
+      document.querySelectorAll(".folder-accounting-detail-backdrop").forEach(item => item.closeAccountingDetail?.());
       setFolderEditorFullscreen(false);
       folderEditorExitActionButton.hidden = true;
       folderEditorModal.classList.remove("open");
@@ -45907,7 +47886,9 @@ ${body}
         itemIndex: Number.isInteger(context.itemIndex)
           ? context.itemIndex
           : null,
-        method: String(context.method || "POST").toUpperCase()
+        method: String(context.method || "POST").toUpperCase(),
+        hideApiResult: Boolean(context.hideApiResult),
+        hideSendJsonButton: Boolean(context.hideSendJsonButton)
       };
 
       let resolvedStoredResult = apiResult;
@@ -45938,6 +47919,8 @@ ${body}
       jsonView.textContent = currentJson;
 
       displayApiResult(currentModalApiResult);
+      apiResultBox.classList.toggle("accounting-json-hidden", currentModalContext.hideApiResult);
+      sendJsonButton.classList.toggle("accounting-json-hidden", currentModalContext.hideSendJsonButton);
       updateSendJsonButton();
 
       jsonModal.classList.add("open");
@@ -48599,6 +50582,23 @@ ${body}
     document.addEventListener("keydown", event => {
       if (event.key !== "Escape") return;
 
+      const accountingDetail = document.querySelector(".folder-accounting-detail-backdrop");
+      if (accountingDetail) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        accountingDetail.closeAccountingDetail?.();
+        return;
+      }
+
+      // La fenêtre JSON est un niveau au-dessus de l’éditeur de dossier :
+      // Échap doit fermer uniquement cette fenêtre au premier plan.
+      if (jsonModal.classList.contains("open")) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        closeJsonModal();
+        return;
+      }
+
       if (folderEditorModal.classList.contains("open")) {
         closeFolderEditor();
       }
@@ -48609,10 +50609,6 @@ ${body}
 
       if (bulkCollaboratorModal.classList.contains("open")) {
         closeBulkCollaboratorModal();
-      }
-
-      if (jsonModal.classList.contains("open")) {
-        closeJsonModal();
       }
 
       if (reportModal.classList.contains("open")) {
