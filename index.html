@@ -1945,6 +1945,16 @@
       margin-top: -2px;
     }
 
+    .sandbox-file-transfer-status { color: #526a84; font-size: 12px; }
+    .sandbox-file-transfer-status.is-error { color: #b42323; }
+    .sandbox-file-transfer-status.is-ok { color: #067647; }
+    #sandboxFileTransferModal { z-index: 1600; }
+    #sandboxFileTransferModal .modal { width: min(680px, 100%); }
+    .sandbox-file-transfer-form { display: grid; gap: 16px; }
+    .sandbox-file-transfer-auto-option { display: flex; align-items: center; gap: 9px; color: #173f70; font-weight: 700; }
+    .sandbox-file-transfer-auto-option input { width: 18px; height: 18px; accent-color: #2563eb; }
+    .sandbox-file-transfer-auto-message { margin: 0; border: 1px solid #dbe5f1; border-radius: 9px; padding: 13px; background: #f4f7fb; color: #334155; font: 13px/1.5 Consolas, "Courier New", monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+
     .sandbox-editor-panel > .generator-reset-button {
       grid-column: 5 / 6;
       grid-row: 1;
@@ -4550,6 +4560,7 @@
     }
 
     .folder-editor-accounting-data-title { color: #173f70; font-size: 16px; font-weight: 800; }
+    .folder-editor-accounting-update-date { color: #526a84; font-size: 13px; font-weight: 600; }
     .folder-editor-accounting-data-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .folder-editor-accounting-data-link {
       display: inline-flex;
@@ -4618,6 +4629,12 @@
     .folder-editor-accounting-items {
       display: grid;
       gap: 10px;
+    }
+
+    .folder-editor-accounting-overview[hidden],
+    .folder-editor-accounting-items[hidden],
+    .folder-editor-accounting-data-card[hidden] {
+      display: none !important;
     }
 
     .folder-editor-accounting-overview { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 10px; }
@@ -4775,6 +4792,8 @@
     .folder-accounting-detail-table .filter-row input { width: 100%; min-width: 96px; border: 1px solid #cbd8e9; border-radius: 9px; padding: 9px 10px; font: inherit; }
     .folder-accounting-detail-table tr.is-blocked { background: #fff0f0; color: #b42323; }
     .folder-accounting-detail-table tr.is-forbidden { background: #fff0f0; color: #b42323; }
+    .folder-accounting-detail-table tr.is-current { background: #eaf7ef; color: #17613a; font-weight: 700; }
+    .folder-accounting-detail-table tr.is-current td:first-child { border-left: 4px solid #198754; }
     .folder-accounting-detail-table .is-true { color: #16834d; font-size: 18px; font-weight: 800; }
     .folder-accounting-detail-table .is-false { color: #b42323; font-size: 18px; font-weight: 800; }
     .folder-accounting-account-tabs { display: flex; align-items: center; gap: 10px; margin: 12px 16px 0; padding: 12px 16px; border: 1px solid #dce6f2; border-radius: 14px; background: #eef4fa; color: #4b5563; font-weight: 750; }
@@ -10475,6 +10494,7 @@
                     <code id="apiSessionUuidDisplay"></code>
                     <button class="api-session-tool-button" id="copyApiSessionUuidButton" type="button">Copier</button>
                     <a class="api-session-tool-button" id="apiSwaggerLink" href="#" target="_blank" rel="noopener noreferrer">Swagger ↗</a>
+                    <a class="api-session-tool-button" id="apiIsuitePortalLink" href="#" target="_blank" rel="noopener noreferrer">Portail i-Suite ↗</a>
                   </div>
                 </div>
                 <div class="api-connect-right" id="apiConnectionRight">
@@ -10826,7 +10846,8 @@
               <div class="sandbox-editor-actions" id="sandboxEditorActions">
                 <button type="button" class="sandbox-export-button" id="exportSandboxCabinetButton" disabled>📊 Cabinet</button>
                 <button type="button" class="sandbox-export-button" id="exportSandboxCollaboratorsButton" disabled>📊 Collaborateurs</button>
-
+                <button type="button" class="sandbox-export-button" id="transferSandboxFilesButton" disabled title="Choisissez le dossier U:\import\automatique lorsque la fenêtre de sélection s’ouvre">Transfert des fichiers</button>
+                <span class="sandbox-file-transfer-status" id="sandboxFileTransferStatus" role="status" aria-live="polite"></span>
               </div>
             </div>
 
@@ -11897,6 +11918,27 @@
   </div>
 
   <!-- MODALE MAIL EDITEUR SANDBOX -->
+  <div class="modal-backdrop" id="sandboxFileTransferModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="sandboxFileTransferTitle">
+      <div class="modal-header">
+        <h3 id="sandboxFileTransferTitle">Transfert des fichiers</h3>
+        <button class="modal-close" id="sandboxFileTransferClose" type="button" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body sandbox-file-transfer-form">
+        <label class="sandbox-file-transfer-auto-option">
+          <input id="sandboxFileTransferAutomatic" type="checkbox">
+          <span>Import automatique</span>
+        </label>
+        <pre class="sandbox-file-transfer-auto-message" id="sandboxFileTransferAutoMessage" hidden></pre>
+        <p class="sandbox-file-transfer-status" id="sandboxFileTransferModalStatus" role="status" aria-live="polite"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-button" id="sandboxFileTransferCancel" type="button">Annuler</button>
+        <button class="primary-button" id="sandboxFileTransferConfirm" type="button">Transférer les fichiers</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="sandboxMailModal" aria-hidden="true">
     <div class="modal sandbox-mail-modal" role="dialog" aria-modal="true" aria-labelledby="sandboxMailModalTitle">
       <div class="modal-header">
@@ -14466,9 +14508,9 @@
       return `${prefix}_${editorToken}_${stamp}.xlsx`;
     }
 
-    function exportSandboxCabinetToExcel() {
+    function buildSandboxCabinetXlsxBlob() {
       rebuildSandboxExportData();
-      if (!sandboxCabinetData) return;
+      if (!sandboxCabinetData) return null;
 
       const headers = [
         "SOC_CODE", "SOC_NOM", "SOC_ADR1", "POSTAL_CODE", "SOC_VILLE",
@@ -14480,11 +14522,13 @@
         headers.map(header => sandboxCabinetData[header] ?? "")
       ];
 
-      downloadBlob(
-        buildSingleSheetXlsxBlob("Cabinet", rows),
-        buildSandboxExportFilename("cabinet_sandbox")
-      );
+      return buildSingleSheetXlsxBlob("Cabinet", rows);
+    }
 
+    function exportSandboxCabinetToExcel() {
+      const workbook = buildSandboxCabinetXlsxBlob();
+      if (!workbook) return;
+      downloadBlob(workbook, buildSandboxExportFilename("cabinet_sandbox"));
       sandboxCabinetFileExported = true;
 
       // Nom éditeur, e-mail, nombre de collaborateurs et durée de validité
@@ -14494,9 +14538,9 @@
       updateSandboxEditButtonState();
     }
 
-    function exportSandboxCollaboratorsToExcel() {
+    function buildSandboxCollaboratorsXlsxExport() {
       rebuildSandboxExportData();
-      if (!sandboxCollaboratorData.length) return;
+      if (!sandboxCollaboratorData.length) return null;
 
       // Le fichier d'import ne doit contenir que les collaborateurs
       // qui n'existent pas encore dans la base API actuellement connectée.
@@ -14505,7 +14549,7 @@
       );
 
       if (!collaboratorsToExport.length) {
-        return;
+        return null;
       }
 
       const headers = [
@@ -14530,16 +14574,19 @@
         )
       ];
 
-      downloadBlob(
-        buildSingleSheetXlsxBlob("Collaborateurs", rows),
-        buildSandboxExportFilename("collaborateurs_sandbox")
-      );
+      return {
+        blob: buildSingleSheetXlsxBlob("Collaborateurs", rows),
+        collaborators: collaboratorsToExport
+      };
+    }
 
+    function exportSandboxCollaboratorsToExcel() {
+      const exportData = buildSandboxCollaboratorsXlsxExport();
+      if (!exportData) return;
+      downloadBlob(exportData.blob, buildSandboxExportFilename("collaborateurs_sandbox"));
       // Verrouiller uniquement les collaborateurs réellement présents
       // dans le fichier qui vient d'être téléchargé.
-      markSandboxCollaboratorsAsExported(
-        collaboratorsToExport
-      );
+      markSandboxCollaboratorsAsExported(exportData.collaborators);
 
       renderSandboxPrimaryCollaboratorInfo();
       updateSandboxExportButtonsState();
@@ -14852,6 +14899,7 @@
     const apiSessionUuidDisplay = document.getElementById("apiSessionUuidDisplay");
     const copyApiSessionUuidButton = document.getElementById("copyApiSessionUuidButton");
     const apiSwaggerLink = document.getElementById("apiSwaggerLink");
+    const apiIsuitePortalLink = document.getElementById("apiIsuitePortalLink");
     const connectApiButton = document.getElementById("connectApiButton");
     const disconnectApiButton = document.getElementById("disconnectApiButton");
     const apiLoginPanel = document.getElementById("apiLoginPanel");
@@ -14906,6 +14954,15 @@
     const sandboxModificationClearFiltersButton = document.getElementById("sandboxModificationClearFiltersButton");
     const exportSandboxCabinetButton = document.getElementById("exportSandboxCabinetButton");
     const exportSandboxCollaboratorsButton = document.getElementById("exportSandboxCollaboratorsButton");
+    const transferSandboxFilesButton = document.getElementById("transferSandboxFilesButton");
+    const sandboxFileTransferStatus = document.getElementById("sandboxFileTransferStatus");
+    const sandboxFileTransferModal = document.getElementById("sandboxFileTransferModal");
+    const sandboxFileTransferAutomatic = document.getElementById("sandboxFileTransferAutomatic");
+    const sandboxFileTransferAutoMessage = document.getElementById("sandboxFileTransferAutoMessage");
+    const sandboxFileTransferModalStatus = document.getElementById("sandboxFileTransferModalStatus");
+    const sandboxFileTransferConfirm = document.getElementById("sandboxFileTransferConfirm");
+    const sandboxFileTransferClose = document.getElementById("sandboxFileTransferClose");
+    const sandboxFileTransferCancel = document.getElementById("sandboxFileTransferCancel");
     const sandboxMailButton = document.getElementById("sandboxMailButton");
     const sandboxMailModal = document.getElementById("sandboxMailModal");
     const sandboxMailModalClose = document.getElementById("sandboxMailModalClose");
@@ -15081,6 +15138,7 @@
     // manuellement l'un de ces codes, l'export concerné est désactivé afin
     // d'éviter d'exporter un fichier qui ne correspond plus à la saisie.
     let sandboxCabinetEditedByUser = false;
+    let sandboxFileTransferInProgress = false;
     let sandboxLevel1EditedByUser = false;
     let sandboxLevel2EditedByUser = false;
     let wasSandboxModificationMode = false;
@@ -16865,6 +16923,9 @@
             sandboxLevel2EditedByUser
           )
         );
+
+      transferSandboxFilesButton.disabled = sandboxFileTransferInProgress ||
+        (exportSandboxCabinetButton.disabled && exportSandboxCollaboratorsButton.disabled);
     }
 
     function markSandboxReferenceEdited(key) {
@@ -23163,12 +23224,18 @@ ${body}
       apiSessionUuidDisplay.textContent = connected ? apiSessionUuid : "";
       if (connected) {
         try {
-          apiSwaggerLink.href = `${getSelectedApiBaseUrl().replace(/\/+$/, "")}/swagger`;
+          const apiBaseUrl = new URL(getSelectedApiBaseUrl());
+          const apiPath = apiBaseUrl.pathname.replace(/\/+$/, "");
+          apiSwaggerLink.href = `${apiBaseUrl.origin}${apiPath}/swagger`;
+          const portalPath = apiPath.replace(/\/api$/i, "").replace(/\/+$/, "");
+          apiIsuitePortalLink.href = `${apiBaseUrl.origin}${portalPath}/isuiteexpert`;
         } catch {
           apiSwaggerLink.href = "#";
+          apiIsuitePortalLink.href = "#";
         }
       } else {
         apiSwaggerLink.href = "#";
+        apiIsuitePortalLink.href = "#";
       }
       connectApiButton.hidden = !connected && !apiEnvironmentInput.value;
       connectApiButton.textContent = connected
@@ -36177,6 +36244,9 @@ ${body}
       const dataTitle = document.createElement("div");
       dataTitle.className = "folder-editor-accounting-data-title";
       dataTitle.textContent = "Données comptables";
+      const dataUpdateDate = document.createElement("div");
+      dataUpdateDate.className = "folder-editor-accounting-update-date";
+      dataUpdateDate.setAttribute("aria-live", "polite");
       const dataActions = document.createElement("div");
       dataActions.className = "folder-editor-accounting-data-actions";
       const addEntriesButton = document.createElement("button");
@@ -36208,7 +36278,7 @@ ${body}
         }
       });
       dataActions.append(addEntriesButton, diagApiButton);
-      dataCard.append(dataTitle, dataActions);
+      dataCard.append(dataTitle, dataUpdateDate, dataActions);
       section.appendChild(dataCard);
 
       const loadingOverlay = document.createElement("div");
@@ -36633,6 +36703,42 @@ ${body}
           await apiJson(baseUrl, "/v1/compta/comptes/generaux", "POST", { Code: code, Lib: label, Let: letValue, Analytique: false });
           codes.add(code);
         };
+        const ensureJournal = async (baseUrl, journalCodes, code, journalPayload) => {
+          if (journalCodes.has(code)) return;
+          let creationError = null;
+          try {
+            const response = await apiJson(baseUrl, "/v1/compta/journal", "POST", journalPayload);
+            if (response && typeof response === "object" && !Array.isArray(response)) {
+              const fields = Object.fromEntries(Object.entries(response).map(([key, value]) => [key.toLowerCase(), value]));
+              const returnCode = fields.coderetour;
+              const errors = fields.listeerreurs ?? fields.erreurs ?? fields.errors;
+              if ((returnCode !== undefined && String(returnCode).trim() !== "1") || (Array.isArray(errors) && errors.length > 0)) {
+                const details = Array.isArray(errors)
+                  ? errors.map(error => typeof error === "string" ? error : error?.description ?? error?.message ?? JSON.stringify(error)).join(" ; ")
+                  : "";
+                throw new Error(details || fields.description || `L’API a refusé la création du journal ${code}.`);
+              }
+            }
+          } catch (error) {
+            creationError = error;
+          }
+
+          // Le POST est attendu, puis on vérifie la présence réelle du journal :
+          // certaines réponses HTTP positives ne garantissent pas sa disponibilité immédiate.
+          for (let attempt = 0; attempt < 4; attempt += 1) {
+            if (attempt > 0) await new Promise(resolve => setTimeout(resolve, attempt * 300));
+            const refreshedJournals = await apiJson(baseUrl, "/v1/compta/journal");
+            const found = apiArray(refreshedJournals, ["Journaux", "journaux", "Items", "items"])
+              .some(item => String(item?.Code ?? "").trim().toUpperCase() === code);
+            if (found) {
+              journalCodes.add(code);
+              return;
+            }
+          }
+
+          if (creationError) throw new Error(`Création du journal ${code} non confirmée : ${creationError.message || creationError}`);
+          throw new Error(`Le journal ${code} reste introuvable après sa création. Aucune facture n’a été envoyée pour ce journal.`);
+        };
         const parseExerciseDate = value => {
           const text = String(value ?? "").trim();
           let match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -36867,6 +36973,27 @@ ${body}
             const settleInvoices = settleInput.checked;
             const generatedEntryIds = { achat: new Set(), vente: new Set() };
             let exerciseDateRange = null;
+            status.textContent = "Vérification et préparation des journaux…";
+            const initialJournals = await apiJson(baseUrl, "/v1/compta/journal");
+            const preparedJournalCodes = new Set(apiArray(initialJournals, ["Journaux", "journaux", "Items", "items"])
+              .map(item => String(item?.Code ?? "").trim().toUpperCase()));
+            for (const kind of selectedKinds) {
+              const code = kind === "achat" ? "AC" : "VE";
+              await ensureJournal(baseUrl, preparedJournalCodes, code, {
+                Code: code,
+                Libelle: kind === "achat" ? "Achats" : "Ventes",
+                Nature: kind === "achat" ? "Achat" : "vente",
+                TypeDeSaisie: "P"
+              });
+            }
+            if (settleInvoices) {
+              await ensureJournal(baseUrl, preparedJournalCodes, "BQ", {
+                Code: "BQ",
+                Libelle: "Banque 1",
+                Nature: "Tresorerie",
+                TypeDeSaisie: "B"
+              });
+            }
             for (const kind of selectedKinds) {
             const partnerGetEndpoint = kind === "achat"
               ? "/v1/compta/comptes/fournisseurs?recupPostes=true&recupParamMultiHT=true"
@@ -36889,29 +37016,26 @@ ${body}
             if (!Number.isInteger(length)) throw new Error("La longueur des comptes est absente du paramétrage comptable.");
             const journalCode = kind === "achat" ? "AC" : "VE";
             const journalRows = apiArray(loaded[2], ["Journaux", "journaux", "Items", "items"]);
-            const journalCodes = new Set(journalRows.map(item => String(item?.Code ?? "").trim().toUpperCase()));
-            if (!journalCodes.has(journalCode)) {
-              await apiJson(baseUrl, "/v1/compta/journal", "POST", {
+            const journalCodes = new Set([
+              ...journalRows.map(item => String(item?.Code ?? "").trim().toUpperCase()),
+              ...preparedJournalCodes
+            ]);
+            await ensureJournal(baseUrl, journalCodes, journalCode, {
                 Code: journalCode,
                 Libelle: kind === "achat" ? "Achats" : "Ventes",
                 Nature: kind === "achat" ? "Achat" : "vente",
                 TypeDeSaisie: "P"
               });
-              journalCodes.add(journalCode);
-            }
             const generalCodes = getCodes(loaded[3], ["Comptes", "comptes", "Items", "items"]);
             const bankCode = settleInvoices ? accountCode("512", 1, length) : null;
             if (settleInvoices) {
               await ensureGeneralAccount(baseUrl, generalCodes, bankCode, "Banque 1", "NON");
-              if (!journalCodes.has("BQ")) {
-                await apiJson(baseUrl, "/v1/compta/journal", "POST", {
+              await ensureJournal(baseUrl, journalCodes, "BQ", {
                   Code: "BQ",
                   Libelle: "Banque 1",
                   Nature: "Tresorerie",
                   TypeDeSaisie: "B"
                 });
-                journalCodes.add("BQ");
-              }
             }
             const partnerRows = apiArray(loaded[4], ["Comptes", "comptes", "Items", "items"]);
             const partnerCodes = getCodes(loaded[4], ["Comptes", "comptes", "Items", "items"]);
@@ -37098,7 +37222,7 @@ ${body}
           codesTva: { title: "Codes TVA", endpoint: "/v1/compta/paramètres/codesTVA", columns: [["Code", ["Code"]], ["Libellé", ["Libelle", "Libellé"]], ["Taux", ["Taux"]], ["Cpt TVA déductible", ["CompteTVADeductible", "CptTVADeductible", "CompteTVADed"]], ["Cpt TVA collectée", ["CompteTVACollectee", "CptTVACollectee", "CompteTVACol"]]] },
           quantities: { title: "Gestion des quantités", endpoint: "/v1/compta/paramètres/quantite", columns: [["Code", ["Code"]], ["Libellé", ["Libelle", "Libellé"]], ["PrixUnitMin", ["PrixUnitMin"]], ["PrixUnitMax", ["PrixUnitMax"]], ["QuantiteMin", ["QuantiteMin"]], ["QuantiteMax", ["QuantiteMax"]], ["NbreDecimale", ["NbreDecimale"]]] },
           analytics: { title: "Paramétrage analytique", endpoint: "/v1/compta/paramètres/analytique", columns: [["SEC_LIB", ["SEC_LIB"]], ["SEC_N1", ["SEC_N1"]], ["SEC_N2", ["SEC_N2"]], ["SEC_N3", ["SEC_N3"]]] },
-          exercises: { title: "Exercices comptables", endpoint: "/v1/compta/exercices", columns: [["Exercice", ["Code", "Annee", "Année"]], ["Date début", ["DateDebut"]], ["Date fin", ["DateFin"]], ["Courant", ["Courant"]]] },
+          exercises: { title: "Exercices comptables", endpoint: "/v1/compta/exercices", columns: [["Exercice", ["DateFin"]], ["Date début", ["DateDebut"]], ["Date fin", ["DateFin"]], ["Courant", ["Courant"]]] },
           journals: { title: "Journaux comptables", endpoint: "/v1/compta/journal", columns: [["Code", ["Code"]], ["Libellé", ["Libelle", "Libellé"]], ["Nature", ["Nature"]], ["TypeDeSaisie", ["TypeDeSaisie"]], ["CompteDeTresorerie", ["CompteDeTresorerie"]], ["Date blocage", ["DateBloquage"]], ["Rubrique GED", ["IdRubriqueGed"]], ["NumeroFacture", ["NumeroFacture"]]] },
           accounts: { title: "Comptes", endpoint: "/v1/compta/comptes/generaux?recupPostes=true", columns: [["Code", ["Code"]], ["Libellé", ["Lib"]], ["TVA", ["CodeTVA", "CompteHorsTaxe"]], ["Lettrable", ["Let"]], ["Analytique", ["ActivationAnalytique"]], ["Quantités", ["Qte"]], ["Inactif", ["CptInactif"]], ["Interdit", ["CptInterdit"]]] }
         }[kind] || { title: "Détail comptable", endpoint: "", columns: [] };
@@ -37219,6 +37343,21 @@ ${body}
           return "";
         };
         const displayValue = (row, keys, label) => {
+          if (kind === "exercises") {
+            if (label === "Exercice") {
+              const closingDate = getValue(row, ["DateFin", "dateFin"]).trim();
+              const isoYear = closingDate.match(/^(\d{4})-/);
+              const localizedYear = closingDate.match(/^\d{1,2}[/.]\d{1,2}[/.](\d{4})$/);
+              return isoYear?.[1] || localizedYear?.[1] || "";
+            }
+            if (label === "Date début" || label === "Date fin") {
+              const rawDate = getValue(row, keys).trim();
+              const isoDate = rawDate.match(/^(\d{4})-(\d{2})-(\d{2})/);
+              if (isoDate) return `${isoDate[3]}/${isoDate[2]}/${isoDate[1]}`;
+              const localizedDate = rawDate.match(/^(\d{1,2})[/.](\d{1,2})[/.](\d{4})$/);
+              if (localizedDate) return `${localizedDate[1].padStart(2, "0")}/${localizedDate[2].padStart(2, "0")}/${localizedDate[3]}`;
+            }
+          }
           if (kind === "accounts") {
             if (label === "TVA") {
               const vatCode = getValue(row, ["CodeTVA"]);
@@ -37528,6 +37667,7 @@ ${body}
               const tr = document.createElement("tr");
               if (kind === "journals" && getValue(row, ["DateBloquage"])) tr.classList.add("is-blocked");
               if (kind === "accounts" && parseBool(getValue(row, ["CptInterdit"])) === true) tr.classList.add("is-forbidden");
+              if (kind === "exercises" && parseBool(getValue(row, ["Courant"])) === true) tr.classList.add("is-current");
               columns.forEach(([label, keys]) => {
                 const td = document.createElement("td");
                 const value = displayValue(row, keys, label);
@@ -37617,20 +37757,110 @@ ${body}
         accountingLoadController = loadController;
         section.dataset.accountingLoading = "true";
         loadingOverlay.hidden = false;
+        overview.hidden = false;
+        items.hidden = false;
+        dataCard.hidden = false;
         status.textContent = "Récupération du paramétrage comptable…";
         status.classList.remove("is-error", "is-ok");
+        const getApiErrorMessage = payload => {
+          if (typeof payload === "string") {
+            const text = payload.trim();
+            if (!text) return "";
+            try { return getApiErrorMessage(JSON.parse(text)); } catch {
+              const message = text.replace(/^.*?erreur\s+\d+\s*[—-]\s*/i, "").trim();
+              try { return getApiErrorMessage(JSON.parse(message)); } catch { return message; }
+            }
+          }
+          if (Array.isArray(payload)) return payload.map(getApiErrorMessage).filter(Boolean).join(" ; ");
+          if (!payload || typeof payload !== "object") return "";
+          const getFieldValue = names => {
+            const wanted = new Set(names.map(name => name.toLowerCase()));
+            return Object.entries(payload).find(([key]) => wanted.has(key.toLowerCase()))?.[1];
+          };
+          const errors = getFieldValue(["listeErreurs", "Erreurs", "Errors"]);
+          const errorDetails = Array.isArray(errors) ? errors.map(getApiErrorMessage).filter(Boolean).join(" ; ") : getApiErrorMessage(errors);
+          const description = getFieldValue(["description", "message", "detail", "title", "erreur", "error"]);
+          const descriptionText = typeof description === "string" ? description.trim() : getApiErrorMessage(description);
+          return errorDetails || descriptionText;
+        };
+        const getApiBusinessError = payload => {
+          if (typeof payload === "string") {
+            const message = payload.trim();
+            return message && !/^ok$/i.test(message) ? message : "";
+          }
+          if (!payload || typeof payload !== "object") return "";
+          const fields = Object.fromEntries(Object.entries(payload).map(([key, value]) => [key.toLowerCase(), value]));
+          const returnCode = fields.coderetour;
+          const errors = fields.listeerreurs ?? fields.erreurs ?? fields.errors;
+          const hasConfig = ["LongueurComptes", "GestionQuantites", "GestionNumeroFacture", "GestionEcheancier", "PublieSurISuite"]
+            .some(key => Object.keys(fields).includes(key.toLowerCase()));
+          const errorDetails = getApiErrorMessage(payload);
+          if ((returnCode !== undefined && String(returnCode).trim() !== "1") || (Array.isArray(errors) && errors.length > 0)) {
+            return errorDetails || "Erreur renvoyée par l’API comptable.";
+          }
+          const errorMessage = fields.description ?? fields.message ?? fields.detail ?? fields.erreur ?? fields.error;
+          if (typeof errorMessage === "string" && !hasConfig && !/^ok$/i.test(errorMessage.trim())) {
+            return errorDetails || errorMessage.trim();
+          }
+          return "";
+        };
+        const showDossierError = message => {
+          const detail = String(message || "Erreur renvoyée par l’API comptable.").trim();
+          accountingData.config = { erreur: detail };
+          overview.hidden = true;
+          items.hidden = true;
+          dataCard.hidden = true;
+          status.textContent = detail;
+          status.classList.remove("is-ok");
+          status.classList.add("is-error");
+          loaded = false;
+        };
         try {
           const baseUrl = getSelectedApiBaseUrl();
           await selectFolderSessionForData(baseUrl, apiSessionUuid, folder?.Code, loadController.signal);
           let errors = 0;
-          const configRequest = await Promise.allSettled([
-            fetchFolderRelatedJson(baseUrl, apiSessionUuid, "/v1/compta/dossier", loadController.signal)
-          ]);
           if (loadController.signal.aborted) throw new DOMException("Chargement annulé.", "AbortError");
-          if (configRequest[0].status === "fulfilled") accountingData.config = configRequest[0].value;
-          else {
-            accountingData.config = { erreur: configRequest[0].reason?.message || "Erreur API" };
-            errors += 1;
+          let configPayload;
+          try {
+            configPayload = await fetchFolderRelatedJson(baseUrl, apiSessionUuid, "/v1/compta/dossier", loadController.signal);
+          } catch (error) {
+            if (loadController.signal.aborted || error?.name === "AbortError") throw error;
+            showDossierError(getApiErrorMessage(error?.message) || error?.message);
+            return;
+          }
+          if (loadController.signal.aborted) throw new DOMException("Chargement annulé.", "AbortError");
+          const dossierApiError = getApiBusinessError(configPayload);
+          if (dossierApiError) {
+            showDossierError(dossierApiError);
+            return;
+          }
+          accountingData.config = configPayload;
+          const modificationDate = configPayload && typeof configPayload === "object"
+            ? Object.entries(configPayload).find(([key]) => key.toLowerCase() === "datemodification")?.[1]
+            : null;
+          if (modificationDate) {
+            const rawDate = String(modificationDate);
+            const datePart = rawDate.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            const updatedAt = datePart
+              ? new Date(Number(datePart[1]), Number(datePart[2]) - 1, Number(datePart[3]))
+              : new Date(rawDate);
+            if (!Number.isNaN(updatedAt.getTime())) {
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              updatedAt.setHours(0, 0, 0, 0);
+              const daysSinceUpdate = Math.round((today - updatedAt) / 86400000);
+              const formattedDate = new Intl.DateTimeFormat("fr-FR").format(updatedAt);
+              const elapsed = daysSinceUpdate === 0
+                ? "aujourd’hui"
+                : daysSinceUpdate > 0
+                  ? `il y a ${daysSinceUpdate} jour${daysSinceUpdate > 1 ? "s" : ""}`
+                  : `dans ${Math.abs(daysSinceUpdate)} jour${daysSinceUpdate < -1 ? "s" : ""}`;
+              dataUpdateDate.textContent = `Dernière mise à jour de la comptabilité : ${formattedDate} (${elapsed})`;
+            } else {
+              dataUpdateDate.textContent = "Date de mise à jour de la comptabilité indisponible.";
+            }
+          } else {
+            dataUpdateDate.textContent = "Date de mise à jour de la comptabilité indisponible.";
           }
 
           const config = accountingData.config && typeof accountingData.config === "object" ? accountingData.config : {};
@@ -48766,6 +48996,139 @@ ${body}
     exportSandboxCollaboratorsButton.addEventListener("click", () => {
       if (exportSandboxCollaboratorsButton.disabled) return;
       exportSandboxCollaboratorsToExcel();
+    });
+
+    // Supprime l’ancien dossier mémorisé par les versions précédentes.
+    try {
+      window.indexedDB?.deleteDatabase("acd-sandbox-file-transfer");
+    } catch (error) {
+      console.warn("Impossible d’effacer l’ancien dossier de transfert mémorisé.", error);
+    }
+    const updateSandboxTransferAutoMessage = () => {
+      sandboxFileTransferAutoMessage.textContent = "Utilisez le programme AwImportGenerique pour importer automatiquement les données dans la base DiaClient";
+      sandboxFileTransferAutoMessage.hidden = !sandboxFileTransferAutomatic.checked;
+    };
+    const closeSandboxFileTransferModal = () => {
+      sandboxFileTransferModal.classList.remove("open");
+      sandboxFileTransferModal.setAttribute("aria-hidden", "true");
+      transferSandboxFilesButton.focus();
+    };
+    const openSandboxFileTransferModal = () => {
+      sandboxFileTransferModalStatus.textContent = "";
+      sandboxFileTransferModalStatus.classList.remove("is-error", "is-ok");
+      sandboxFileTransferConfirm.disabled = false;
+      updateSandboxTransferAutoMessage();
+      sandboxFileTransferModal.classList.add("open");
+      sandboxFileTransferModal.setAttribute("aria-hidden", "false");
+      sandboxFileTransferConfirm.focus();
+    };
+    transferSandboxFilesButton.addEventListener("click", () => {
+      if (transferSandboxFilesButton.disabled) return;
+      openSandboxFileTransferModal();
+    });
+    sandboxFileTransferClose.addEventListener("click", closeSandboxFileTransferModal);
+    sandboxFileTransferCancel.addEventListener("click", closeSandboxFileTransferModal);
+    sandboxFileTransferModal.addEventListener("click", event => {
+      if (event.target === sandboxFileTransferModal) closeSandboxFileTransferModal();
+    });
+    sandboxFileTransferModal.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        closeSandboxFileTransferModal();
+      }
+    });
+    sandboxFileTransferAutomatic.addEventListener("change", updateSandboxTransferAutoMessage);
+    sandboxFileTransferConfirm.addEventListener("click", async () => {
+      if (sandboxFileTransferInProgress) return;
+      if (typeof window.showDirectoryPicker !== "function") {
+        sandboxFileTransferModalStatus.textContent = "Votre navigateur ne permet pas de choisir un dossier. Utilisez Microsoft Edge ou Google Chrome.";
+        sandboxFileTransferModalStatus.classList.add("is-error");
+        return;
+      }
+
+      let selectionPromise;
+      try {
+        // Ouvre le sélecteur directement depuis le clic, à chaque transfert.
+        selectionPromise = window.showDirectoryPicker({ mode: "readwrite" });
+      } catch (error) {
+        sandboxFileTransferModalStatus.textContent = error?.message || "Sélection du dossier impossible.";
+        sandboxFileTransferModalStatus.classList.add("is-error");
+        return;
+      }
+
+      const cabinetAvailable = !exportSandboxCabinetButton.disabled;
+      const collaboratorsAvailable = !exportSandboxCollaboratorsButton.disabled;
+      const cabinetBlob = cabinetAvailable ? buildSandboxCabinetXlsxBlob() : null;
+      const collaboratorExport = collaboratorsAvailable ? buildSandboxCollaboratorsXlsxExport() : null;
+      const automatic = sandboxFileTransferAutomatic.checked;
+      const files = [
+        ...(cabinetBlob ? [{ name: automatic ? "1-ImportCabinet.xlsx" : buildSandboxExportFilename("cabinet_sandbox"), blob: cabinetBlob, type: "cabinet" }] : []),
+        ...(collaboratorExport ? [{ name: automatic ? "2-ImportCollaborateur.xlsx" : buildSandboxExportFilename("collaborateurs_sandbox"), blob: collaboratorExport.blob, type: "collaborateurs", rows: collaboratorExport.collaborators }] : [])
+      ];
+      if (!files.length) {
+        sandboxFileTransferModalStatus.textContent = "Aucun fichier Excel n’est actuellement récupérable.";
+        sandboxFileTransferModalStatus.classList.add("is-error");
+        return;
+      }
+
+      sandboxFileTransferInProgress = true;
+      sandboxFileTransferConfirm.disabled = true;
+      transferSandboxFilesButton.disabled = true;
+      sandboxFileTransferStatus.classList.remove("is-error", "is-ok");
+      sandboxFileTransferStatus.textContent = "Transfert des fichiers en cours…";
+      sandboxFileTransferModalStatus.classList.remove("is-error", "is-ok");
+      sandboxFileTransferModalStatus.textContent = "Choisissez le dossier de destination…";
+      try {
+        const directory = await selectionPromise;
+        if (!directory) throw new Error("Sélectionnez le dossier de destination avant de transférer les fichiers.");
+        let permission = await directory.queryPermission({ mode: "readwrite" });
+        if (permission !== "granted") permission = await directory.requestPermission({ mode: "readwrite" });
+        if (permission !== "granted") throw new Error("L’autorisation d’écriture dans le dossier choisi a été refusée.");
+        const transferred = [];
+        const failures = [];
+        for (const file of files) {
+          try {
+            const fileHandle = await directory.getFileHandle(file.name, { create: true });
+            const writable = await fileHandle.createWritable();
+            await writable.write(file.blob);
+            await writable.close();
+            transferred.push(file.name);
+            if (file.type === "cabinet") {
+              sandboxCabinetFileExported = true;
+              updateSandboxNewConfigurationVisibility();
+            } else {
+              markSandboxCollaboratorsAsExported(file.rows);
+            }
+          } catch (error) {
+            failures.push(file.name + " : " + (error?.message || "écriture impossible"));
+          }
+        }
+
+        renderSandboxPrimaryCollaboratorInfo();
+        updateSandboxExportButtonsState();
+        updateSandboxEditButtonState();
+        sandboxFileTransferStatus.classList.toggle("is-ok", failures.length === 0 && transferred.length > 0);
+        sandboxFileTransferStatus.classList.toggle("is-error", failures.length > 0 || transferred.length === 0);
+        sandboxFileTransferStatus.textContent = [
+          transferred.length ? "Fichier(s) transféré(s) dans le dossier choisi : " + transferred.join(", ") : "Aucun fichier transféré.",
+          ...failures
+        ].join(" — ");
+        if (failures.length === 0 && transferred.length > 0) closeSandboxFileTransferModal();
+      } catch (error) {
+        if (error?.name === "AbortError") {
+          sandboxFileTransferModalStatus.textContent = "Transfert annulé.";
+        } else {
+          sandboxFileTransferModalStatus.textContent = error?.message || "Le transfert des fichiers a échoué.";
+          sandboxFileTransferModalStatus.classList.add("is-error");
+          sandboxFileTransferStatus.textContent = error?.message || "Le transfert des fichiers a échoué.";
+          sandboxFileTransferStatus.classList.add("is-error");
+        }
+      } finally {
+        sandboxFileTransferInProgress = false;
+        sandboxFileTransferConfirm.disabled = false;
+        updateSandboxExportButtonsState();
+      }
     });
 
     document.getElementById("sandboxMailPlanningChoose").addEventListener("click", openSandboxMailPlanningDialog);
