@@ -36623,10 +36623,30 @@ ${body}
         const reconcileText = document.createElement("span");
         reconcileText.textContent = "Lettrer les comptes";
         reconcileOption.append(reconcileInput, reconcileText);
+        const paniereOption = document.createElement("label");
+        paniereOption.className = "folder-accounting-settle-option";
+        const paniereInput = document.createElement("input");
+        paniereInput.type = "checkbox";
+        const paniereText = document.createElement("span");
+        paniereText.textContent = "Facture i-dépôt";
+        paniereOption.append(paniereInput, paniereText);
+        const updatePaniereAvailability = () => {
+          const hasSelectedKind = choices.some(checkbox => checkbox.checked);
+          settleOption.hidden = !hasSelectedKind;
+          reconcileOption.hidden = !hasSelectedKind;
+          settleOption.style.display = hasSelectedKind ? "flex" : "none";
+          reconcileOption.style.display = hasSelectedKind ? "flex" : "none";
+          const enabled = hasSelectedKind;
+          paniereInput.disabled = !enabled;
+          if (!enabled) paniereInput.checked = false;
+        };
         settleInput.addEventListener("change", () => {
           reconcileInput.disabled = !settleInput.checked;
           if (!settleInput.checked) reconcileInput.checked = false;
+          updatePaniereAvailability();
         });
+        choices.forEach(checkbox => checkbox.addEventListener("change", updatePaniereAvailability));
+        updatePaniereAvailability();
         const status = document.createElement("p");
         status.className = "folder-accounting-entry-status";
         status.setAttribute("role", "status");
@@ -36644,7 +36664,7 @@ ${body}
         submitButton.className = "primary";
         submitButton.textContent = "Générer les écritures";
         footer.append(cancelButton, submitButton);
-        form.append(instruction, typeField, countLabel, settleOption, reconcileOption, status, footer);
+        form.append(instruction, typeField, countLabel, settleOption, reconcileOption, paniereOption, status, footer);
         dialog.append(dialogHeader, form);
         backdrop.appendChild(dialog);
         document.body.appendChild(backdrop);
@@ -36776,8 +36796,8 @@ ${body}
         const buildFacturXMinimumXml = invoice => {
           const currency = "EUR";
           const amountHt = Math.round(Number(invoice.amountHt) * 100) / 100;
-          const amountVat = Math.round(amountHt * 0.2 * 100) / 100;
-          const amountGross = Math.round((amountHt + amountVat) * 100) / 100;
+          const amountVat = Math.round(Number(invoice.amountVat ?? amountHt * 0.2) * 100) / 100;
+          const amountGross = Math.round(Number(invoice.amountTtc ?? amountHt + amountVat) * 100) / 100;
           const date = String(invoice.date || "").replace(/-/g, "");
           const partyXml = (role, party) => {
             const siren = String(party.siren || "").replace(/\D/g, "").slice(0, 9).padStart(9, "0");
@@ -36835,7 +36855,7 @@ ${body}
           });
           return new Blob([await pdfDocument.save()], { type: "application/pdf" });
         };
-        const uploadInvoiceGedDocument = async (baseUrl, idArboged, year, invoice) => {
+        const createRandomFacturXPdf = async invoice => {
           const pdfFiles = [1, 2, 3, 4].map(number => ({
             name: "Facture00" + number + ".pdf",
             url: "https://sbarreau-acd.github.io/outils/Facture00" + number + ".pdf"
@@ -36846,8 +36866,12 @@ ${body}
           const sourcePdf = await pdfResponse.blob();
           if (sourcePdf.type && sourcePdf.type !== "application/pdf") throw new Error("Le fichier " + pdf.name + " reçu n’est pas au format PDF.");
           const pdfBlob = await createFacturXTestPdf(sourcePdf, invoice);
+          return { name: pdf.name, blob: pdfBlob };
+        };
+        const uploadInvoiceGedDocument = async (baseUrl, idArboged, year, invoice) => {
+          const pdf = await createRandomFacturXPdf(invoice);
           const formData = new FormData();
-          formData.append("file", pdfBlob, pdf.name);
+          formData.append("file", pdf.blob, pdf.name);
           formData.append("idArboged", String(idArboged));
           formData.append("DateExercice", String(year));
           formData.append("Diffusable", "true");
@@ -36865,6 +36889,35 @@ ${body}
           const documentId = toDocumentId(documentInfo?.Id ?? documentInfo?.Document?.Id ?? documentInfo?.id);
           if (documentId === null) throw new Error("Le document a été envoyé, mais l’API GED n’a pas retourné son identifiant.");
           return { id: documentId, name: pdf.name };
+        };
+        const uploadInvoicePaniereDocument = async (baseUrl, paniereId, invoice) => {
+          const pdf = await createRandomFacturXPdf(invoice);
+          const formData = new FormData();
+          formData.append("file", pdf.blob, invoice.number + ".pdf");
+          const endpoint = "/v1/panieres/documents?type=" + encodeURIComponent(paniereId);
+          const response = await fetch(baseUrl + endpoint, {
+            method: "POST",
+            headers: { "Accept": "text/plain", "UUID": apiSessionUuid },
+            body: formData
+          });
+          const responseText = await response.text();
+          if (!response.ok) throw new Error(endpoint + " : erreur " + response.status + (responseText.trim() ? " — " + responseText.trim().slice(0, 300) : ""));
+          if (responseText.trim()) {
+            try {
+              const result = JSON.parse(responseText);
+              const apiError = getApiResultError(result);
+              if (apiError) throw new Error(endpoint + " : " + apiError);
+            } catch (error) {
+              if (error instanceof SyntaxError) {
+                if (/\b(ko|erreur|error|échec|echec)\b/i.test(responseText)) {
+                  throw new Error(endpoint + " : " + responseText.trim().slice(0, 300));
+                }
+                return { name: invoice.number + ".pdf" };
+              }
+              throw error;
+            }
+          }
+          return { name: invoice.number + ".pdf" };
         };
         const toDocumentId = value => {
           if (value === null || value === undefined || String(value).trim() === "") return null;
@@ -37201,9 +37254,10 @@ ${body}
           busy = true;
           submitButton.disabled = cancelButton.disabled = closeButton.disabled = true;
           status.classList.remove("is-error", "is-ok");
-          const generationCounts = { achat: 0, vente: 0, settlements: 0, reconciled: { achat: 0, vente: 0 } };
+          const generationCounts = { achat: 0, vente: 0, settlements: 0, reconciled: { achat: 0, vente: 0 }, paniere: { achat: 0, vente: 0 } };
           const reconciliationErrors = [];
           const reconcileAccounts = reconcileInput.checked;
+          const generatePaniereInvoices = paniereInput.checked;
           let letteringStarted = false;
           const totalReconciled = () => generationCounts.reconciled.achat + generationCounts.reconciled.vente;
           const formatGenerationSummary = () => {
@@ -37213,6 +37267,12 @@ ${body}
               "Écritures de règlement générées : " + generationCounts.settlements,
               "Lettrages confirmés : " + totalReconciled() + " (fournisseurs : " + generationCounts.reconciled.achat + " ; clients : " + generationCounts.reconciled.vente + ")"
             ];
+            if (generatePaniereInvoices) {
+              lines.splice(2, 0,
+                "Factures i-dépôt d’achat envoyées : " + generationCounts.paniere.achat,
+                "Factures i-dépôt de vente envoyées : " + generationCounts.paniere.vente
+              );
+            }
             if (!reconcileAccounts) lines.push("Lettrage demandé : non");
             else lines.push("Retours API en erreur de lettrage : " + (letteringStarted ? reconciliationErrors.length : "lettrage non exécuté"));
             lines.push(...reconciliationErrors.map(message => "• " + message));
@@ -37224,6 +37284,8 @@ ${body}
             await selectFolderSessionForData(baseUrl, apiSessionUuid, folder?.Code);
             const settleInvoices = settleInput.checked;
             const generatedEntryIds = { achat: new Set(), vente: new Set() };
+            const usedPartners = { achat: new Map(), vente: new Map() };
+            const usedInvoiceNumbers = { achat: new Set(), vente: new Set() };
             let exerciseDateRange = null;
             status.textContent = "Vérification et préparation des journaux…";
             const initialJournals = await apiJson(baseUrl, "/v1/compta/journal");
@@ -37344,10 +37406,22 @@ ${body}
               const label = labels[randomInt(0, labels.length - 1)];
               const sequence = String(index + 1).padStart(4, "0") + randomDigits(2);
               const piece = journalCode + invoiceYear + String(invoiceMonth).padStart(2, "0") + sequence;
-              const invoice = (kind === "achat" ? "FA" : "FV") + "-" + invoiceYear + String(invoiceMonth).padStart(2, "0") + "-" + randomDigits(6);
+              const invoicePrefix = kind === "achat" ? "FA" : "FV";
+              let invoice = "";
+              for (let attempt = 0; attempt < 100; attempt += 1) {
+                const candidate = invoicePrefix + "-" + invoiceYear + String(invoiceMonth).padStart(2, "0") + "-" + randomDigits(6);
+                if (!usedInvoiceNumbers[kind].has(candidate)) { invoice = candidate; break; }
+              }
+              if (!invoice) throw new Error("Impossible de générer un numéro de facture unique.");
+              usedInvoiceNumbers[kind].add(invoice);
               const amountHt = randomInt(1000, 10000);
               const dueLines = createDueLines(amountHt, date);
               const partner = partnerDetails.get(partners[partnerIndex]) || {};
+              usedPartners[kind].set(partners[partnerIndex], {
+                code: partners[partnerIndex],
+                name: partner.name || "Société de test",
+                siren: partner.siren || ""
+              });
               const dossierName = String(folder?.RaisonSociale ?? folder?.Denomination ?? folder?.Nom ?? "Société de test").trim();
               const dossierSiren = makeSiren();
               const counterpartyName = partner.name || companyName();
@@ -37436,6 +37510,64 @@ ${body}
                   }
                 } catch (error) {
                   reconciliationErrors.push((kind === "achat" ? "Fournisseurs" : "Clients") + " — " + (error?.message || "Erreur API inconnue"));
+                }
+              }
+            }
+            if (generatePaniereInvoices) {
+              status.textContent = "Récupération des panières i-dépôt…";
+              const panierePayload = await apiJson(baseUrl, "/v1/panieres/types");
+              const paniereTypes = apiArray(panierePayload, ["Panieres", "Panières", "Types", "types", "Items", "items"]);
+              const getPaniereId = family => {
+                const paniere = paniereTypes.find(item => String(item?.Famille ?? "").trim().toUpperCase() === family);
+                return toDocumentId(paniere?.Id);
+              };
+              const paniereIds = {
+                achat: getPaniereId("_TYPE_FACTURES_ACHAT"),
+                vente: getPaniereId("_TYPE_FACTURES_VENTE")
+              };
+              for (const kind of selectedKinds) {
+                if (paniereIds[kind] === null) {
+                  throw new Error("Aucune panière i-dépôt trouvée pour les factures d’" + (kind === "achat" ? "achat" : "vente") + ".");
+                }
+                const partnersForKind = [...usedPartners[kind].values()];
+                if (!partnersForKind.length) throw new Error("Aucun compte tiers utilisé n’est disponible pour créer les factures i-dépôt.");
+                const start = parseExerciseDate(exerciseDateRange?.start);
+                const end = parseExerciseDate(exerciseDateRange?.end);
+                if (!start || !end) throw new Error("Les dates de l’exercice sont introuvables pour générer les factures i-dépôt.");
+                for (let index = 0; index < quantity; index += 1) {
+                  const date = randomInvoiceDate(start, end);
+                  const invoiceYear = Number(date.slice(0, 4));
+                  const invoiceMonth = Number(date.slice(5, 7));
+                  const invoicePrefix = kind === "achat" ? "FA" : "FV";
+                  let invoice = "";
+                  for (let attempt = 0; attempt < 100; attempt += 1) {
+                    const candidate = invoicePrefix + "-" + invoiceYear + String(invoiceMonth).padStart(2, "0") + "-" + randomDigits(6);
+                    if (!usedInvoiceNumbers[kind].has(candidate)) { invoice = candidate; break; }
+                  }
+                  if (!invoice) throw new Error("Impossible de générer un numéro de facture i-dépôt unique.");
+                  usedInvoiceNumbers[kind].add(invoice);
+                  const partner = partnersForKind[randomInt(0, partnersForKind.length - 1)];
+                  const dossierName = String(folder?.RaisonSociale ?? folder?.Denomination ?? folder?.Nom ?? "Société de test").trim();
+                  const dossierSiren = makeSiren();
+                  const amountHt = randomInt(1000, 10000);
+                  const amountVat = Math.round(amountHt * 0.2 * 100) / 100;
+                  const amountTtc = Math.round((amountHt + amountVat) * 100) / 100;
+                  const invoiceData = {
+                    number: invoice,
+                    date,
+                    amountHt,
+                    amountVat,
+                    amountTtc,
+                    seller: kind === "achat"
+                      ? { name: partner.name, siren: partner.siren || makeSiren() }
+                      : { name: dossierName, siren: dossierSiren },
+                    buyer: kind === "achat"
+                      ? { name: dossierName, siren: dossierSiren }
+                      : { name: partner.name, siren: partner.siren || makeSiren() }
+                  };
+                  status.textContent = "Création de la facture i-dépôt " + (index + 1) + " / " + quantity + " — " + (kind === "achat" ? "achat" : "vente") + "…";
+                  await uploadInvoicePaniereDocument(baseUrl, paniereIds[kind], invoiceData);
+                  generationCounts.paniere[kind] += 1;
                 }
               }
             }
