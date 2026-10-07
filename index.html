@@ -9113,6 +9113,53 @@
       font-size: 14px;
     }
 
+    .folder-editor-correspondents-add {
+      margin-left: 0;
+      padding: 8px 12px;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    .folder-editor-correspondents-bulk-delete {
+      margin-left: auto;
+      padding: 8px 12px;
+      border: 1px solid #fca5a5;
+      border-radius: 8px;
+      background: #fff1f2;
+      color: #b42323;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .folder-editor-correspondents-bulk-delete:hover:not(:disabled) {
+      background: #fee2e2;
+      border-color: #ef4444;
+    }
+
+    .folder-editor-correspondents-bulk-delete[hidden] {
+      display: none !important;
+    }
+
+    .folder-editor-correspondents-selection-cell,
+    .folder-editor-correspondents-action-cell {
+      text-align: center !important;
+    }
+
+    .folder-editor-correspondents-action-status {
+      color: #b42323;
+      font-size: 12px;
+    }
+
+    .folder-editor-correspondents-action-status.is-success {
+      color: #067647;
+    }
+
+    .folder-editor-correspondents-action-status[hidden] {
+      display: none !important;
+    }
+
     .folder-editor-correspondents-count {
       color: #64748b;
       font-size: 11px;
@@ -9205,6 +9252,44 @@
       vertical-align: middle;
     }
 
+    .folder-editor-correspondents-table tbody tr.is-new-correspondent td {
+      background: #ecfdf3;
+      border-top-color: #86efac;
+      border-bottom-color: #86efac;
+    }
+
+    .folder-editor-correspondents-table tbody tr.is-new-correspondent td:first-child {
+      box-shadow: inset 4px 0 0 #16a34a;
+    }
+
+    .folder-editor-correspondents-table th:last-child {
+      width: 48px;
+      min-width: 48px;
+    }
+
+    .folder-editor-correspondents-delete {
+      width: 28px;
+      height: 28px;
+      border: 1px solid #fca5a5;
+      border-radius: 7px;
+      background: #fff1f2;
+      color: #b42323;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .folder-editor-correspondents-delete:hover:not(:disabled) {
+      background: #fee2e2;
+      border-color: #ef4444;
+    }
+
+    .folder-editor-correspondents-delete:disabled {
+      opacity: .55;
+      cursor: wait;
+    }
+
     .folder-editor-correspondents-table th {
       background: #e9eef2;
       color: #334155;
@@ -9215,34 +9300,40 @@
 
     .folder-editor-correspondents-table
       th:first-child {
-      width: 250px;
+      width: 40px;
     }
 
     .folder-editor-correspondents-table
       th:nth-child(2) {
-      width: 90px;
+      width: 250px;
     }
 
     .folder-editor-correspondents-table
       th:nth-child(3) {
-      width: 95px;
+      width: 90px;
     }
 
     .folder-editor-correspondents-table
       th:nth-child(4) {
+      width: 95px;
+    }
+
+    .folder-editor-correspondents-table
+      th:nth-child(5) {
       width: 120px;
     }
 
     .folder-editor-correspondents-table
-      th:nth-child(5),
+      th:nth-child(6),
     .folder-editor-correspondents-table
-      th:nth-child(6) {
+      th:nth-child(7) {
       width: 150px;
     }
 
     .folder-editor-correspondents-table
       th:last-child {
-      min-width: 220px;
+      width: 48px;
+      min-width: 48px;
     }
 
     .folder-editor-correspondents-table
@@ -9356,7 +9447,7 @@
 
 
     /* ==============================================================
-       Détail d'un correspondant — sous-fenêtre en lecture seule
+       Détail d'un correspondant — édition des informations API
        ============================================================== */
 
     .folder-editor-correspondent-id-link {
@@ -9553,6 +9644,58 @@
       cursor: default;
     }
 
+    .correspondent-detail-editable-control {
+      width: 100%;
+      min-height: 38px;
+      box-sizing: border-box;
+      border: 1px solid #cbd8e9;
+      border-radius: 6px;
+      padding: 8px 10px;
+      background: #fff;
+      color: #111827;
+      font: inherit;
+      font-size: 12px;
+    }
+
+    .correspondent-detail-editable-control:focus {
+      border-color: #3b82f6;
+      outline: 3px solid rgba(59, 130, 246, .16);
+    }
+
+    .correspondent-detail-field.is-modified > .correspondent-detail-field-label {
+      color: #b45309;
+      font-weight: 800;
+    }
+
+    .correspondent-detail-field.is-modified .correspondent-detail-editable-control {
+      border-color: #f59e0b;
+      background: #fffbeb;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, .12);
+    }
+
+    .correspondent-detail-modified-badge {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      margin-top: 5px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .correspondent-detail-modified-badge[hidden] {
+      display: none !important;
+    }
+
+    .correspondent-detail-status { margin-right: auto; color: #526a84; font-size: 12px; }
+    .correspondent-detail-status.is-error { color: #b42323; }
+    .correspondent-detail-status.is-ok { color: #067647; }
+    #correspondentDetailSave[hidden] { display: none !important; }
+
     textarea.correspondent-detail-readonly-control {
       min-height: 96px;
       resize: none;
@@ -9568,10 +9711,28 @@
       gap: 12px 18px;
     }
 
+    .correspondent-detail-role-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(240px, .8fr);
+      align-items: center;
+      gap: 18px;
+    }
+
+    @media (max-width: 1100px) {
+      .correspondent-detail-role-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .correspondent-detail-role-line {
       display: inline-flex;
       align-items: center;
       gap: 8px;
+    }
+
+    .correspondent-detail-role-line.is-modified {
+      color: #b45309;
+      font-weight: 800;
     }
 
     .correspondent-detail-role-line
@@ -28887,24 +29048,28 @@ ${body}
       {
         key: "RESPONSABLE",
         label: "Responsable",
+        apiValue: "Responsable",
         order: 1,
         className: "responsable"
       },
       {
         key: "REGULIER",
         label: "Regulier",
+        apiValue: "Regulier",
         order: 2,
         className: "regulier"
       },
       {
         key: "NIVEAU3",
         label: "Niveau 3",
+        apiValue: "Niveau3",
         order: 3,
         className: "niveau3"
       },
       {
         key: "FACTURATION",
         label: "Facturation",
+        apiValue: "Facturation",
         order: 4,
         className: "facturation"
       }
@@ -36602,7 +36767,75 @@ ${body}
           if (id === null) throw new Error("Le plan de classement ne contient pas de numéro de rubrique GED exploitable.");
           return id;
         };
-        const uploadInvoiceGedDocument = async (baseUrl, idArboged, year) => {
+        const escapeXmlText = value => String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&apos;");
+        const buildFacturXMinimumXml = invoice => {
+          const currency = "EUR";
+          const amountHt = Math.round(Number(invoice.amountHt) * 100) / 100;
+          const amountVat = Math.round(amountHt * 0.2 * 100) / 100;
+          const amountGross = Math.round((amountHt + amountVat) * 100) / 100;
+          const date = String(invoice.date || "").replace(/-/g, "");
+          const partyXml = (role, party) => {
+            const siren = String(party.siren || "").replace(/\D/g, "").slice(0, 9).padStart(9, "0");
+            const vatKey = String((12 + 3 * (Number(siren) % 97)) % 97).padStart(2, "0");
+            return `<ram:${role}>
+              <ram:Name>${escapeXmlText(party.name)}</ram:Name>
+              <ram:SpecifiedLegalOrganization><ram:ID schemeID="0002">${siren}</ram:ID></ram:SpecifiedLegalOrganization>
+              <ram:PostalTradeAddress><ram:CountryID>FR</ram:CountryID></ram:PostalTradeAddress>
+              <ram:SpecifiedTaxRegistration><ram:ID schemeID="VA">FR${vatKey}${siren}</ram:ID></ram:SpecifiedTaxRegistration>
+            </ram:${role}>`;
+          };
+          return `<?xml version="1.0" encoding="UTF-8"?>
+<rsm:CrossIndustryInvoice xmlns:qdt="urn:un:unece:uncefact:data:standard:QualifiedDataType:100" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100" xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <rsm:ExchangedDocumentContext>
+    <ram:BusinessProcessSpecifiedDocumentContextParameter><ram:ID>A1</ram:ID></ram:BusinessProcessSpecifiedDocumentContextParameter>
+    <ram:GuidelineSpecifiedDocumentContextParameter><ram:ID>urn:factur-x.eu:1p0:minimum</ram:ID></ram:GuidelineSpecifiedDocumentContextParameter>
+  </rsm:ExchangedDocumentContext>
+  <rsm:ExchangedDocument>
+    <ram:ID>${escapeXmlText(invoice.number)}</ram:ID>
+    <ram:TypeCode>380</ram:TypeCode>
+    <ram:IssueDateTime><udt:DateTimeString format="102">${date}</udt:DateTimeString></ram:IssueDateTime>
+  </rsm:ExchangedDocument>
+  <rsm:SupplyChainTradeTransaction>
+    <ram:ApplicableHeaderTradeAgreement>
+      ${partyXml("SellerTradeParty", invoice.seller)}
+      ${partyXml("BuyerTradeParty", invoice.buyer)}
+    </ram:ApplicableHeaderTradeAgreement>
+    <ram:ApplicableHeaderTradeDelivery/>
+    <ram:ApplicableHeaderTradeSettlement>
+      <ram:InvoiceCurrencyCode>${currency}</ram:InvoiceCurrencyCode>
+      <ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+        <ram:TaxBasisTotalAmount currencyID="${currency}">${amountHt.toFixed(2)}</ram:TaxBasisTotalAmount>
+        <ram:TaxTotalAmount currencyID="${currency}">${amountVat.toFixed(2)}</ram:TaxTotalAmount>
+        <ram:GrandTotalAmount currencyID="${currency}">${amountGross.toFixed(2)}</ram:GrandTotalAmount>
+        <ram:DuePayableAmount currencyID="${currency}">${amountGross.toFixed(2)}</ram:DuePayableAmount>
+      </ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+    </ram:ApplicableHeaderTradeSettlement>
+  </rsm:SupplyChainTradeTransaction>
+</rsm:CrossIndustryInvoice>`;
+        };
+        const createFacturXTestPdf = async (sourcePdf, invoice) => {
+          const pdfLib = window.PDFLib;
+          if (!pdfLib?.PDFDocument) throw new Error("La bibliothèque PDF nécessaire pour joindre le XML n’a pas été chargée.");
+          const pdfDocument = await pdfLib.PDFDocument.load(await sourcePdf.arrayBuffer());
+          const xml = buildFacturXMinimumXml(invoice);
+          const parsedXml = new DOMParser().parseFromString(xml, "application/xml");
+          if (parsedXml.querySelector("parsererror")) throw new Error("Le XML Factur-X généré n’est pas un XML valide.");
+          const xmlBytes = new TextEncoder().encode(xml);
+          await pdfDocument.attach(xmlBytes, "factur-x.xml", {
+            mimeType: "application/xml",
+            description: "Données de facture Factur-X de test (profil MINIMUM)",
+            afRelationship: pdfLib.AFRelationship.Data,
+            creationDate: new Date(),
+            modificationDate: new Date()
+          });
+          return new Blob([await pdfDocument.save()], { type: "application/pdf" });
+        };
+        const uploadInvoiceGedDocument = async (baseUrl, idArboged, year, invoice) => {
           const pdfFiles = [1, 2, 3, 4].map(number => ({
             name: "Facture00" + number + ".pdf",
             url: "https://sbarreau-acd.github.io/outils/Facture00" + number + ".pdf"
@@ -36610,8 +36843,9 @@ ${body}
           const pdf = pdfFiles[randomInt(0, pdfFiles.length - 1)];
           const pdfResponse = await fetch(pdf.url);
           if (!pdfResponse.ok) throw new Error("Téléchargement de " + pdf.name + " impossible (erreur " + pdfResponse.status + ").");
-          const pdfBlob = await pdfResponse.blob();
-          if (pdfBlob.type && pdfBlob.type !== "application/pdf") throw new Error("Le fichier " + pdf.name + " reçu n’est pas au format PDF.");
+          const sourcePdf = await pdfResponse.blob();
+          if (sourcePdf.type && sourcePdf.type !== "application/pdf") throw new Error("Le fichier " + pdf.name + " reçu n’est pas au format PDF.");
+          const pdfBlob = await createFacturXTestPdf(sourcePdf, invoice);
           const formData = new FormData();
           formData.append("file", pdfBlob, pdf.name);
           formData.append("idArboged", String(idArboged));
@@ -36700,7 +36934,12 @@ ${body}
             Analytique: false
           });
           existingCodes.add(code);
-          return code;
+          return {
+            code,
+            name,
+            siren,
+            vatId: "FR" + key + siren
+          };
         };
         const accountCode = (prefix, suffix, length) => {
           const countLength = Number(length);
@@ -37068,8 +37307,19 @@ ${body}
               return new RegExp("^" + partnerPrefix + "[A-Z0-9]{9}$").test(code) &&
                 email === "contact-" + code.toLowerCase() + "@example.test";
             }).slice(0, 3).map(item => String(item.Code).trim().toUpperCase());
+            const partnerDetails = new Map(partnerRows.map(item => {
+              const code = String(item?.Code ?? "").trim().toUpperCase();
+              const tiers = item?.TiersAssocie ?? item?.Tiers ?? {};
+              return [code, {
+                code,
+                name: String(tiers?.RaisonSociale ?? tiers?.Nom ?? item?.Lib ?? "").trim(),
+                siren: String(tiers?.Siren ?? "").trim()
+              }];
+            }).filter(([code]) => code));
             while (partners.length < 3) {
-              partners.push(await generatePartnerAccount(baseUrl, partnerEndpoint, kind === "achat" ? "F" : "C", partnerCodes));
+              const createdPartner = await generatePartnerAccount(baseUrl, partnerEndpoint, kind === "achat" ? "F" : "C", partnerCodes);
+              partners.push(createdPartner.code);
+              partnerDetails.set(createdPartner.code, createdPartner);
             }
 
             status.textContent = "Récupération du plan de classement du journal " + journalCode + "…";
@@ -37097,8 +37347,24 @@ ${body}
               const invoice = (kind === "achat" ? "FA" : "FV") + "-" + invoiceYear + String(invoiceMonth).padStart(2, "0") + "-" + randomDigits(6);
               const amountHt = randomInt(1000, 10000);
               const dueLines = createDueLines(amountHt, date);
-              status.textContent = "Dépôt de la facture " + (index + 1) + " / " + quantity + " dans la GED…";
-              const gedDocument = await uploadInvoiceGedDocument(baseUrl, gedFolderId, invoiceYear);
+              const partner = partnerDetails.get(partners[partnerIndex]) || {};
+              const dossierName = String(folder?.RaisonSociale ?? folder?.Denomination ?? folder?.Nom ?? "Société de test").trim();
+              const dossierSiren = makeSiren();
+              const counterpartyName = partner.name || companyName();
+              const counterpartySiren = partner.siren || makeSiren();
+              const invoiceData = {
+                number: invoice,
+                date,
+                amountHt,
+                seller: kind === "achat"
+                  ? { name: counterpartyName, siren: counterpartySiren }
+                  : { name: dossierName, siren: dossierSiren },
+                buyer: kind === "achat"
+                  ? { name: dossierName, siren: dossierSiren }
+                  : { name: counterpartyName, siren: counterpartySiren }
+              };
+              status.textContent = "Génération du XML Factur-X et ajout au PDF " + (index + 1) + " / " + quantity + "…";
+              const gedDocument = await uploadInvoiceGedDocument(baseUrl, gedFolderId, invoiceYear, invoiceData);
               const invoiceResponse = await apiJson(baseUrl, "/v1/compta/ecriture", "POST", {
                 Journal: journalCode,
                 Mois: invoiceMonth,
@@ -40104,6 +40370,118 @@ ${body}
       return wrapper;
     }
 
+    function makeCorrespondentEditableField(label, apiField, value, options = {}) {
+      const wrapper = document.createElement("label");
+      wrapper.className = `correspondent-detail-field${options.wide ? " wide" : ""}`;
+      const labelNode = document.createElement("span");
+      labelNode.className = "correspondent-detail-field-label";
+      labelNode.textContent = label;
+
+      const control = options.multiline
+        ? document.createElement("textarea")
+        : document.createElement("input");
+      if (!options.multiline) control.type = options.type || "text";
+      if (options.type === "number") control.step = "any";
+      if (options.multiline) control.rows = options.rows || 4;
+      control.value = options.type === "date"
+        ? normalizeCorrespondentDateForInput(value)
+        : formatCorrespondentDetailValue(value);
+      control.className = "correspondent-detail-editable-control";
+      control.dataset.correspondentApiField = apiField;
+      control.dataset.initialValue = control.value;
+
+      const modifiedBadge = document.createElement("span");
+      modifiedBadge.className = "correspondent-detail-modified-badge";
+      modifiedBadge.textContent = "Modifié";
+      modifiedBadge.hidden = true;
+
+      wrapper.append(labelNode, control, modifiedBadge);
+      return wrapper;
+    }
+
+    function makeCorrespondentTitleField(item) {
+      const currentCode = getCorrespondentDetailTitleCode(item);
+      const wrapper = makeCorrespondentEditableField("Titre", "CodeTitre", currentCode);
+      const input = wrapper.querySelector(".correspondent-detail-editable-control");
+      const select = document.createElement("select");
+      select.className = input.className;
+      select.dataset.correspondentApiField = "CodeTitre";
+      select.dataset.initialValue = currentCode;
+      input.replaceWith(select);
+
+      const fillOptions = titles => {
+        const personTitles = (Array.isArray(titles) ? titles : [])
+          .filter(title => title.personnePhysique);
+        select.replaceChildren();
+
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = personTitles.length ? "— Sélectionner un titre —" : "Aucun titre personne physique disponible";
+        select.appendChild(placeholder);
+
+        const matchingTitle = personTitles.find(
+          title => title.normalizedCode === normalizeReferenceCode(currentCode)
+        );
+        if (currentCode && !matchingTitle) {
+          const currentOption = document.createElement("option");
+          currentOption.value = currentCode;
+          currentOption.textContent = `${currentCode} (titre actuel)`;
+          select.appendChild(currentOption);
+        }
+
+        personTitles.forEach(title => {
+          const option = document.createElement("option");
+          option.value = currentCode && title.normalizedCode === normalizeReferenceCode(currentCode)
+            ? currentCode
+            : title.code;
+          option.textContent = title.label ? `${title.label} (${title.code})` : title.code;
+          select.appendChild(option);
+        });
+        select.value = currentCode || matchingTitle?.code || "";
+        select.disabled = personTitles.length === 0 && !currentCode;
+      };
+
+      const cachedTitles = availableTitles.filter(title => title.personnePhysique);
+      fillOptions(availableTitles);
+      if (!cachedTitles.length && apiSessionUuid) {
+        const placeholder = select.querySelector('option[value=""]');
+        if (placeholder) placeholder.textContent = "Chargement des titres…";
+        select.disabled = true;
+        fetchApiTitles(getSelectedApiBaseUrl(), apiSessionUuid)
+          .then(titles => {
+            availableTitles = titles;
+            if (select.isConnected) fillOptions(titles);
+          })
+          .catch(error => {
+            if (!select.isConnected) return;
+            select.disabled = true;
+            const status = select.closest(".correspondent-detail-overlay")?.querySelector("#correspondentDetailStatus");
+            if (status) {
+              status.textContent = error?.message || "Impossible de récupérer les titres.";
+              status.classList.add("is-error");
+            }
+          });
+      }
+      return wrapper;
+    }
+
+    function updateCorrespondentDetailFieldHighlight(control) {
+      const wrapper = control?.closest(".correspondent-detail-field");
+      if (!wrapper) return;
+      const modified = control.value !== control.dataset.initialValue;
+      wrapper.classList.toggle("is-modified", modified);
+      const badge = wrapper.querySelector(".correspondent-detail-modified-badge");
+      if (badge) badge.hidden = !modified;
+    }
+
+    function normalizeCorrespondentDateForInput(value) {
+      const raw = String(value ?? "").trim();
+      const iso = raw.match(/^(\d{4}-\d{2}-\d{2})/);
+      if (iso) return iso[1];
+      const french = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      return french ? `${french[3]}-${french[2]}-${french[1]}` : "";
+    }
+
     function makeCorrespondentDetailSection(
       title
     ) {
@@ -40160,18 +40538,8 @@ ${body}
         "correspondent-detail-grid correspondent-detail-grid-4";
 
       generalGrid.append(
-        makeCorrespondentReadonlyField(
-          "Titre",
-          getCorrespondentDetailTitleCode(
-            item
-          ) || "<AUCUN>"
-        ),
-        makeCorrespondentReadonlyField(
-          "Date de naissance",
-          formatCorrespondentDate(
-            dateNaissance
-          )
-        ),
+        makeCorrespondentTitleField(item),
+        makeCorrespondentEditableField("Date de naissance", "DateNaissance", dateNaissance, { type: "date" }),
         makeCorrespondentReadonlyField(
           "Âge",
           getCorrespondentAge(
@@ -40182,46 +40550,9 @@ ${body}
               )} ans`
             : ""
         ),
-        makeCorrespondentReadonlyField(
-          "Fonction",
-          getCorrespondentDetailValue(
-            item,
-            [
-              "Fonction",
-              "fonction"
-            ]
-          )
-        ),
-        makeCorrespondentReadonlyField(
-          "Nom",
-          item?.Nom ||
-          getCorrespondentDetailValue(
-            item,
-            ["Nom", "nom"]
-          )
-        ),
-        makeCorrespondentReadonlyField(
-          "Prénom",
-          item?.Prenom ||
-          getCorrespondentDetailValue(
-            item,
-            ["Prenom", "prenom"]
-          )
-        ),
-        makeCorrespondentReadonlyField(
-          "Service Corresp.",
-          getCorrespondentDetailValue(
-            item,
-            [
-              "CodeService",
-              "codeService",
-              "Service",
-              "service",
-              "ServiceCorrespondant",
-              "serviceCorrespondant"
-            ]
-          )
-        ),
+        makeCorrespondentEditableField("Nom", "Nom", getCorrespondentDetailValue(item, ["Nom", "nom"])),
+        makeCorrespondentEditableField("Prénom", "Prenom", getCorrespondentDetailValue(item, ["Prenom", "prenom"])),
+        makeCorrespondentEditableField("Service Corresp.", "CodeService", getCorrespondentDetailValue(item, ["CodeService", "codeService", "Service", "service", "ServiceCorrespondant", "serviceCorrespondant"])),
         makeCorrespondentReadonlyField(
           "Code",
           item?.Code ||
@@ -40252,117 +40583,25 @@ ${body}
         "correspondent-detail-grid correspondent-detail-grid-4";
 
       [
-        [
-          "Adr. L1",
-          [
-            "Adresse1",
-            "adresse1"
-          ]
-        ],
-        [
-          "Adr. L2",
-          [
-            "Adresse2",
-            "adresse2"
-          ]
-        ],
-        [
-          "Adr. L3",
-          [
-            "Adresse3",
-            "adresse3"
-          ]
-        ],
-        [
-          "Tél. 1",
-          [
-            "Telephone1",
-            "telephone1",
-            "Telephone",
-            "telephone"
-          ]
-        ],
-        [
-          "Tél. 2",
-          [
-            "Telephone2",
-            "telephone2"
-          ]
-        ],
-        [
-          "Mobile",
-          [
-            "Mobile",
-            "mobile"
-          ]
-        ],
-        [
-          "Code Postal",
-          [
-            "CodePostal",
-            "codePostal"
-          ]
-        ],
-        [
-          "Ville",
-          [
-            "Ville",
-            "ville"
-          ]
-        ],
-        [
-          "Fax",
-          [
-            "Fax",
-            "fax"
-          ]
-        ],
-        [
-          "Pays",
-          [
-            "Pays",
-            "pays",
-            "CodePays",
-            "codePays"
-          ]
-        ],
-        [
-          "Email",
-          [
-            "Email",
-            "email"
-          ]
-        ],
-        [
-          "Web",
-          [
-            "Web",
-            "web",
-            "SiteWeb",
-            "siteWeb"
-          ]
-        ]
-      ].forEach(
-        ([label, keys]) => {
-          coordinateGrid.appendChild(
-            makeCorrespondentReadonlyField(
-              label,
-              label === "Email"
-                ? (
-                    item?.Email ||
-                    getCorrespondentDetailValue(
-                      item,
-                      keys
-                    )
-                  )
-                : getCorrespondentDetailValue(
-                    item,
-                    keys
-                  )
-            )
-          );
-        }
-      );
+        ["Adr. L1", "Adresse1", ["Adresse1", "adresse1"]],
+        ["Adr. L2", "Adresse2", ["Adresse2", "adresse2"]],
+        ["Adr. L3", "Adresse3", ["Adresse3", "adresse3"]],
+        ["Tél. 1", "Telephone1", ["Telephone1", "telephone1", "Telephone", "telephone"]],
+        ["Tél. 2", "Telephone2", ["Telephone2", "telephone2"]],
+        ["Mobile", "Gsm", ["Gsm", "gsm", "Mobile", "mobile"]],
+        ["Code Postal", "CodePostal", ["CodePostal", "codePostal"]],
+        ["Ville", "Ville", ["Ville", "ville"]],
+        ["Fax", "Fax", ["Fax", "fax"]],
+        ["Pays", "CodePays", ["CodePays", "codePays", "Pays", "pays"]],
+        ["Email", "Email", ["Email", "email"]],
+        ["Web", "UrlWeb", ["UrlWeb", "urlWeb", "Web", "web", "SiteWeb", "siteWeb"]]
+      ].forEach(([label, apiField, keys]) => {
+        coordinateGrid.appendChild(makeCorrespondentEditableField(
+          label,
+          apiField,
+          getCorrespondentDetailValue(item, keys)
+        ));
+      });
 
       coordinates.appendChild(
         coordinateGrid
@@ -40384,53 +40623,17 @@ ${body}
         "correspondent-detail-grid correspondent-detail-grid-4";
 
       [
-        [
-          "Nom de naissance",
-          [
-            "NomNaissance",
-            "nomNaissance"
-          ]
-        ],
-        [
-          "Département naissance",
-          [
-            "DepartementNaissance",
-            "departementNaissance",
-            "DptNaissance",
-            "dptNaissance"
-          ]
-        ],
-        [
-          "Ville naissance",
-          [
-            "VilleNaissance",
-            "villeNaissance"
-          ]
-        ],
-        [
-          "Numéro fiscal (NIF/SPI)",
-          [
-            "NumeroFiscal",
-            "numeroFiscal",
-            "NIF",
-            "nif",
-            "SPI",
-            "spi"
-          ]
-        ]
-      ].forEach(
-        ([label, keys]) => {
-          identityGrid.appendChild(
-            makeCorrespondentReadonlyField(
-              label,
-              getCorrespondentDetailValue(
-                item,
-                keys
-              )
-            )
-          );
-        }
-      );
+        ["Nom de naissance", "NomNaissance", ["NomNaissance", "nomNaissance"]],
+        ["Département naissance", "DepartementNaissance", ["DepartementNaissance", "departementNaissance", "DptNaissance", "dptNaissance"]],
+        ["Ville naissance", "VilleNaissance", ["VilleNaissance", "villeNaissance"]],
+        ["Numéro fiscal (NIF/SPI)", "NumeroIdentificationFiscal", ["NumeroIdentificationFiscal", "numeroIdentificationFiscal", "NumeroFiscal", "numeroFiscal", "NIF", "nif", "SPI", "spi"]]
+      ].forEach(([label, apiField, keys]) => {
+        identityGrid.appendChild(makeCorrespondentEditableField(
+          label,
+          apiField,
+          getCorrespondentDetailValue(item, keys)
+        ));
+      });
 
       identity.appendChild(
         identityGrid
@@ -40452,10 +40655,7 @@ ${body}
       panel.className =
         "correspondent-detail-panel";
 
-      const roles =
-        getCorrespondentDetailRoles(
-          item
-        );
+      const roles = getCorrespondentDetailRoles(item);
 
       const normalizedRoles =
         new Set(
@@ -40475,24 +40675,7 @@ ${body}
       roleGrid.className =
         "correspondent-detail-role-list";
 
-      const displayedRoles = [
-        {
-          key: "RESPONSABLE",
-          label: "Responsable"
-        },
-        {
-          key: "REGULIER",
-          label: "Regulier"
-        },
-        {
-          key: "NIVEAU3",
-          label: "Niveau 3"
-        },
-        {
-          key: "FACTURATION",
-          label: "Facturation"
-        }
-      ];
+      const displayedRoles = correspondentRoleDefinitions;
 
       displayedRoles.forEach(
         definition => {
@@ -40511,12 +40694,12 @@ ${body}
 
           checkbox.type =
             "checkbox";
-          checkbox.disabled =
-            true;
           checkbox.checked =
             normalizedRoles.has(
               definition.key
             );
+          checkbox.dataset.correspondentRole = definition.apiValue || definition.label;
+          checkbox.dataset.initialChecked = String(checkbox.checked);
 
           const presentation =
             getCorrespondentRoleDefinition(
@@ -40546,9 +40729,18 @@ ${body}
         }
       );
 
-      roleFieldset.appendChild(
-        roleGrid
+      const roleLayout = document.createElement("div");
+      roleLayout.className = "correspondent-detail-role-layout";
+      const functionField = makeCorrespondentEditableField(
+        "Fonction",
+        "",
+        getCorrespondentDetailValue(item, ["Fonction", "fonction"])
       );
+      const functionControl = functionField.querySelector(".correspondent-detail-editable-control");
+      delete functionControl.dataset.correspondentApiField;
+      functionControl.dataset.correspondentLinkFunction = "true";
+      roleLayout.append(roleGrid, functionField);
+      roleFieldset.appendChild(roleLayout);
 
       panel.appendChild(
         roleFieldset
@@ -40730,142 +40922,37 @@ ${body}
         "correspondent-detail-grid correspondent-detail-grid-4";
 
       const fields = [
-        [
-          "Liste 1 correspondants",
-          [
-            "Liste1Correspondants",
-            "liste1Correspondants",
-            "ListeCorrespondant1",
-            "listeCorrespondant1"
-          ]
-        ],
-        [
-          "Liste 2 correspondants",
-          [
-            "Liste2Correspondants",
-            "liste2Correspondants",
-            "ListeCorrespondant2",
-            "listeCorrespondant2"
-          ]
-        ],
-        [
-          "Liste 3 correspondants",
-          [
-            "Liste3Correspondants",
-            "liste3Correspondants",
-            "ListeCorrespondant3",
-            "listeCorrespondant3"
-          ]
-        ],
-        [
-          "Liste 4 correspondants",
-          [
-            "Liste4Correspondants",
-            "liste4Correspondants",
-            "ListeCorrespondant4",
-            "listeCorrespondant4"
-          ]
-        ],
-        [
-          "Chiffre 1",
-          [
-            "Chiffre1",
-            "chiffre1"
-          ]
-        ],
-        [
-          "Chiffre 2",
-          [
-            "Chiffre2",
-            "chiffre2"
-          ]
-        ],
-        [
-          "Date 1",
-          [
-            "Date1",
-            "date1"
-          ]
-        ],
-        [
-          "Date 2",
-          [
-            "Date2",
-            "date2"
-          ]
-        ],
-        [
-          "Texte 1",
-          [
-            "Texte1",
-            "texte1"
-          ]
-        ],
-        [
-          "Texte 2",
-          [
-            "Texte2",
-            "texte2"
-          ]
-        ],
-        [
-          "Texte 3",
-          [
-            "Texte3",
-            "texte3"
-          ]
-        ],
-        [
-          "Texte 4",
-          [
-            "Texte4",
-            "texte4"
-          ]
-        ],
-        [
-          "WEB",
-          [
-            "WEB",
-            "Web",
-            "web"
-          ]
-        ]
+        ["Liste 1", "Liste1", ["Liste1", "liste1"]],
+        ["Liste 2", "Liste2", ["Liste2", "liste2"]],
+        ["Liste 3", "Liste3", ["Liste3", "liste3"]],
+        ["Liste 4", "Liste4", ["Liste4", "liste4"]],
+        ["Chiffre 1", "Chiffre1", ["Chiffre1", "chiffre1"], "number"],
+        ["Chiffre 2", "Chiffre2", ["Chiffre2", "chiffre2"], "number"],
+        ["Date 1", "Date1", ["Date1", "date1"], "date"],
+        ["Date 2", "Date2", ["Date2", "date2"], "date"],
+        ["Texte 2", "Texte2", ["Texte2", "texte2"]],
+        ["Texte 3", "Texte3", ["Texte3", "texte3"]],
+        ["Texte 4", "Texte4", ["Texte4", "texte4"]]
       ];
 
-      fields.forEach(
-        ([label, keys]) => {
-          let value =
-            getCorrespondentDetailValue(
-              item,
-              keys
-            );
-
-          if (
-            label.startsWith(
-              "Date "
-            )
-          ) {
-            value =
-              formatCorrespondentDate(
-                value
-              );
-          }
-
-          grid.appendChild(
-            makeCorrespondentReadonlyField(
-              label,
-              value
-            )
-          );
-        }
-      );
+      fields.forEach(([label, apiField, keys, type]) => {
+        grid.appendChild(makeCorrespondentEditableField(
+          label,
+          apiField,
+          getCorrespondentDetailValue(item, keys),
+          { type: type || "text" }
+        ));
+      });
 
       grid.appendChild(
-        makeCorrespondentReadonlyField(
-          "Commentaire correspondant",
+        makeCorrespondentEditableField(
+          "Mémo",
+          "Memo",
           getCorrespondentDetailValue(
             item,
             [
+              "Memo",
+              "memo",
               "CommentaireCorrespondant",
               "commentaireCorrespondant",
               "Commentaire",
@@ -41219,6 +41306,23 @@ ${body}
       return panel;
     }
 
+    let activeCorrespondentDetailItem = null;
+    let correspondentDetailSaveInProgress = false;
+
+    function updateCorrespondentDetailSaveState(overlay) {
+      const saveButton = overlay.querySelector("#correspondentDetailSave");
+      if (!saveButton) return;
+      const hasApiChanges = [...overlay.querySelectorAll("[data-correspondent-api-field]")]
+        .some(control => control.value !== control.dataset.initialValue);
+      const functionControl = overlay.querySelector("[data-correspondent-link-function]");
+      const hasFunctionChanges = Boolean(functionControl && functionControl.value !== functionControl.dataset.initialValue);
+      const hasRoleChanges = [...overlay.querySelectorAll("[data-correspondent-role]")]
+        .some(control => control.checked !== (control.dataset.initialChecked === "true"));
+      const hasChanges = hasApiChanges || hasFunctionChanges || hasRoleChanges;
+      saveButton.hidden = !hasChanges && !correspondentDetailSaveInProgress;
+      saveButton.disabled = correspondentDetailSaveInProgress || !hasChanges;
+    }
+
     function ensureCorrespondentDetailModal() {
       let overlay =
         document.getElementById(
@@ -41280,6 +41384,8 @@ ${body}
           </div>
 
           <div class="correspondent-detail-footer">
+            <p id="correspondentDetailStatus" class="correspondent-detail-status" role="status" aria-live="polite"></p>
+            <button type="button" class="primary-button" id="correspondentDetailSave" disabled hidden>Enregistrer</button>
             <button
               type="button"
               class="secondary-button"
@@ -41302,6 +41408,35 @@ ${body}
           "click",
           closeCorrespondentDetailModal
         );
+      });
+
+      overlay.addEventListener("input", event => {
+        if (!event.target.matches("[data-correspondent-api-field], [data-correspondent-link-function], [data-correspondent-role]")) return;
+        if (event.target.matches("[data-correspondent-api-field], [data-correspondent-link-function]")) {
+          event.target.setCustomValidity("");
+          updateCorrespondentDetailFieldHighlight(event.target);
+        }
+        if (event.target.matches("[data-correspondent-role]")) {
+          event.target.closest(".correspondent-detail-role-line")?.classList.toggle(
+            "is-modified",
+            event.target.checked !== (event.target.dataset.initialChecked === "true")
+          );
+        }
+        const status = overlay.querySelector("#correspondentDetailStatus");
+        status.textContent = "";
+        status.classList.remove("is-error", "is-ok");
+        updateCorrespondentDetailSaveState(overlay);
+      });
+      overlay.addEventListener("change", event => {
+        if (!event.target.matches("[data-correspondent-role]")) return;
+        event.target.closest(".correspondent-detail-role-line")?.classList.toggle(
+          "is-modified",
+          event.target.checked !== (event.target.dataset.initialChecked === "true")
+        );
+        updateCorrespondentDetailSaveState(overlay);
+      });
+      overlay.querySelector("#correspondentDetailSave").addEventListener("click", () => {
+        saveCorrespondentDetailChanges(activeCorrespondentDetailItem, overlay);
       });
 
       overlay.addEventListener(
@@ -41336,6 +41471,158 @@ ${body}
         "aria-hidden",
         "true"
       );
+      activeCorrespondentDetailItem = null;
+    }
+
+    async function saveCorrespondentDetailChanges(item, overlay) {
+      if (!item || correspondentDetailSaveInProgress) return;
+      const status = overlay.querySelector("#correspondentDetailStatus");
+      const saveButton = overlay.querySelector("#correspondentDetailSave");
+      const apiControls = [...overlay.querySelectorAll("[data-correspondent-api-field]")];
+      const patchPayload = {};
+      for (const control of apiControls) {
+        if (control.value === control.dataset.initialValue) continue;
+        const field = control.dataset.correspondentApiField;
+        if (control.type === "number") {
+          const value = control.value.trim() === "" ? 0 : Number(control.value);
+          if (!Number.isFinite(value)) {
+            control.setCustomValidity("Saisissez un nombre valide.");
+            control.reportValidity();
+            return;
+          }
+          patchPayload[field] = value;
+        } else {
+          patchPayload[field] = control.value;
+        }
+      }
+
+      const functionControl = overlay.querySelector("[data-correspondent-link-function]");
+      const roleControls = [...overlay.querySelectorAll("[data-correspondent-role]")];
+      const functionChanged = Boolean(
+        functionControl && functionControl.value !== functionControl.dataset.initialValue
+      );
+      const rolesChanged = roleControls.some(
+        control => control.checked !== (control.dataset.initialChecked === "true")
+      );
+      const relationChanged = functionChanged || rolesChanged;
+      if (!Object.keys(patchPayload).length && !relationChanged) return;
+
+      const correspondentId = item.Id ?? item.id ?? item.raw?.Id ?? item.raw?.id;
+      if (correspondentId === null || correspondentId === undefined || String(correspondentId).trim() === "") {
+        status.textContent = "L’identifiant du correspondant est introuvable.";
+        status.classList.add("is-error");
+        return;
+      }
+
+      const folderCode = String(generatedFolders[currentFolderEditorIndex]?.Code || "").trim();
+      if (relationChanged && !folderCode) {
+        status.textContent = "Le code du dossier est introuvable pour modifier les rôles.";
+        status.classList.add("is-error");
+        return;
+      }
+
+      const previousRoles = getCorrespondentDetailRoles(item);
+      const supportedRoleKeys = new Set(correspondentRoleDefinitions.map(definition => definition.key));
+      const relationRoles = previousRoles.filter(
+        role => !supportedRoleKeys.has(normalizeCorrespondentRole(role))
+      );
+      roleControls.filter(control => control.checked).forEach(control => {
+        const apiRole = control.dataset.correspondentRole;
+        const existingRole = previousRoles.find(
+          role => normalizeCorrespondentRole(role) === normalizeCorrespondentRole(apiRole)
+        );
+        relationRoles.push(existingRole || apiRole);
+      });
+      const relationPayload = {
+        Fonction: functionControl?.value || "",
+        Roles: [...new Set(relationRoles)]
+      };
+
+      correspondentDetailSaveInProgress = true;
+      saveButton.textContent = "Enregistrement…";
+      updateCorrespondentDetailSaveState(overlay);
+      status.textContent = "Enregistrement des modifications…";
+      status.classList.remove("is-error", "is-ok");
+      try {
+        const sendUpdate = async (method, endpoint, payload) => {
+          const headers = {
+            Accept: "application/json, text/plain, */*",
+            UUID: apiSessionUuid
+          };
+          const requestOptions = { method, headers };
+          if (payload !== undefined) {
+            headers["Content-Type"] = "application/json";
+            requestOptions.body = JSON.stringify(payload);
+          }
+          const response = await fetch(getSelectedApiBaseUrl().replace(/\/+$/, "") + endpoint, {
+            ...requestOptions
+          });
+          const responseText = await response.text();
+          let responseData = null;
+          try { responseData = responseText.trim() ? JSON.parse(responseText) : null; } catch { responseData = null; }
+          if (!response.ok) {
+            const detail = responseData?.description || responseData?.Description || responseText.trim();
+            throw new Error(`${endpoint} : erreur ${response.status}${detail ? ` — ${detail}` : ""}`);
+          }
+          const returnCode = responseData?.codeRetour ?? responseData?.CodeRetour;
+          if (returnCode !== undefined && String(returnCode) !== "1") {
+            const details = responseData?.listeErreurs || responseData?.ListeErreurs || responseData?.Erreurs;
+            const errorText = Array.isArray(details)
+              ? details.map(error => error?.Description || error?.description || error?.Erreur || "").filter(Boolean).join(" ; ")
+              : "";
+            throw new Error(errorText || responseData?.description || responseData?.Description || "L’API a refusé la modification.");
+          }
+        };
+
+        if (Object.keys(patchPayload).length) {
+          const endpoint = `/v1/correspondants/${encodeURIComponent(correspondentId)}`;
+          await sendUpdate("PATCH", endpoint, patchPayload);
+        }
+        if (relationChanged) {
+          const endpoint = `/v1/dossiers/${encodeURIComponent(folderCode)}/correspondants/${encodeURIComponent(correspondentId)}`;
+          await sendUpdate("DELETE", endpoint);
+          await sendUpdate("POST", endpoint, relationPayload);
+        }
+
+        const { raw, person } = getCorrespondentDetailSource(item);
+        Object.assign(person, patchPayload);
+        Object.assign(item, patchPayload);
+        if (raw && raw !== person) Object.assign(raw, patchPayload);
+        if (relationChanged) {
+          item.Fonction = relationPayload.Fonction;
+          if (raw && raw !== person) raw.Fonction = relationPayload.Fonction;
+          if (person && person !== raw) person.Fonction = relationPayload.Fonction;
+        }
+        status.textContent = "Correspondant modifié. Actualisation de la liste…";
+
+        const refreshResult = await refreshFolderEditorCorrespondents(folderCode);
+        const previousSection = folderEditorForm.querySelector("#folderEditorSection_correspondents");
+        if (previousSection) {
+          const refreshedSection = buildFolderEditorCorrespondentsSection(
+            refreshResult.correspondents,
+            refreshResult.error
+          );
+          refreshedSection.id = "folderEditorSection_correspondents";
+          refreshedSection.setAttribute("role", "tabpanel");
+          refreshedSection.classList.toggle("active", previousSection.classList.contains("active"));
+          previousSection.replaceWith(refreshedSection);
+        }
+        if (refreshResult.error) {
+          folderEditorError.textContent = `Correspondant modifié, mais la liste n’a pas pu être actualisée : ${refreshResult.error}`;
+          folderEditorError.classList.add("visible");
+        } else {
+          folderEditorError.textContent = "";
+          folderEditorError.classList.remove("visible");
+        }
+        closeCorrespondentDetailModal();
+      } catch (error) {
+        status.textContent = error?.message || "La modification du correspondant a échoué.";
+        status.classList.add("is-error");
+      } finally {
+        correspondentDetailSaveInProgress = false;
+        saveButton.textContent = "Enregistrer";
+        updateCorrespondentDetailSaveState(overlay);
+      }
     }
 
     function openCorrespondentDetailModal(
@@ -41343,6 +41630,10 @@ ${body}
     ) {
       const overlay =
         ensureCorrespondentDetailModal();
+      activeCorrespondentDetailItem = item;
+      const status = overlay.querySelector("#correspondentDetailStatus");
+      status.textContent = "";
+      status.classList.remove("is-error", "is-ok");
 
       const title =
         overlay.querySelector(
@@ -41520,6 +41811,7 @@ ${body}
         "aria-hidden",
         "false"
       );
+      updateCorrespondentDetailSaveState(overlay);
     }
 
     function getCorrespondentAssociateInfo(
@@ -41979,10 +42271,295 @@ ${body}
       return section;
     }
 
+    async function addRandomFolderCorrespondent(button, statusNode) {
+      if (!apiSessionUuid) {
+        statusNode.textContent = "Connexion API indisponible.";
+        statusNode.hidden = false;
+        return;
+      }
+
+      const folderCode = normalizeReferenceCode(getCurrentFolderEditorCode());
+      if (!folderCode) {
+        statusNode.textContent = "Le code du dossier est introuvable.";
+        statusNode.hidden = false;
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "Création en cours…";
+      statusNode.hidden = true;
+      statusNode.textContent = "";
+      statusNode.classList.remove("is-success");
+
+      try {
+        if (!availableTitles.some(title => title.personnePhysique)) {
+          availableTitles = await fetchApiTitles(getSelectedApiBaseUrl(), apiSessionUuid);
+        }
+        const physicalTitles = availableTitles.filter(title => title.personnePhysique);
+        const gender = getRandomGender();
+        const person = generatePerson(gender);
+        const correspondentCode = getNextCorrespondentCode();
+        const title = physicalTitles.length ? randomItem(physicalTitles) : null;
+        const creationPayload = {
+          Correspondant: {
+            Code: correspondentCode,
+            ...(title ? { CodeTitre: title.code } : {}),
+            Nom: person.nom,
+            Prenom: person.prenom,
+            DateNaissance: person.dateNaissance,
+            Adresse1: person.adresse1,
+            Email: person.email,
+            Ville: person.ville,
+            CodePostal: person.codePostal
+          },
+          Fonction: "",
+          Roles: []
+        };
+        const endpoint = `/v1/dossiers/${encodeURIComponent(folderCode)}/correspondants`;
+        const response = await fetch(`${getSelectedApiBaseUrl().replace(/\/+$/, "")}${endpoint}`, {
+          method: "POST",
+          headers: {
+            Accept: "application/json, text/plain, */*",
+            "Content-Type": "application/json",
+            UUID: apiSessionUuid
+          },
+          body: JSON.stringify(creationPayload)
+        });
+        const responseText = await response.text();
+        let responseData = null;
+        try { responseData = responseText.trim() ? JSON.parse(responseText) : null; } catch { responseData = null; }
+        if (!response.ok) {
+          const detail = responseData?.description || responseData?.Description || responseText.trim();
+          throw new Error(`${endpoint} : erreur ${response.status}${detail ? ` — ${detail}` : ""}`);
+        }
+        const returnCode = responseData?.codeRetour ?? responseData?.CodeRetour;
+        if (returnCode !== undefined && String(returnCode) !== "1") {
+          const errors = responseData?.listeErreurs || responseData?.ListeErreurs || responseData?.Erreurs;
+          const detail = Array.isArray(errors)
+            ? errors.map(error => error?.Description || error?.description || error?.Erreur || "").filter(Boolean).join(" ; ")
+            : "";
+          throw new Error(detail || responseData?.description || responseData?.Description || "L’API a refusé la création du correspondant.");
+        }
+
+        const refreshResult = await refreshFolderEditorCorrespondents(folderCode);
+        const section = button.closest(".folder-editor-correspondents-section");
+        let refreshedSection = section;
+        if (section) {
+          refreshedSection = buildFolderEditorCorrespondentsSection(
+            refreshResult.correspondents,
+            refreshResult.error,
+            refreshResult.correspondents.find(item =>
+              normalizeReferenceCode(item.Code) === normalizeReferenceCode(correspondentCode)
+            )?.Code || correspondentCode
+          );
+          refreshedSection.id = "folderEditorSection_correspondents";
+          refreshedSection.setAttribute("role", "tabpanel");
+          refreshedSection.classList.toggle("active", section.classList.contains("active"));
+          section.replaceWith(refreshedSection);
+          statusNode = refreshedSection.querySelector(".folder-editor-correspondents-action-status") || statusNode;
+        }
+
+        if (refreshResult.error) {
+          statusNode.textContent = `Correspondant créé, mais la liste n’a pas pu être actualisée : ${refreshResult.error}`;
+          statusNode.classList.remove("is-success");
+          statusNode.hidden = false;
+        } else {
+          statusNode.textContent = "Correspondant créé et ajouté à la liste.";
+          statusNode.classList.add("is-success");
+          statusNode.hidden = false;
+        }
+      } catch (error) {
+        statusNode.textContent = error?.message || "La création du correspondant a échoué.";
+        statusNode.classList.remove("is-success");
+        statusNode.hidden = false;
+      } finally {
+        if (button.isConnected) {
+          button.disabled = false;
+          button.textContent = "+ Ajouter un correspondant";
+        }
+      }
+    }
+
+    async function sendFolderEditorCorrespondentDelete(folderCode, correspondentId) {
+      const endpoint = `/v1/dossiers/${encodeURIComponent(folderCode)}/correspondants/${encodeURIComponent(correspondentId)}`;
+      const response = await fetch(`${getSelectedApiBaseUrl().replace(/\/+$/, "")}${endpoint}`, {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          UUID: apiSessionUuid
+        }
+      });
+      const responseText = await response.text();
+      let responseData = null;
+      try { responseData = responseText.trim() ? JSON.parse(responseText) : null; } catch { responseData = null; }
+      if (!response.ok) {
+        const detail = responseData?.description || responseData?.Description || responseText.trim();
+        throw new Error(`${endpoint} : erreur ${response.status}${detail ? ` — ${detail}` : ""}`);
+      }
+      const returnCode = responseData?.codeRetour ?? responseData?.CodeRetour;
+      if (returnCode !== undefined && String(returnCode) !== "1") {
+        const errors = responseData?.listeErreurs || responseData?.ListeErreurs || responseData?.Erreurs;
+        const detail = Array.isArray(errors)
+          ? errors.map(error => error?.Description || error?.description || error?.Erreur || "").filter(Boolean).join(" ; ")
+          : "";
+        throw new Error(detail || responseData?.description || responseData?.Description || "L’API a refusé la suppression du correspondant.");
+      }
+    }
+
+    async function deleteFolderEditorCorrespondent(item, button) {
+      const correspondentId = String(item?.Id || "").trim();
+      const folderCode = normalizeReferenceCode(getCurrentFolderEditorCode());
+      const name = [item?.Prenom, item?.Nom].filter(Boolean).join(" ").trim();
+      if (!correspondentId || !folderCode) {
+        const status = button.closest(".folder-editor-correspondents-section")?.querySelector(".folder-editor-correspondents-action-status");
+        if (status) {
+          status.textContent = !correspondentId ? "Identifiant du correspondant introuvable." : "Code du dossier introuvable.";
+          status.classList.remove("is-success");
+          status.hidden = false;
+        }
+        return;
+      }
+
+      if (!window.confirm(`Confirmez-vous la suppression du correspondant${name ? ` « ${name} »` : ""} du dossier ${folderCode} ?`)) return;
+
+      button.disabled = true;
+      button.textContent = "…";
+      let statusNode = button.closest(".folder-editor-correspondents-section")?.querySelector(".folder-editor-correspondents-action-status");
+      if (statusNode) {
+        statusNode.hidden = true;
+        statusNode.textContent = "";
+        statusNode.classList.remove("is-success");
+      }
+
+      try {
+        await sendFolderEditorCorrespondentDelete(folderCode, correspondentId);
+
+        const refreshResult = await refreshFolderEditorCorrespondents(folderCode);
+        const section = button.closest(".folder-editor-correspondents-section");
+        if (section) {
+          const refreshedSection = buildFolderEditorCorrespondentsSection(
+            refreshResult.correspondents,
+            refreshResult.error
+          );
+          refreshedSection.id = "folderEditorSection_correspondents";
+          refreshedSection.setAttribute("role", "tabpanel");
+          refreshedSection.classList.toggle("active", section.classList.contains("active"));
+          section.replaceWith(refreshedSection);
+          statusNode = refreshedSection.querySelector(".folder-editor-correspondents-action-status") || statusNode;
+        }
+
+        if (statusNode) {
+          if (refreshResult.error) {
+            statusNode.textContent = `Correspondant supprimé, mais la liste n’a pas pu être actualisée : ${refreshResult.error}`;
+            statusNode.classList.remove("is-success");
+          } else {
+            statusNode.textContent = "Correspondant supprimé du dossier.";
+            statusNode.classList.add("is-success");
+          }
+          statusNode.hidden = false;
+        }
+      } catch (error) {
+        if (statusNode) {
+          statusNode.textContent = error?.message || "La suppression du correspondant a échoué.";
+          statusNode.classList.remove("is-success");
+          statusNode.hidden = false;
+        }
+      } finally {
+        if (button.isConnected) {
+          button.disabled = false;
+          button.textContent = "−";
+        }
+      }
+    }
+
+    async function deleteSelectedFolderEditorCorrespondents(correspondentIds, button) {
+      const ids = [...new Set((Array.isArray(correspondentIds) ? correspondentIds : []).map(id => String(id).trim()).filter(Boolean))];
+      const folderCode = normalizeReferenceCode(getCurrentFolderEditorCode());
+      if (!ids.length) return;
+
+      let statusNode = button.closest(".folder-editor-correspondents-section")?.querySelector(".folder-editor-correspondents-action-status");
+      if (!apiSessionUuid || !folderCode) {
+        if (statusNode) {
+          statusNode.textContent = !apiSessionUuid ? "Connexion API indisponible." : "Code du dossier introuvable.";
+          statusNode.classList.remove("is-success");
+          statusNode.hidden = false;
+        }
+        return;
+      }
+
+      if (!window.confirm(`Confirmez-vous la suppression des ${ids.length} correspondant(s) sélectionné(s) du dossier ${folderCode} ?`)) return;
+
+      button.disabled = true;
+      button.textContent = "Suppression en cours…";
+      if (statusNode) {
+        statusNode.hidden = true;
+        statusNode.textContent = "";
+        statusNode.classList.remove("is-success");
+      }
+
+      const deletedIds = [];
+      const errors = [];
+      try {
+        for (const id of ids) {
+          try {
+            await sendFolderEditorCorrespondentDelete(folderCode, id);
+            deletedIds.push(id);
+          } catch (error) {
+            errors.push(`${id} : ${error?.message || "échec de suppression"}`);
+          }
+        }
+
+        const refreshResult = await refreshFolderEditorCorrespondents(folderCode);
+        const section = button.closest(".folder-editor-correspondents-section");
+        if (section) {
+          const remainingSelectedIds = ids.filter(id => !deletedIds.includes(id));
+          const refreshedSection = buildFolderEditorCorrespondentsSection(
+            refreshResult.correspondents,
+            refreshResult.error,
+            "",
+            remainingSelectedIds
+          );
+          refreshedSection.id = "folderEditorSection_correspondents";
+          refreshedSection.setAttribute("role", "tabpanel");
+          refreshedSection.classList.toggle("active", section.classList.contains("active"));
+          section.replaceWith(refreshedSection);
+          statusNode = refreshedSection.querySelector(".folder-editor-correspondents-action-status") || statusNode;
+        }
+
+        if (statusNode) {
+          const refreshError = refreshResult.error ? ` La liste n’a pas pu être actualisée : ${refreshResult.error}` : "";
+          if (errors.length) {
+            statusNode.textContent = `${deletedIds.length} supprimé(s), ${errors.length} échec(s). ${errors.join(" ; ")}${refreshError}`;
+            statusNode.classList.remove("is-success");
+          } else {
+            statusNode.textContent = `${deletedIds.length} correspondant(s) supprimé(s).${refreshError}`;
+            statusNode.classList.toggle("is-success", !refreshResult.error);
+          }
+          statusNode.hidden = false;
+        }
+      } catch (error) {
+        if (statusNode) {
+          statusNode.textContent = error?.message || "La suppression des correspondants a échoué.";
+          statusNode.classList.remove("is-success");
+          statusNode.hidden = false;
+        }
+      } finally {
+        if (button.isConnected) {
+          button.disabled = false;
+          button.textContent = "Supprimer les correspondants";
+        }
+      }
+    }
+
     function buildFolderEditorCorrespondentsSection(
       correspondents,
-      errorMessage = ""
+      errorMessage = "",
+      newCorrespondentCode = "",
+      initialSelectedIds = []
     ) {
+      const selectedCorrespondentIds = new Set(
+        (Array.isArray(initialSelectedIds) ? initialSelectedIds : []).map(String)
+      );
       const section =
         document.createElement("section");
 
@@ -42016,9 +42593,43 @@ ${body}
       headingCount.className =
         "folder-editor-correspondents-count";
 
+      const addButton = document.createElement("button");
+      addButton.type = "button";
+      addButton.className = "primary-button folder-editor-correspondents-add";
+      addButton.textContent = "+ Ajouter un correspondant";
+      addButton.disabled = !apiSessionUuid;
+      addButton.title = apiSessionUuid ? "Créer un correspondant aléatoire" : "Connectez-vous à l’API pour ajouter un correspondant.";
+
+      const bulkDeleteButton = document.createElement("button");
+      bulkDeleteButton.type = "button";
+      bulkDeleteButton.className = "folder-editor-correspondents-bulk-delete";
+      bulkDeleteButton.textContent = "Supprimer les correspondants";
+      bulkDeleteButton.disabled = !apiSessionUuid;
+      bulkDeleteButton.hidden = true;
+      bulkDeleteButton.addEventListener("click", () => {
+        deleteSelectedFolderEditorCorrespondents(
+          [...selectedCorrespondentIds],
+          bulkDeleteButton
+        );
+      });
+
+      const updateBulkDeleteButton = () => {
+        bulkDeleteButton.hidden = selectedCorrespondentIds.size === 0;
+      };
+
+      const actionStatus = document.createElement("div");
+      actionStatus.className = "folder-editor-correspondents-action-status";
+      actionStatus.hidden = true;
+
+      addButton.addEventListener("click", () => {
+        addRandomFolderCorrespondent(addButton, actionStatus);
+      });
+
       heading.appendChild(
         headingTitle
       );
+      heading.appendChild(bulkDeleteButton);
+      heading.appendChild(addButton);
       heading.appendChild(
         headingCount
       );
@@ -42034,9 +42645,11 @@ ${body}
         "folder-editor-correspondents-help";
 
       help.textContent =
-        "Liste retournée par GET /v1/dossiers/{code}/correspondants. Ces informations sont en lecture seule.";
+        "Liste retournée par GET /v1/dossiers/{code}/correspondants. Cliquez sur l’ID d’un correspondant pour modifier ses informations.";
 
       wrapper.appendChild(help);
+
+      wrapper.appendChild(actionStatus);
 
       if (errorMessage) {
         const warning =
@@ -42104,7 +42717,6 @@ ${body}
       filters.appendChild(
         resetButton
       );
-
       wrapper.appendChild(
         filters
       );
@@ -42122,6 +42734,11 @@ ${body}
         "folder-editor-correspondents-table";
 
       const columns = [
+        {
+          key: "Selection",
+          label: "",
+          sortable: false
+        },
         {
           key: "Roles",
           label: "Rôle"
@@ -42157,6 +42774,11 @@ ${body}
         {
           key: "ISuite",
           label: "i-Suite"
+        },
+        {
+          key: "Actions",
+          label: "",
+          sortable: false
         }
       ];
 
@@ -42166,9 +42788,27 @@ ${body}
       const headerRow =
         document.createElement("tr");
 
+      const selectVisibleCheckbox = document.createElement("input");
+      selectVisibleCheckbox.type = "checkbox";
+      selectVisibleCheckbox.className = "folder-editor-correspondents-selection";
+      selectVisibleCheckbox.setAttribute("aria-label", "Sélectionner tous les correspondants affichés");
+      selectVisibleCheckbox.title = "Sélectionner tous les correspondants affichés";
+      selectVisibleCheckbox.disabled = !apiSessionUuid;
+
       columns.forEach(column => {
         const th =
           document.createElement("th");
+
+        if (column.sortable === false) {
+          if (column.key === "Selection") {
+            th.className = "folder-editor-correspondents-selection-cell";
+            th.appendChild(selectVisibleCheckbox);
+          } else {
+            th.textContent = column.label;
+          }
+          headerRow.appendChild(th);
+          return;
+        }
 
         const button =
           document.createElement("button");
@@ -42212,6 +42852,10 @@ ${body}
         Array.isArray(correspondents)
           ? correspondents
           : [];
+      const sourceIds = new Set(source.map(item => String(item?.Id || "").trim()).filter(Boolean));
+      selectedCorrespondentIds.forEach(id => {
+        if (!sourceIds.has(id)) selectedCorrespondentIds.delete(id);
+      });
 
       const state = {
         sortKey: "Roles",
@@ -42364,6 +43008,26 @@ ${body}
           });
         };
 
+      let visibleCorrespondentIds = [];
+
+      const updateSelectionHeaderState = () => {
+        const selectedVisibleCount = visibleCorrespondentIds.filter(id =>
+          selectedCorrespondentIds.has(id)
+        ).length;
+
+        selectVisibleCheckbox.disabled =
+          !apiSessionUuid || visibleCorrespondentIds.length === 0;
+        selectVisibleCheckbox.checked =
+          visibleCorrespondentIds.length > 0 &&
+          selectedVisibleCount === visibleCorrespondentIds.length;
+        selectVisibleCheckbox.indeterminate =
+          selectedVisibleCount > 0 &&
+          selectedVisibleCount < visibleCorrespondentIds.length;
+        selectVisibleCheckbox.title = selectVisibleCheckbox.checked
+          ? "Désélectionner tous les correspondants affichés"
+          : "Sélectionner tous les correspondants affichés";
+      };
+
       const renderRows =
         () => {
           const query =
@@ -42503,6 +43167,10 @@ ${body}
                 entry.item
               );
 
+          visibleCorrespondentIds = sorted
+            .map(item => String(item?.Id || "").trim())
+            .filter(Boolean);
+
           headingCount.textContent =
             `${sorted.length} / ${source.length} correspondant(s)`;
 
@@ -42528,12 +43196,39 @@ ${body}
             tbody.appendChild(row);
 
             updateSortIndicators();
+            updateSelectionHeaderState();
             return;
           }
 
           sorted.forEach(item => {
             const row =
               document.createElement("tr");
+
+            if (
+              newCorrespondentCode &&
+              normalizeReferenceCode(item.Code) === normalizeReferenceCode(newCorrespondentCode)
+            ) {
+              row.classList.add("is-new-correspondent");
+              row.title = "Nouveau correspondant créé";
+            }
+
+            const selectionCell = document.createElement("td");
+            selectionCell.className = "folder-editor-correspondents-selection-cell";
+            const selectionCheckbox = document.createElement("input");
+            selectionCheckbox.type = "checkbox";
+            selectionCheckbox.className = "folder-editor-correspondents-selection";
+            selectionCheckbox.setAttribute("aria-label", `Sélectionner ${[item.Prenom, item.Nom].filter(Boolean).join(" ") || `le correspondant ${item.Id}`}`);
+            const correspondentId = String(item?.Id || "").trim();
+            selectionCheckbox.disabled = !apiSessionUuid || !correspondentId;
+            selectionCheckbox.checked = correspondentId && selectedCorrespondentIds.has(correspondentId);
+            selectionCheckbox.addEventListener("change", () => {
+              if (selectionCheckbox.checked) selectedCorrespondentIds.add(correspondentId);
+              else selectedCorrespondentIds.delete(correspondentId);
+              updateBulkDeleteButton();
+              updateSelectionHeaderState();
+            });
+            selectionCell.appendChild(selectionCheckbox);
+            row.appendChild(selectionCell);
 
             const roleCell =
               document.createElement("td");
@@ -42602,7 +43297,8 @@ ${body}
               "Nom",
               "Email",
               "Associate",
-              "ISuite"
+              "ISuite",
+              "Actions"
             ].forEach(key => {
               const cell =
                 document.createElement("td");
@@ -42742,6 +43438,22 @@ ${body}
                     }
                   );
                 }
+              } else if (
+                key === "Actions"
+              ) {
+                cell.className = "folder-editor-correspondents-action-cell";
+                const deleteButton = document.createElement("button");
+                deleteButton.type = "button";
+                deleteButton.className = "folder-editor-correspondents-delete";
+                deleteButton.textContent = "−";
+                deleteButton.title = "Supprimer ce correspondant du dossier";
+                deleteButton.setAttribute("aria-label", `Supprimer le correspondant ${item.Prenom} ${item.Nom}`.trim());
+                deleteButton.disabled = !apiSessionUuid;
+                deleteButton.addEventListener("click", event => {
+                  event.stopPropagation();
+                  deleteFolderEditorCorrespondent(item, deleteButton);
+                });
+                cell.appendChild(deleteButton);
               } else {
                 cell.textContent =
                   String(
@@ -42761,6 +43473,7 @@ ${body}
           });
 
           updateSortIndicators();
+          updateSelectionHeaderState();
         };
 
       table.querySelectorAll(
@@ -42811,7 +43524,24 @@ ${body}
         }
       );
 
+      selectVisibleCheckbox.addEventListener("change", () => {
+        visibleCorrespondentIds.forEach(id => {
+          if (selectVisibleCheckbox.checked) selectedCorrespondentIds.add(id);
+          else selectedCorrespondentIds.delete(id);
+        });
+        renderRows();
+        updateBulkDeleteButton();
+      });
+
       renderRows();
+      updateBulkDeleteButton();
+
+      if (newCorrespondentCode) {
+        tbody.querySelector("tr.is-new-correspondent")?.scrollIntoView({
+          block: "nearest",
+          behavior: "smooth"
+        });
+      }
 
       section.appendChild(wrapper);
 
@@ -54346,6 +55076,7 @@ ${body}
     })();
 
   </script>
+  <script src="./pdf-lib.min.js"></script>
   <script>
     (() => {
       const buildInfo = document.getElementById("appBuildInfo");
