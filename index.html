@@ -36895,27 +36895,114 @@ ${body}
           .replace(/>/g, "&gt;")
           .replace(/"/g, "&quot;")
           .replace(/'/g, "&apos;");
-        const buildFacturXMinimumXml = invoice => {
+        const completeInvoicePartyAddress = party => {
+          const completed = { ...(party || {}) };
+          if (completed.address1 && completed.postalCode && completed.city) return completed;
+          const seed = [completed.name, completed.siren, completed.siret, completed.email].filter(Boolean).join("|") || "facture-test";
+          let hash = 0;
+          for (const character of seed) hash = (hash * 31 + character.charCodeAt(0)) >>> 0;
+          const locations = [
+            { postalCode: "14000", city: "Caen" },
+            { postalCode: "44000", city: "Nantes" },
+            { postalCode: "31000", city: "Toulouse" },
+            { postalCode: "67000", city: "Strasbourg" },
+            { postalCode: "33000", city: "Bordeaux" },
+            { postalCode: "59000", city: "Lille" },
+            { postalCode: "69003", city: "Lyon" },
+            { postalCode: "13002", city: "Marseille" }
+          ];
+          const normalizePlace = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+          const location = locations.find(item => normalizePlace(item.city) === normalizePlace(completed.city)) ||
+            locations.find(item => completed.postalCode && String(completed.postalCode).startsWith(item.postalCode.slice(0, 2))) ||
+            locations[hash % locations.length];
+          const streetNumber = 1 + (hash % 98);
+          const streetNames = ["rue des Ateliers", "avenue des Tilleuls", "rue des Érables", "allée des Artisans"];
+          if (!completed.address1) completed.address1 = streetNumber + " " + streetNames[Math.floor(hash / locations.length) % streetNames.length];
+          if (!completed.postalCode) completed.postalCode = location.postalCode;
+          if (!completed.city) completed.city = location.city;
+          if (!completed.country) completed.country = "France";
+          if (!completed.countryCode) completed.countryCode = "FR";
+          completed.addressIsSynthetic = true;
+          return completed;
+        };
+        const buildFacturXInvoiceLines = (invoice, amountHt) => {
+          if (Array.isArray(invoice.lines) && invoice.lines.length) return invoice.lines;
+          const seed = String(invoice.number || "facture-test");
+          let hash = 0;
+          for (const character of seed) hash = (hash * 31 + character.charCodeAt(0)) >>> 0;
+          const count = 2 + (hash % 2);
+          const labels = String(invoice.number || "").toUpperCase().startsWith("FV")
+            ? ["Prestation de services", "Matériel professionnel", "Maintenance et assistance"]
+            : ["Fournitures de bureau", "Matériel professionnel", "Consommables et accessoires"];
+          let remainingCents = Math.round(amountHt * 100);
+          return Array.from({ length: count }, (_, index) => {
+            const remainingLines = count - index - 1;
+            const quantity = remainingLines === 0 ? 1 : 1 + ((hash >>> (index * 3)) % 4);
+            let unitCents;
+            if (remainingLines === 0) {
+              unitCents = remainingCents;
+            } else {
+              const maxUnitCents = Math.floor((remainingCents - remainingLines * 100) / quantity);
+              const share = 0.25 + (((hash >>> (index * 5 + 4)) % 36) / 100);
+              unitCents = Math.max(100, Math.floor((maxUnitCents * share) / 100) * 100);
+            }
+            const totalCents = quantity * unitCents;
+            remainingCents -= totalCents;
+            return {
+              label: labels[(hash + index) % labels.length],
+              quantity,
+              unitPrice: unitCents / 100,
+              amountHt: totalCents / 100,
+              vatRate: 20
+            };
+          });
+        };
+        const buildFacturXBasicXml = invoice => {
           const currency = "EUR";
           const amountHt = Math.round(Number(invoice.amountHt) * 100) / 100;
           const amountVat = Math.round(Number(invoice.amountVat ?? amountHt * 0.2) * 100) / 100;
           const amountGross = Math.round(Number(invoice.amountTtc ?? amountHt + amountVat) * 100) / 100;
           const date = String(invoice.date || "").replace(/-/g, "");
+          const invoiceLines = invoice.lines || buildFacturXInvoiceLines(invoice, amountHt);
+          const invoiceLineXml = invoiceLines.map((line, index) => `<ram:IncludedSupplyChainTradeLineItem>
+      <ram:AssociatedDocumentLineDocument><ram:LineID>${index + 1}</ram:LineID></ram:AssociatedDocumentLineDocument>
+      <ram:SpecifiedTradeProduct><ram:Name>${escapeXmlText(line.label)}</ram:Name></ram:SpecifiedTradeProduct>
+      <ram:SpecifiedLineTradeAgreement><ram:NetPriceProductTradePrice><ram:ChargeAmount>${Number(line.unitPrice).toFixed(2)}</ram:ChargeAmount></ram:NetPriceProductTradePrice></ram:SpecifiedLineTradeAgreement>
+      <ram:SpecifiedLineTradeDelivery><ram:BilledQuantity unitCode="C62">${Number(line.quantity)}</ram:BilledQuantity></ram:SpecifiedLineTradeDelivery>
+      <ram:SpecifiedLineTradeSettlement>
+        <ram:ApplicableTradeTax><ram:TypeCode>VAT</ram:TypeCode><ram:CategoryCode>S</ram:CategoryCode><ram:RateApplicablePercent>${Number(line.vatRate ?? 20).toFixed(2)}</ram:RateApplicablePercent></ram:ApplicableTradeTax>
+        <ram:SpecifiedTradeSettlementLineMonetarySummation><ram:LineTotalAmount currencyID="${currency}">${Number(line.amountHt).toFixed(2)}</ram:LineTotalAmount></ram:SpecifiedTradeSettlementLineMonetarySummation>
+      </ram:SpecifiedLineTradeSettlement>
+    </ram:IncludedSupplyChainTradeLineItem>`).join("\n    ");
           const partyXml = (role, party) => {
-            const siren = String(party.siren || "").replace(/\D/g, "").slice(0, 9).padStart(9, "0");
-            const vatKey = String((12 + 3 * (Number(siren) % 97)) % 97).padStart(2, "0");
+            const siren = String(party.siren || party.siret || "").replace(/\D/g, "").slice(0, 9);
+            const vatKey = siren.length === 9 ? String((12 + 3 * (Number(siren) % 97)) % 97).padStart(2, "0") : "";
+            const vatId = String(party.vatId || (vatKey ? "FR" + vatKey + siren : "")).trim();
+            const organizationXml = siren ? `<ram:SpecifiedLegalOrganization><ram:ID schemeID="0002">${siren}</ram:ID></ram:SpecifiedLegalOrganization>` : "";
+            const taxXml = vatId ? `<ram:SpecifiedTaxRegistration><ram:ID schemeID="VA">${escapeXmlText(vatId)}</ram:ID></ram:SpecifiedTaxRegistration>` : "";
+            const contactXml = party.email
+              ? `<ram:DefinedTradeContact><ram:EmailURIUniversalCommunication><ram:URIID>${escapeXmlText(party.email)}</ram:URIID></ram:EmailURIUniversalCommunication></ram:DefinedTradeContact>`
+              : "";
             return `<ram:${role}>
-              <ram:Name>${escapeXmlText(party.name)}</ram:Name>
-              <ram:SpecifiedLegalOrganization><ram:ID schemeID="0002">${siren}</ram:ID></ram:SpecifiedLegalOrganization>
-              <ram:PostalTradeAddress><ram:CountryID>FR</ram:CountryID></ram:PostalTradeAddress>
-              <ram:SpecifiedTaxRegistration><ram:ID schemeID="VA">FR${vatKey}${siren}</ram:ID></ram:SpecifiedTaxRegistration>
+              <ram:Name>${escapeXmlText(party.name || "Société")}</ram:Name>
+              ${organizationXml}
+              ${contactXml}
+              <ram:PostalTradeAddress>
+                ${party.address1 ? `<ram:LineOne>${escapeXmlText(party.address1)}</ram:LineOne>` : ""}
+                ${party.address2 ? `<ram:LineTwo>${escapeXmlText(party.address2)}</ram:LineTwo>` : ""}
+                ${party.address3 ? `<ram:LineThree>${escapeXmlText(party.address3)}</ram:LineThree>` : ""}
+                ${party.postalCode ? `<ram:PostcodeCode>${escapeXmlText(party.postalCode)}</ram:PostcodeCode>` : ""}
+                ${party.city ? `<ram:CityName>${escapeXmlText(party.city)}</ram:CityName>` : ""}
+                <ram:CountryID>${escapeXmlText(party.countryCode || "FR")}</ram:CountryID>
+              </ram:PostalTradeAddress>
+              ${taxXml}
             </ram:${role}>`;
           };
           return `<?xml version="1.0" encoding="UTF-8"?>
 <rsm:CrossIndustryInvoice xmlns:qdt="urn:un:unece:uncefact:data:standard:QualifiedDataType:100" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100" xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <rsm:ExchangedDocumentContext>
     <ram:BusinessProcessSpecifiedDocumentContextParameter><ram:ID>A1</ram:ID></ram:BusinessProcessSpecifiedDocumentContextParameter>
-    <ram:GuidelineSpecifiedDocumentContextParameter><ram:ID>urn:factur-x.eu:1p0:minimum</ram:ID></ram:GuidelineSpecifiedDocumentContextParameter>
+  <ram:GuidelineSpecifiedDocumentContextParameter><ram:ID>urn:factur-x.eu:1p0:basic</ram:ID></ram:GuidelineSpecifiedDocumentContextParameter>
   </rsm:ExchangedDocumentContext>
   <rsm:ExchangedDocument>
     <ram:ID>${escapeXmlText(invoice.number)}</ram:ID>
@@ -36923,6 +37010,7 @@ ${body}
     <ram:IssueDateTime><udt:DateTimeString format="102">${date}</udt:DateTimeString></ram:IssueDateTime>
   </rsm:ExchangedDocument>
   <rsm:SupplyChainTradeTransaction>
+    ${invoiceLineXml}
     <ram:ApplicableHeaderTradeAgreement>
       ${partyXml("SellerTradeParty", invoice.seller)}
       ${partyXml("BuyerTradeParty", invoice.buyer)}
@@ -36930,6 +37018,7 @@ ${body}
     <ram:ApplicableHeaderTradeDelivery/>
     <ram:ApplicableHeaderTradeSettlement>
       <ram:InvoiceCurrencyCode>${currency}</ram:InvoiceCurrencyCode>
+      <ram:ApplicableTradeTax><ram:CalculatedAmount currencyID="${currency}">${amountVat.toFixed(2)}</ram:CalculatedAmount><ram:TypeCode>VAT</ram:TypeCode><ram:BasisAmount currencyID="${currency}">${amountHt.toFixed(2)}</ram:BasisAmount><ram:CategoryCode>S</ram:CategoryCode><ram:RateApplicablePercent>20.00</ram:RateApplicablePercent></ram:ApplicableTradeTax>
       <ram:SpecifiedTradeSettlementHeaderMonetarySummation>
         <ram:TaxBasisTotalAmount currencyID="${currency}">${amountHt.toFixed(2)}</ram:TaxBasisTotalAmount>
         <ram:TaxTotalAmount currencyID="${currency}">${amountVat.toFixed(2)}</ram:TaxTotalAmount>
@@ -36940,38 +37029,171 @@ ${body}
   </rsm:SupplyChainTradeTransaction>
 </rsm:CrossIndustryInvoice>`;
         };
-        const createFacturXTestPdf = async (sourcePdf, invoice) => {
+        const createFacturXTestPdf = async invoice => {
           const pdfLib = window.PDFLib;
           if (!pdfLib?.PDFDocument) throw new Error("La bibliothèque PDF nécessaire pour joindre le XML n’a pas été chargée.");
-          const pdfDocument = await pdfLib.PDFDocument.load(await sourcePdf.arrayBuffer());
-          const xml = buildFacturXMinimumXml(invoice);
+          invoice = {
+            ...invoice,
+            seller: completeInvoicePartyAddress(invoice.seller),
+            buyer: completeInvoicePartyAddress(invoice.buyer)
+          };
+          const pdfDocument = await pdfLib.PDFDocument.create();
+          const page = pdfDocument.addPage([595.28, 841.89]);
+          const font = await pdfDocument.embedFont(pdfLib.StandardFonts.Helvetica);
+          const boldFont = await pdfDocument.embedFont(pdfLib.StandardFonts.HelveticaBold);
+          const { rgb } = pdfLib;
+          const width = page.getWidth();
+          const height = page.getHeight();
+          const margin = 44;
+          const navy = rgb(0.07, 0.19, 0.35);
+          const blue = rgb(0.14, 0.38, 0.88);
+          const pale = rgb(0.93, 0.96, 0.99);
+          const border = rgb(0.82, 0.87, 0.93);
+          const muted = rgb(0.35, 0.41, 0.49);
+          const dark = rgb(0.10, 0.14, 0.20);
+          const white = rgb(1, 1, 1);
+          const pdfText = value => String(value ?? "")
+            .replace(/[’‘]/g, "'").replace(/[–—]/g, "-").replace(/…/g, "...")
+            .replace(/[œŒ]/g, letter => letter === "œ" ? "oe" : "OE")
+            .replace(/[æÆ]/g, letter => letter === "æ" ? "ae" : "AE")
+            .replace(/\s+/g, " ").replace(/[^\x20-\x7E\u00A0-\u00FF]/g, "?").trim();
+          const drawParagraph = (value, x, y, maxWidth, size, face = font, color = dark, lineHeight = size + 4, maxLines = 3) => {
+            const words = pdfText(value).split(" ").filter(Boolean);
+            const lines = [];
+            let line = "";
+            for (const word of words) {
+              const candidate = line ? line + " " + word : word;
+              if (line && face.widthOfTextAtSize(candidate, size) > maxWidth) {
+                lines.push(line);
+                line = word;
+              } else line = candidate;
+            }
+            if (line) lines.push(line);
+            lines.slice(0, maxLines).forEach((text, index) => page.drawText(text, { x, y: y - index * lineHeight, size, font: face, color, maxWidth }));
+            return y - Math.min(lines.length, maxLines) * lineHeight;
+          };
+          const formatAmount = amount => Number(amount || 0)
+            .toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            .replace(/[\u00a0\u202f]/g, " ") + " EUR";
+          const formatDate = value => {
+            const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            return match ? match[3] + "/" + match[2] + "/" + match[1] : String(value || "");
+          };
+          const drawPartyCard = (party, title, x, top, cardWidth) => {
+            const cardHeight = 178;
+            const bottom = top - cardHeight;
+            page.drawRectangle({ x, y: bottom, width: cardWidth, height: cardHeight, color: white, borderColor: border, borderWidth: 1 });
+            page.drawRectangle({ x, y: top - 31, width: cardWidth, height: 31, color: pale });
+            page.drawText(title, { x: x + 12, y: top - 21, size: 9, font: boldFont, color: navy });
+            let y = top - 50;
+            y = drawParagraph(party.name || "Société", x + 12, y, cardWidth - 24, 12, boldFont, dark, 15, 2) - 2;
+            [party.address1, party.address2, party.address3, [party.postalCode, party.city].filter(Boolean).join(" "), party.country].filter(Boolean).slice(0, 4).forEach(line => {
+              y = drawParagraph(line, x + 12, y, cardWidth - 24, 9, font, muted, 12, 1);
+            });
+            const idLine = [party.siren ? "SIREN " + party.siren : "", party.siret ? "SIRET " + party.siret : ""].filter(Boolean).join("  |  ");
+            if (idLine) y = drawParagraph(idLine, x + 12, y - 2, cardWidth - 24, 8.5, font, dark, 11, 1);
+            if (party.vatId) y = drawParagraph("TVA intracommunautaire " + party.vatId, x + 12, y - 1, cardWidth - 24, 8.5, font, dark, 11, 1);
+            if (party.email) drawParagraph(party.email, x + 12, y - 1, cardWidth - 24, 8.5, font, muted, 11, 1);
+          };
+          const amountHt = Math.round(Number(invoice.amountHt) * 100) / 100;
+          const amountVat = Math.round(Number(invoice.amountVat ?? amountHt * 0.2) * 100) / 100;
+          const amountTtc = Math.round(Number(invoice.amountTtc ?? amountHt + amountVat) * 100) / 100;
+          const invoiceLines = buildFacturXInvoiceLines(invoice, amountHt);
+          const lineTotalHt = Math.round(invoiceLines.reduce((sum, line) => sum + Number(line.amountHt || 0), 0) * 100) / 100;
+          if (Math.abs(lineTotalHt - amountHt) > 0.005) throw new Error("Le détail des lignes ne correspond pas au montant HT de la facture.");
+          invoice = { ...invoice, lines: invoiceLines };
+          const headerHeight = 112;
+          page.drawRectangle({ x: 0, y: height - headerHeight, width, height: headerHeight, color: navy });
+          page.drawText("FACTURE", { x: margin, y: height - 43, size: 25, font: boldFont, color: white });
+          page.drawText("Facture n° " + pdfText(invoice.number), { x: margin, y: height - 70, size: 12, font: boldFont, color: white });
+          const dateText = "Date : " + formatDate(invoice.date);
+          page.drawText(dateText, { x: width - margin - font.widthOfTextAtSize(dateText, 11), y: height - 42, size: 11, font, color: white });
+          const partiesTop = height - 136;
+          const cardGap = 14;
+          const cardWidth = (width - 2 * margin - cardGap) / 2;
+          drawPartyCard(invoice.seller || {}, "ÉMETTEUR", margin, partiesTop, cardWidth);
+          drawPartyCard(invoice.buyer || {}, "DESTINATAIRE", margin + cardWidth + cardGap, partiesTop, cardWidth);
+          let detailY = partiesTop - 205;
+          page.drawText("Détail de la facture", { x: margin, y: detailY, size: 13, font: boldFont, color: navy });
+          const tableX = margin;
+          const tableWidth = width - 2 * margin;
+          const columnWidths = [187, 55, 94, 100, tableWidth - 436];
+          const columnLabels = ["Libellé", "Quantité", "Prix unitaire", "Montant HT", "Tx TVA"];
+          const headerHeightTable = 23;
+          const rowHeight = 24;
+          const tableTop = detailY - 10;
+          let tableRowTop = tableTop - headerHeightTable;
+          page.drawRectangle({ x: tableX, y: tableRowTop, width: tableWidth, height: headerHeightTable, color: navy, borderColor: border, borderWidth: 0.6 });
+          let columnX = tableX;
+          columnLabels.forEach((label, index) => {
+            page.drawText(label, { x: columnX + 6, y: tableRowTop + 7, size: 7.4, font: boldFont, color: white });
+            columnX += columnWidths[index];
+          });
+          invoiceLines.forEach((line, index) => {
+            const rowBottom = tableRowTop - rowHeight;
+            page.drawRectangle({ x: tableX, y: rowBottom, width: tableWidth, height: rowHeight, color: index % 2 === 0 ? pale : white, borderColor: border, borderWidth: 0.5 });
+            const values = [
+              pdfText(line.label),
+              String(line.quantity),
+              formatAmount(line.unitPrice),
+              formatAmount(line.amountHt),
+              Number(line.vatRate ?? 20) + " %"
+            ];
+            columnX = tableX;
+            values.forEach((value, columnIndex) => {
+              const colWidth = columnWidths[columnIndex];
+              const rightAligned = columnIndex > 0;
+              const textWidth = font.widthOfTextAtSize(value, 7.5);
+              const textX = rightAligned ? columnX + colWidth - 6 - textWidth : columnX + 6;
+              page.drawText(value, { x: textX, y: rowBottom + 8, size: 7.5, font, color: dark, maxWidth: colWidth - 12 });
+              columnX += colWidth;
+            });
+            tableRowTop = rowBottom;
+          });
+          let sectionY = tableRowTop - 25;
+          page.drawText("Récapitulatif de la facture", { x: margin, y: sectionY, size: 13, font: boldFont, color: navy });
+          sectionY -= 20;
+          page.drawRectangle({ x: margin, y: sectionY - 38, width: width - 2 * margin, height: 42, color: pale, borderColor: border, borderWidth: 0.8 });
+          page.drawText("Base hors taxes", { x: margin + 12, y: sectionY - 13, size: 9, font, color: muted });
+          page.drawText("TVA (20 %)", { x: margin + 12, y: sectionY - 29, size: 9, font, color: muted });
+          const rightX = width - margin - 12;
+          const htText = formatAmount(amountHt);
+          const vatText = formatAmount(amountVat);
+          page.drawText(htText, { x: rightX - font.widthOfTextAtSize(htText, 9), y: sectionY - 13, size: 9, font, color: dark });
+          page.drawText(vatText, { x: rightX - font.widthOfTextAtSize(vatText, 9), y: sectionY - 29, size: 9, font, color: dark });
+          const totalY = sectionY - 78;
+          page.drawRectangle({ x: width - margin - 240, y: totalY - 10, width: 240, height: 39, color: pale, borderColor: blue, borderWidth: 1 });
+          page.drawText("TOTAL TTC", { x: width - margin - 228, y: totalY + 4, size: 11, font: boldFont, color: navy });
+          const ttcText = formatAmount(amountTtc);
+          page.drawText(ttcText, { x: width - margin - 12 - boldFont.widthOfTextAtSize(ttcText, 12), y: totalY + 3, size: 12, font: boldFont, color: blue });
+          page.drawLine({ start: { x: margin, y: 74 }, end: { x: width - margin, y: 74 }, thickness: 0.8, color: border });
+          page.drawText("PDF généré à partir des données de la facture. XML Factur-X joint : factur-x.xml (profil BASIC).", {
+            x: margin, y: 56, size: 8, font, color: muted, maxWidth: width - 2 * margin
+          });
+          page.drawText("Montants et coordonnées identiques aux données structurées jointes.", {
+            x: margin, y: 43, size: 8, font, color: muted
+          });
+          pdfDocument.setTitle("Facture " + pdfText(invoice.number));
+          pdfDocument.setSubject("Facture Factur-X de test");
+          const xml = buildFacturXBasicXml(invoice);
           const parsedXml = new DOMParser().parseFromString(xml, "application/xml");
           if (parsedXml.querySelector("parsererror")) throw new Error("Le XML Factur-X généré n’est pas un XML valide.");
           const xmlBytes = new TextEncoder().encode(xml);
           await pdfDocument.attach(xmlBytes, "factur-x.xml", {
             mimeType: "application/xml",
-            description: "Données de facture Factur-X de test (profil MINIMUM)",
+            description: "Données de facture Factur-X de test (profil BASIC)",
             afRelationship: pdfLib.AFRelationship.Data,
             creationDate: new Date(),
             modificationDate: new Date()
           });
           return new Blob([await pdfDocument.save()], { type: "application/pdf" });
         };
-        const createRandomFacturXPdf = async invoice => {
-          const pdfFiles = [1, 2, 3, 4].map(number => ({
-            name: "Facture00" + number + ".pdf",
-            url: "https://sbarreau-acd.github.io/outils/Facture00" + number + ".pdf"
-          }));
-          const pdf = pdfFiles[randomInt(0, pdfFiles.length - 1)];
-          const pdfResponse = await fetch(pdf.url);
-          if (!pdfResponse.ok) throw new Error("Téléchargement de " + pdf.name + " impossible (erreur " + pdfResponse.status + ").");
-          const sourcePdf = await pdfResponse.blob();
-          if (sourcePdf.type && sourcePdf.type !== "application/pdf") throw new Error("Le fichier " + pdf.name + " reçu n’est pas au format PDF.");
-          const pdfBlob = await createFacturXTestPdf(sourcePdf, invoice);
-          return { name: pdf.name, blob: pdfBlob };
+        const createFacturXPdf = async invoice => {
+          const pdfBlob = await createFacturXTestPdf(invoice);
+          return { name: String(invoice.number || "facture") + ".pdf", blob: pdfBlob };
         };
         const uploadInvoiceGedDocument = async (baseUrl, idArboged, year, invoice) => {
-          const pdf = await createRandomFacturXPdf(invoice);
+          const pdf = await createFacturXPdf(invoice);
           const formData = new FormData();
           formData.append("file", pdf.blob, pdf.name);
           formData.append("idArboged", String(idArboged));
@@ -36993,7 +37215,7 @@ ${body}
           return { id: documentId, name: pdf.name };
         };
         const uploadInvoicePaniereDocument = async (baseUrl, paniereId, invoice) => {
-          const pdf = await createRandomFacturXPdf(invoice);
+          const pdf = await createFacturXPdf(invoice);
           const formData = new FormData();
           formData.append("file", pdf.blob, invoice.number + ".pdf");
           const endpoint = "/v1/panieres/documents?type=" + encodeURIComponent(paniereId);
@@ -37233,6 +37455,54 @@ ${body}
           const entry = Object.entries(row).find(([key]) => normalizedNames.has(key.toLowerCase()));
           return entry?.[1];
         };
+        const firstPartyValue = (sources, names) => {
+          for (const source of sources) {
+            const value = getField(source, names);
+            if (value !== undefined && value !== null && String(value).trim()) return String(value).trim();
+          }
+          return "";
+        };
+        const normalizeInvoiceParty = source => {
+          const address = getField(source, ["Adresse", "Coordonnees", "Coordonnées"]) || {};
+          const sources = [source, address];
+          const name = firstPartyValue(sources, ["RaisonSociale", "Denomination", "Dénomination", "Libelle", "Libellé", "Nom", "Name"]);
+          const rawSiret = firstPartyValue(sources, ["Siret", "SIRET", "NumeroSiret", "NumeroSIRET"]).replace(/\D/g, "");
+          let siren = firstPartyValue(sources, ["Siren", "SIREN", "NumeroSiren", "NumeroSIREN"]).replace(/\D/g, "");
+          if (!siren && rawSiret.length >= 9) siren = rawSiret.slice(0, 9);
+          const rawCountry = firstPartyValue(sources, ["CodePays", "Pays", "Country", "CountryCode"]);
+          const countryCode = /^[A-Za-z]{2}$/.test(rawCountry) ? rawCountry.toUpperCase() : "FR";
+          return {
+            name,
+            siren: siren.slice(0, 9),
+            siret: rawSiret,
+            vatId: firstPartyValue(sources, ["NumeroTVAIntracom", "NumeroTvaIntracom", "NumeroIntracom", "TvaIntracom", "TVAIntracom", "VatId"]),
+            address1: firstPartyValue(sources, ["Adresse1", "Adr1", "AdresseLigne1", "LineOne"]),
+            address2: firstPartyValue(sources, ["Adresse2", "Adr2", "AdresseLigne2", "LineTwo"]),
+            address3: firstPartyValue(sources, ["Adresse3", "Adr3", "AdresseLigne3", "LineThree"]),
+            postalCode: firstPartyValue(sources, ["CodePostal", "PostalCode", "PostcodeCode"]),
+            city: firstPartyValue(sources, ["Ville", "City", "CityName"]),
+            country: rawCountry && !/^[A-Za-z]{2}$/.test(rawCountry) ? rawCountry : countryCode === "FR" ? "France" : countryCode,
+            countryCode,
+            email: firstPartyValue(sources, ["Email", "Courriel"]),
+            phone: firstPartyValue(sources, ["Telephone", "Téléphone", "Telephone1", "Tel"])
+          };
+        };
+        const loadInvoiceDossierParty = async baseUrl => {
+          let party = normalizeInvoiceParty(folder);
+          const hasIdentity = Boolean(party.name && (party.siren || party.siret || party.vatId));
+          const hasAddress = Boolean(party.address1 || party.postalCode || party.city);
+          if (hasIdentity && hasAddress) return party;
+          const dossierCode = String(folder?.Code ?? folder?.CodeDossier ?? "").trim();
+          if (!dossierCode) throw new Error("Le code du dossier est nécessaire pour récupérer ses coordonnées de facturation.");
+          const payload = await apiJson(baseUrl, "/v1/dossiers/filtrer", "POST", { Codes: [dossierCode] }, "application/json-patch+json");
+          const apiError = getApiResultError(payload);
+          if (apiError) throw new Error("/v1/dossiers/filtrer : " + apiError);
+          const rows = apiArray(payload, ["Dossiers", "dossiers", "Items", "items"]);
+          const matched = rows.find(row => String(getField(row, ["Code", "CodeDossier"]) ?? "").trim().toUpperCase() === dossierCode.toUpperCase()) || rows[0];
+          if (matched) party = normalizeInvoiceParty({ ...folder, ...matched });
+          if (!party.name) throw new Error("Les coordonnées du dossier n’ont pas été retournées par /v1/dossiers/filtrer.");
+          return party;
+        };
         const getApiResultError = payload => {
           const inspect = value => {
             if (Array.isArray(value)) {
@@ -37405,6 +37675,7 @@ ${body}
             const usedInvoiceNumbers = { achat: new Set(), vente: new Set() };
             const preparedPartners = { achat: [], vente: [] };
             let exerciseDateRange = null;
+            let invoiceDossierParty = null;
             status.textContent = "Vérification et préparation des journaux…";
             const initialJournals = await apiJson(baseUrl, "/v1/compta/journal");
             const preparedJournalCodes = new Set(apiArray(initialJournals, ["Journaux", "journaux", "Items", "items"])
@@ -37470,10 +37741,11 @@ ${body}
               const partnerDetails = new Map(partnerRows.map(item => {
                 const code = String(item?.Code ?? "").trim().toUpperCase();
                 const tiers = item?.TiersAssocie ?? item?.Tiers ?? {};
+                const normalized = normalizeInvoiceParty({ ...item, ...tiers });
                 return [code, {
+                  ...normalized,
                   code,
-                  name: String(tiers?.RaisonSociale ?? tiers?.Nom ?? item?.Lib ?? "").trim(),
-                  siren: String(tiers?.Siren ?? "").trim()
+                  name: normalized.name || String(tiers?.RaisonSociale ?? tiers?.Nom ?? item?.Lib ?? "").trim()
                 }];
               }).filter(([code]) => code));
               while (partners.length < 3) {
@@ -37487,6 +37759,10 @@ ${body}
                 const classementPlan = await apiJson(baseUrl, "/v1/compta/planClassementEcriture/" + journalCode);
                 resolveGedFolderId(classementPlan);
               }
+            }
+            if (workflowKinds.length) {
+              status.textContent = "Vérification des coordonnées de facturation du dossier…";
+              invoiceDossierParty = await loadInvoiceDossierParty(baseUrl);
             }
             for (const kind of selectedKinds) {
             const partnerGetEndpoint = kind === "achat"
@@ -37553,10 +37829,11 @@ ${body}
             const partnerDetails = new Map(partnerRows.map(item => {
               const code = String(item?.Code ?? "").trim().toUpperCase();
               const tiers = item?.TiersAssocie ?? item?.Tiers ?? {};
+              const normalized = normalizeInvoiceParty({ ...item, ...tiers });
               return [code, {
+                ...normalized,
                 code,
-                name: String(tiers?.RaisonSociale ?? tiers?.Nom ?? item?.Lib ?? "").trim(),
-                siren: String(tiers?.Siren ?? "").trim()
+                name: normalized.name || String(tiers?.RaisonSociale ?? tiers?.Nom ?? item?.Lib ?? "").trim()
               }];
             }).filter(([code]) => code));
             while (partners.length < 3) {
@@ -37599,12 +37876,11 @@ ${body}
               const dueLines = createDueLines(amountHt, date);
               const partner = partnerDetails.get(partners[partnerIndex]) || {};
               usedPartners[kind].set(partners[partnerIndex], {
+                ...normalizeInvoiceParty(partner),
                 code: partners[partnerIndex],
-                name: partner.name || "Société de test",
-                siren: partner.siren || ""
+                name: partner.name || "Société de test"
               });
-              const dossierName = String(folder?.RaisonSociale ?? folder?.Denomination ?? folder?.Nom ?? "Société de test").trim();
-              const dossierSiren = makeSiren();
+              const dossierParty = invoiceDossierParty || normalizeInvoiceParty(folder);
               const counterpartyName = partner.name || companyName();
               const counterpartySiren = partner.siren || makeSiren();
               const invoiceData = {
@@ -37612,11 +37888,11 @@ ${body}
                 date,
                 amountHt,
                 seller: kind === "achat"
-                  ? { name: counterpartyName, siren: counterpartySiren }
-                  : { name: dossierName, siren: dossierSiren },
+                  ? { ...normalizeInvoiceParty(partner), name: counterpartyName, siren: counterpartySiren }
+                  : dossierParty,
                 buyer: kind === "achat"
-                  ? { name: dossierName, siren: dossierSiren }
-                  : { name: counterpartyName, siren: counterpartySiren }
+                  ? dossierParty
+                  : { ...normalizeInvoiceParty(partner), name: counterpartyName, siren: counterpartySiren }
               };
               status.textContent = "Génération du XML Factur-X et ajout au PDF " + (index + 1) + " / " + quantity + "…";
               const gedDocument = await uploadInvoiceGedDocument(baseUrl, gedFolderId, invoiceYear, invoiceData);
@@ -37731,8 +38007,7 @@ ${body}
                   if (!invoice) throw new Error("Impossible de générer un numéro de facture i-dépôt unique.");
                   usedInvoiceNumbers[kind].add(invoice);
                   const partner = partnersForKind[randomInt(0, partnersForKind.length - 1)];
-                  const dossierName = String(folder?.RaisonSociale ?? folder?.Denomination ?? folder?.Nom ?? "Société de test").trim();
-                  const dossierSiren = makeSiren();
+                  const dossierParty = invoiceDossierParty || normalizeInvoiceParty(folder);
                   const amountHt = randomInt(1000, 10000);
                   const amountVat = Math.round(amountHt * 0.2 * 100) / 100;
                   const amountTtc = Math.round((amountHt + amountVat) * 100) / 100;
@@ -37743,11 +38018,11 @@ ${body}
                     amountVat,
                     amountTtc,
                     seller: kind === "achat"
-                      ? { name: partner.name, siren: partner.siren || makeSiren() }
-                      : { name: dossierName, siren: dossierSiren },
+                      ? { ...normalizeInvoiceParty(partner), name: partner.name, siren: partner.siren || makeSiren() }
+                      : dossierParty,
                     buyer: kind === "achat"
-                      ? { name: dossierName, siren: dossierSiren }
-                      : { name: partner.name, siren: partner.siren || makeSiren() }
+                      ? dossierParty
+                      : { ...normalizeInvoiceParty(partner), name: partner.name, siren: partner.siren || makeSiren() }
                   };
                   status.textContent = "Création de la facture i-dépôt " + (index + 1) + " / " + quantity + " — " + (kind === "achat" ? "achat" : "vente") + "…";
                   await uploadInvoicePaniereDocument(baseUrl, paniereIds[kind], invoiceData);
