@@ -15600,6 +15600,17 @@
     const retrievedFolderDataCompleteIndexes = new Set();
     const retrievedFolderDataErrors = new Map();
 
+    function folderIsAlreadyInApi(folderIndex) {
+      if (retrievedFolderIndexes.has(folderIndex)) return true;
+      const folder = generatedFolders[folderIndex];
+      const transfer = folderTransferResults[folderIndex];
+      return Boolean(
+        folder &&
+        transfer?.ok &&
+        normalizeReferenceCode(transfer.code) === normalizeReferenceCode(folder.Code)
+      );
+    }
+
     // Options Web / tuiles i-Suite retournées lors du positionnement
     // sur un dossier avec POST /v2/sessions/dossier.
     const folderOptionsWebByCode = new Map();
@@ -46637,10 +46648,7 @@ ${body}
       const folder = generatedFolders[folderIndex];
       if (!folder) return;
 
-      const retrievedFromApi =
-        retrievedFolderIndexes.has(
-          folderIndex
-        );
+      const retrievedFromApi = folderIsAlreadyInApi(folderIndex);
 
       let folderOptionsWeb =
         getRememberedFolderOptionsWeb(
@@ -48138,7 +48146,7 @@ ${body}
 
       const folderIndex = currentFolderEditorIndex;
       const previousFolder = cloneEditorValue(generatedFolders[folderIndex]);
-      const existingFolder = doNotTransferFolderIndexes.has(folderIndex);
+      const existingFolder = folderIsAlreadyInApi(folderIndex);
 
       if (existingFolder) {
         const baseline = folderUpdateOriginalSnapshots.get(folderIndex) || cloneEditorValue(previousFolder);
