@@ -4588,8 +4588,23 @@
     }
     .folder-editor-accounting-data-link:hover { background: #d7e9ff; }
     .folder-accounting-entry-form { display: grid; gap: 16px; overflow: auto; padding: 20px; }
-    .folder-accounting-entry-choice { display: flex; align-items: center; gap: 10px; border: 1px solid #dce6f2; border-radius: 12px; padding: 14px; background: #f5f8fc; font-weight: 700; cursor: pointer; }
+    .folder-accounting-entry-choice { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 18px; border: 1px solid #dce6f2; border-radius: 12px; padding: 14px; background: #f5f8fc; font-weight: 700; }
     .folder-accounting-entry-choice:has(input:checked) { border-color: #6ca4ed; background: #eaf3ff; color: #174f91; }
+    .folder-accounting-entry-kind, .folder-accounting-entry-paniere { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .folder-accounting-entry-paniere { white-space: nowrap; }
+    .folder-accounting-period { display: grid; gap: 8px; }
+    .folder-accounting-period-title { font-weight: 700; }
+    .folder-accounting-period-values { display: flex; justify-content: space-between; gap: 12px; color: #174f91; font-weight: 700; }
+    .folder-accounting-period-slider { position: relative; height: 28px; margin: 0 8px; touch-action: pan-y; }
+    .folder-accounting-period-track, .folder-accounting-period-fill { position: absolute; top: 12px; height: 4px; border-radius: 999px; }
+    .folder-accounting-period-track { left: 0; right: 0; background: #d5deea; }
+    .folder-accounting-period-fill { background: #2563eb; }
+    .folder-accounting-period-range { position: absolute; inset: 0; width: 100%; height: 28px; margin: 0; appearance: none; background: transparent; pointer-events: none; }
+    .folder-accounting-period-range::-webkit-slider-runnable-track { height: 4px; background: transparent; }
+    .folder-accounting-period-range::-moz-range-track { height: 4px; background: transparent; }
+    .folder-accounting-period-range::-webkit-slider-thumb { width: 16px; height: 16px; margin-top: -6px; border: 0; border-radius: 50%; appearance: none; background: #2563eb; box-shadow: 0 1px 4px #174f9155; pointer-events: auto; cursor: grab; }
+    .folder-accounting-period-range::-moz-range-thumb { width: 16px; height: 16px; border: 0; border-radius: 50%; background: #2563eb; box-shadow: 0 1px 4px #174f9155; pointer-events: auto; cursor: grab; }
+    .folder-accounting-period-hint { margin: 0; color: #64748b; font-size: 12px; }
     .folder-accounting-entry-count { display: grid; gap: 6px; max-width: 260px; font-weight: 700; }
     .folder-accounting-entry-count input { width: 100%; border: 1px solid #cbd8e9; border-radius: 9px; padding: 10px 12px; font: inherit; }
     .folder-accounting-settle-option { display: flex; align-items: center; gap: 10px; width: fit-content; color: #173f70; font-weight: 700; cursor: pointer; }
@@ -36583,19 +36598,114 @@ ${body}
         const typeField = document.createElement("div");
         typeField.style.cssText = "display:grid;gap:8px;";
         const choices = [];
+        const paniereChoices = [];
         [["achat", "Écritures d’achat"], ["vente", "Écritures de vente"]].forEach(item => {
-          const choice = document.createElement("label");
+          const choice = document.createElement("div");
           choice.className = "folder-accounting-entry-choice";
+          const accountingLabel = document.createElement("label");
+          accountingLabel.className = "folder-accounting-entry-kind";
           const checkbox = document.createElement("input");
           checkbox.type = "checkbox";
           checkbox.value = item[0];
           checkbox.checked = true;
           const text = document.createElement("span");
           text.textContent = item[1];
-          choice.append(checkbox, text);
+          accountingLabel.append(checkbox, text);
+          const paniereLabel = document.createElement("label");
+          paniereLabel.className = "folder-accounting-entry-paniere";
+          const paniereCheckbox = document.createElement("input");
+          paniereCheckbox.type = "checkbox";
+          paniereCheckbox.value = item[0];
+          paniereCheckbox.checked = true;
+          const paniereText = document.createElement("span");
+          paniereText.textContent = item[0] === "achat" ? "i-dépôt Achat" : "i-dépôt Vente";
+          paniereLabel.append(paniereCheckbox, paniereText);
+          choice.append(accountingLabel, paniereLabel);
           typeField.appendChild(choice);
           choices.push(checkbox);
+          paniereChoices.push(paniereCheckbox);
         });
+        const parsePeriodExerciseDate = value => {
+          const text = String(value ?? "").trim();
+          let match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+          if (match) return { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) };
+          match = text.match(/^(\d{1,2})[/.](\d{1,2})[/.](\d{4})$/);
+          return match ? { year: Number(match[3]), month: Number(match[2]), day: Number(match[1]) } : null;
+        };
+        const exerciseRowsForPeriod = readArray(accountingData.exercises, ["Exercices", "exercices", "Items", "items"]);
+        const currentExerciseForPeriod = exerciseRowsForPeriod.find(item => parseBool(item?.Courant) === true) || exerciseRowsForPeriod[0];
+        const todayYear = new Date().getFullYear();
+        const periodExerciseStart = parsePeriodExerciseDate(currentExerciseForPeriod?.DateDebut) || { year: todayYear, month: 1, day: 1 };
+        const periodExerciseEnd = parsePeriodExerciseDate(currentExerciseForPeriod?.DateFin) || { year: todayYear, month: 12, day: 31 };
+        const firstExerciseMonthIndex = periodExerciseStart.year * 12 + periodExerciseStart.month - 1;
+        const lastExerciseMonthIndex = periodExerciseEnd.year * 12 + periodExerciseEnd.month - 1;
+        const periodMonthCount = Math.max(0, lastExerciseMonthIndex - firstExerciseMonthIndex);
+        const periodField = document.createElement("div");
+        periodField.className = "folder-accounting-period";
+        const periodTitle = document.createElement("div");
+        periodTitle.className = "folder-accounting-period-title";
+        periodTitle.textContent = "Période des écritures";
+        const periodValues = document.createElement("div");
+        periodValues.className = "folder-accounting-period-values";
+        const periodStartLabel = document.createElement("span");
+        const periodEndLabel = document.createElement("span");
+        periodValues.append(periodStartLabel, periodEndLabel);
+        const periodSlider = document.createElement("div");
+        periodSlider.className = "folder-accounting-period-slider";
+        const periodTrack = document.createElement("div");
+        periodTrack.className = "folder-accounting-period-track";
+        const periodFill = document.createElement("div");
+        periodFill.className = "folder-accounting-period-fill";
+        const periodStartInput = document.createElement("input");
+        periodStartInput.type = "range";
+        periodStartInput.className = "folder-accounting-period-range";
+        periodStartInput.min = "0";
+        periodStartInput.max = String(periodMonthCount);
+        periodStartInput.step = "1";
+        periodStartInput.value = "0";
+        periodStartInput.style.zIndex = "2";
+        periodStartInput.setAttribute("aria-label", "Mois de début des écritures");
+        const periodEndInput = document.createElement("input");
+        periodEndInput.type = "range";
+        periodEndInput.className = "folder-accounting-period-range";
+        periodEndInput.min = "0";
+        periodEndInput.max = String(periodMonthCount);
+        periodEndInput.step = "1";
+        periodEndInput.value = String(periodMonthCount);
+        periodEndInput.style.zIndex = "3";
+        periodEndInput.setAttribute("aria-label", "Mois de fin des écritures");
+        periodSlider.append(periodTrack, periodFill, periodStartInput, periodEndInput);
+        const periodHint = document.createElement("p");
+        periodHint.className = "folder-accounting-period-hint";
+        periodHint.textContent = "Un cran du curseur correspond à un mois.";
+        const periodDateAtOffset = offset => {
+          const index = firstExerciseMonthIndex + Number(offset);
+          return { year: Math.floor(index / 12), month: index % 12 + 1 };
+        };
+        const formatPeriodMonth = parts => new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric", timeZone: "UTC" })
+          .format(new Date(Date.UTC(parts.year, parts.month - 1, 1)));
+        const updatePeriodSlider = changedInput => {
+          let startValue = Number(periodStartInput.value);
+          let endValue = Number(periodEndInput.value);
+          if (startValue > endValue) {
+            if (changedInput === periodStartInput) endValue = startValue;
+            else startValue = endValue;
+            periodStartInput.value = String(startValue);
+            periodEndInput.value = String(endValue);
+          }
+          periodStartInput.style.zIndex = changedInput === periodStartInput ? "3" : changedInput === periodEndInput ? "2" : periodStartInput.style.zIndex;
+          periodEndInput.style.zIndex = changedInput === periodEndInput ? "3" : changedInput === periodStartInput ? "2" : periodEndInput.style.zIndex;
+          const startPercent = periodMonthCount ? startValue / periodMonthCount * 100 : 0;
+          const endPercent = periodMonthCount ? endValue / periodMonthCount * 100 : 100;
+          periodFill.style.left = startPercent + "%";
+          periodFill.style.width = Math.max(0, endPercent - startPercent) + "%";
+          periodStartLabel.textContent = "Début : " + formatPeriodMonth(periodDateAtOffset(startValue));
+          periodEndLabel.textContent = "Fin : " + formatPeriodMonth(periodDateAtOffset(endValue));
+        };
+        periodStartInput.addEventListener("input", () => updatePeriodSlider(periodStartInput));
+        periodEndInput.addEventListener("input", () => updatePeriodSlider(periodEndInput));
+        updatePeriodSlider();
+        periodField.append(periodTitle, periodValues, periodSlider, periodHint);
         const countLabel = document.createElement("label");
         countLabel.className = "folder-accounting-entry-count";
         countLabel.appendChild(document.createTextNode("Nombre de factures par type"));
@@ -36623,30 +36733,21 @@ ${body}
         const reconcileText = document.createElement("span");
         reconcileText.textContent = "Lettrer les comptes";
         reconcileOption.append(reconcileInput, reconcileText);
-        const paniereOption = document.createElement("label");
-        paniereOption.className = "folder-accounting-settle-option";
-        const paniereInput = document.createElement("input");
-        paniereInput.type = "checkbox";
-        const paniereText = document.createElement("span");
-        paniereText.textContent = "Facture i-dépôt";
-        paniereOption.append(paniereInput, paniereText);
-        const updatePaniereAvailability = () => {
-          const hasSelectedKind = choices.some(checkbox => checkbox.checked);
-          settleOption.hidden = !hasSelectedKind;
-          reconcileOption.hidden = !hasSelectedKind;
-          settleOption.style.display = hasSelectedKind ? "flex" : "none";
-          reconcileOption.style.display = hasSelectedKind ? "flex" : "none";
-          const enabled = hasSelectedKind;
-          paniereInput.disabled = !enabled;
-          if (!enabled) paniereInput.checked = false;
+        const updateOptionsAvailability = () => {
+          const hasAccountingKind = choices.some(checkbox => checkbox.checked);
+          settleOption.hidden = !hasAccountingKind;
+          reconcileOption.hidden = !hasAccountingKind;
+          settleOption.style.display = hasAccountingKind ? "flex" : "none";
+          reconcileOption.style.display = hasAccountingKind ? "flex" : "none";
+          submitButton.textContent = hasAccountingKind ? "Générer les écritures" : "Envoyer les factures i-dépôt";
         };
         settleInput.addEventListener("change", () => {
           reconcileInput.disabled = !settleInput.checked;
           if (!settleInput.checked) reconcileInput.checked = false;
-          updatePaniereAvailability();
+          updateOptionsAvailability();
         });
-        choices.forEach(checkbox => checkbox.addEventListener("change", updatePaniereAvailability));
-        updatePaniereAvailability();
+        choices.forEach(checkbox => checkbox.addEventListener("change", updateOptionsAvailability));
+        paniereChoices.forEach(checkbox => checkbox.addEventListener("change", updateOptionsAvailability));
         const status = document.createElement("p");
         status.className = "folder-accounting-entry-status";
         status.setAttribute("role", "status");
@@ -36664,7 +36765,8 @@ ${body}
         submitButton.className = "primary";
         submitButton.textContent = "Générer les écritures";
         footer.append(cancelButton, submitButton);
-        form.append(instruction, typeField, countLabel, settleOption, reconcileOption, paniereOption, status, footer);
+        updateOptionsAvailability();
+        form.append(instruction, typeField, periodField, countLabel, settleOption, reconcileOption, status, footer);
         dialog.append(dialogHeader, form);
         backdrop.appendChild(dialog);
         document.body.appendChild(backdrop);
@@ -37068,6 +37170,23 @@ ${body}
           const day = randomInt(firstDay, lastDay);
           return year + "-" + String(month).padStart(2, "0") + "-" + String(day).padStart(2, "0");
         };
+        const getSelectedInvoiceDateBounds = (exerciseStart, exerciseEnd) => {
+          const actualFirstIndex = exerciseStart.year * 12 + exerciseStart.month - 1;
+          const actualLastIndex = exerciseEnd.year * 12 + exerciseEnd.month - 1;
+          const toActualIndex = offset => Math.max(actualFirstIndex, Math.min(actualLastIndex, firstExerciseMonthIndex + Number(offset)));
+          const selectedFirstIndex = toActualIndex(periodStartInput.value);
+          const selectedLastIndex = Math.max(selectedFirstIndex, toActualIndex(periodEndInput.value));
+          const fromIndex = (index, isLast) => {
+            const year = Math.floor(index / 12);
+            const month = index % 12 + 1;
+            const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+            const day = isLast
+              ? (index === actualLastIndex ? Math.min(exerciseEnd.day, daysInMonth) : daysInMonth)
+              : (index === actualFirstIndex ? exerciseStart.day : 1);
+            return { year, month, day };
+          };
+          return { start: fromIndex(selectedFirstIndex, false), end: fromIndex(selectedLastIndex, true) };
+        };
         const createDueLines = (amountHt, date) => {
           const vat = Math.round(amountHt * 0.2 * 100) / 100;
           const gross = Math.round((amountHt + vat) * 100) / 100;
@@ -37243,8 +37362,9 @@ ${body}
             return;
           }
           const selectedKinds = choices.filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
-          if (!selectedKinds.length) {
-            status.textContent = "Sélectionnez au moins un type de facture.";
+          const selectedPaniereKinds = paniereChoices.filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
+          if (!selectedKinds.length && !selectedPaniereKinds.length) {
+            status.textContent = "Sélectionnez au moins un type d’écriture ou une panière i-dépôt.";
             status.classList.add("is-error");
             return;
           }
@@ -37256,25 +37376,23 @@ ${body}
           status.classList.remove("is-error", "is-ok");
           const generationCounts = { achat: 0, vente: 0, settlements: 0, reconciled: { achat: 0, vente: 0 }, paniere: { achat: 0, vente: 0 } };
           const reconciliationErrors = [];
-          const reconcileAccounts = reconcileInput.checked;
-          const generatePaniereInvoices = paniereInput.checked;
+          const settleInvoices = selectedKinds.length > 0 && settleInput.checked;
+          const reconcileAccounts = settleInvoices && reconcileInput.checked;
+          const generatePaniereInvoices = selectedPaniereKinds.length > 0;
+          const workflowKinds = [...new Set([...selectedKinds, ...selectedPaniereKinds])];
           let letteringStarted = false;
           const totalReconciled = () => generationCounts.reconciled.achat + generationCounts.reconciled.vente;
           const formatGenerationSummary = () => {
-            const lines = [
-              "Factures d’achat envoyées : " + generationCounts.achat,
-              "Factures de vente envoyées : " + generationCounts.vente,
-              "Écritures de règlement générées : " + generationCounts.settlements,
-              "Lettrages confirmés : " + totalReconciled() + " (fournisseurs : " + generationCounts.reconciled.achat + " ; clients : " + generationCounts.reconciled.vente + ")"
-            ];
-            if (generatePaniereInvoices) {
-              lines.splice(2, 0,
-                "Factures i-dépôt d’achat envoyées : " + generationCounts.paniere.achat,
-                "Factures i-dépôt de vente envoyées : " + generationCounts.paniere.vente
-              );
+            const lines = [];
+            if (selectedKinds.includes("achat")) lines.push("Factures d’achat envoyées : " + generationCounts.achat);
+            if (selectedKinds.includes("vente")) lines.push("Factures de vente envoyées : " + generationCounts.vente);
+            if (generatePaniereInvoices && selectedPaniereKinds.includes("achat")) lines.push("Factures i-dépôt d’achat envoyées : " + generationCounts.paniere.achat);
+            if (generatePaniereInvoices && selectedPaniereKinds.includes("vente")) lines.push("Factures i-dépôt de vente envoyées : " + generationCounts.paniere.vente);
+            if (settleInvoices) lines.push("Écritures de règlement générées : " + generationCounts.settlements);
+            if (reconcileAccounts) {
+              lines.push("Lettrages confirmés : " + totalReconciled() + " (fournisseurs : " + generationCounts.reconciled.achat + " ; clients : " + generationCounts.reconciled.vente + ")");
+              lines.push("Retours API en erreur de lettrage : " + (letteringStarted ? reconciliationErrors.length : "lettrage non exécuté"));
             }
-            if (!reconcileAccounts) lines.push("Lettrage demandé : non");
-            else lines.push("Retours API en erreur de lettrage : " + (letteringStarted ? reconciliationErrors.length : "lettrage non exécuté"));
             lines.push(...reconciliationErrors.map(message => "• " + message));
             return lines.join("\n");
           };
@@ -37282,16 +37400,16 @@ ${body}
             status.textContent = "Préparation des journaux et des comptes nécessaires…";
             const baseUrl = getSelectedApiBaseUrl();
             await selectFolderSessionForData(baseUrl, apiSessionUuid, folder?.Code);
-            const settleInvoices = settleInput.checked;
             const generatedEntryIds = { achat: new Set(), vente: new Set() };
             const usedPartners = { achat: new Map(), vente: new Map() };
             const usedInvoiceNumbers = { achat: new Set(), vente: new Set() };
+            const preparedPartners = { achat: [], vente: [] };
             let exerciseDateRange = null;
             status.textContent = "Vérification et préparation des journaux…";
             const initialJournals = await apiJson(baseUrl, "/v1/compta/journal");
             const preparedJournalCodes = new Set(apiArray(initialJournals, ["Journaux", "journaux", "Items", "items"])
               .map(item => String(item?.Code ?? "").trim().toUpperCase()));
-            for (const kind of selectedKinds) {
+            for (const kind of workflowKinds) {
               const code = kind === "achat" ? "AC" : "VE";
               await ensureJournal(baseUrl, preparedJournalCodes, code, {
                 Code: code,
@@ -37307,6 +37425,68 @@ ${body}
                 Nature: "Tresorerie",
                 TypeDeSaisie: "B"
               });
+            }
+            for (const kind of workflowKinds) {
+              status.textContent = "Contrôle des comptes nécessaires pour les factures " + (kind === "achat" ? "d’achat" : "de vente") + "…";
+              const partnerGetEndpoint = kind === "achat"
+                ? "/v1/compta/comptes/fournisseurs?recupPostes=true&recupParamMultiHT=true"
+                : "/v1/compta/comptes/clients?recupPostes=true&recupParamMultiHT=true";
+              const loaded = await Promise.all([
+                apiJson(baseUrl, "/v1/compta/dossier"),
+                apiJson(baseUrl, "/v1/compta/exercices"),
+                apiJson(baseUrl, "/v1/compta/comptes/generaux?recupPostes=true"),
+                apiJson(baseUrl, partnerGetEndpoint)
+              ]);
+              const config = loaded[0] || {};
+              const exercises = apiArray(loaded[1], ["Exercices", "exercices", "Items", "items"]);
+              const exercise = exercises.find(item => parseBool(item?.Courant) === true) || exercises[0];
+              const exerciseStart = parseExerciseDate(exercise?.DateDebut);
+              const exerciseEnd = parseExerciseDate(exercise?.DateFin);
+              if (!exerciseStart || !exerciseEnd) throw new Error("Les dates de début et de fin de l’exercice comptable sont introuvables ou invalides.");
+              if (!exerciseDateRange) exerciseDateRange = { start: exercise.DateDebut, end: exercise.DateFin };
+              const length = Number(config.LongueurComptes);
+              if (!Number.isInteger(length)) throw new Error("La longueur des comptes est absente du paramétrage comptable.");
+              const generalCodes = getCodes(loaded[2], ["Comptes", "comptes", "Items", "items"]);
+              const generalPrefix = kind === "achat" ? "607" : "707";
+              const taxPrefix = kind === "achat" ? "44566" : "4457";
+              const expenseRevenueCodes = [1, 2].map(index => accountCode(generalPrefix, index, length));
+              const taxCode = accountCode(taxPrefix, 1, length);
+              await ensureGeneralAccount(baseUrl, generalCodes, expenseRevenueCodes[0], kind === "achat" ? "Achat de marchandise 1" : "Vente de marchandise 1", "NON");
+              await ensureGeneralAccount(baseUrl, generalCodes, expenseRevenueCodes[1], kind === "achat" ? "Achat de marchandise 2" : "Vente de marchandise 2", "NON");
+              await ensureGeneralAccount(baseUrl, generalCodes, taxCode, kind === "achat" ? "TVA déductible" : "TVA collectée", "OUI");
+              if (settleInvoices && selectedKinds.includes(kind)) {
+                await ensureGeneralAccount(baseUrl, generalCodes, accountCode("512", 1, length), "Banque 1", "NON");
+              }
+              const partnerRows = apiArray(loaded[3], ["Comptes", "comptes", "Items", "items"]);
+              const partnerCodes = getCodes(loaded[3], ["Comptes", "comptes", "Items", "items"]);
+              const partnerPrefix = kind === "achat" ? "F" : "C";
+              const partners = partnerRows.filter(item => {
+                const code = String(item?.Code ?? "").trim().toUpperCase();
+                const tiers = item?.TiersAssocie ?? item?.Tiers ?? {};
+                const email = String(tiers?.Email ?? "").trim().toLowerCase();
+                return new RegExp("^" + partnerPrefix + "[A-Z0-9]{9}$").test(code) &&
+                  email === "contact-" + code.toLowerCase() + "@example.test";
+              }).slice(0, 3).map(item => String(item.Code).trim().toUpperCase());
+              const partnerDetails = new Map(partnerRows.map(item => {
+                const code = String(item?.Code ?? "").trim().toUpperCase();
+                const tiers = item?.TiersAssocie ?? item?.Tiers ?? {};
+                return [code, {
+                  code,
+                  name: String(tiers?.RaisonSociale ?? tiers?.Nom ?? item?.Lib ?? "").trim(),
+                  siren: String(tiers?.Siren ?? "").trim()
+                }];
+              }).filter(([code]) => code));
+              while (partners.length < 3) {
+                const createdPartner = await generatePartnerAccount(baseUrl, kind === "achat" ? "/v1/compta/comptes/fournisseur" : "/v1/compta/comptes/client", partnerPrefix, partnerCodes);
+                partners.push(createdPartner.code);
+                partnerDetails.set(createdPartner.code, createdPartner);
+              }
+              preparedPartners[kind] = partners.map(code => partnerDetails.get(code)).filter(Boolean);
+              if (selectedKinds.includes(kind)) {
+                const journalCode = kind === "achat" ? "AC" : "VE";
+                const classementPlan = await apiJson(baseUrl, "/v1/compta/planClassementEcriture/" + journalCode);
+                resolveGedFolderId(classementPlan);
+              }
             }
             for (const kind of selectedKinds) {
             const partnerGetEndpoint = kind === "achat"
@@ -37326,6 +37506,7 @@ ${body}
             const exerciseEnd = parseExerciseDate(exercise?.DateFin);
             if (!exerciseStart || !exerciseEnd) throw new Error("Les dates de début et de fin de l’exercice comptable sont introuvables ou invalides.");
             exerciseDateRange = { start: exercise.DateDebut, end: exercise.DateFin };
+            const invoiceDateBounds = getSelectedInvoiceDateBounds(exerciseStart, exerciseEnd);
             const length = Number(config.LongueurComptes);
             if (!Number.isInteger(length)) throw new Error("La longueur des comptes est absente du paramétrage comptable.");
             const journalCode = kind === "achat" ? "AC" : "VE";
@@ -37396,7 +37577,7 @@ ${body}
             }
             status.textContent = "Comptes prêts. Envoi de " + quantity + " écriture(s)…";
             for (let index = 0; index < quantity; index += 1) {
-              const date = randomInvoiceDate(exerciseStart, exerciseEnd);
+              const date = randomInvoiceDate(invoiceDateBounds.start, invoiceDateBounds.end);
               const invoiceYear = Number(date.slice(0, 4));
               const invoiceMonth = Number(date.slice(5, 7));
               const partnerIndex = randomInt(0, 2);
@@ -37525,17 +37706,20 @@ ${body}
                 achat: getPaniereId("_TYPE_FACTURES_ACHAT"),
                 vente: getPaniereId("_TYPE_FACTURES_VENTE")
               };
-              for (const kind of selectedKinds) {
+              for (const kind of selectedPaniereKinds) {
                 if (paniereIds[kind] === null) {
                   throw new Error("Aucune panière i-dépôt trouvée pour les factures d’" + (kind === "achat" ? "achat" : "vente") + ".");
                 }
-                const partnersForKind = [...usedPartners[kind].values()];
+                const partnersForKind = usedPartners[kind].size
+                  ? [...usedPartners[kind].values()]
+                  : preparedPartners[kind];
                 if (!partnersForKind.length) throw new Error("Aucun compte tiers utilisé n’est disponible pour créer les factures i-dépôt.");
                 const start = parseExerciseDate(exerciseDateRange?.start);
                 const end = parseExerciseDate(exerciseDateRange?.end);
                 if (!start || !end) throw new Error("Les dates de l’exercice sont introuvables pour générer les factures i-dépôt.");
+                const invoiceDateBounds = getSelectedInvoiceDateBounds(start, end);
                 for (let index = 0; index < quantity; index += 1) {
-                  const date = randomInvoiceDate(start, end);
+                  const date = randomInvoiceDate(invoiceDateBounds.start, invoiceDateBounds.end);
                   const invoiceYear = Number(date.slice(0, 4));
                   const invoiceMonth = Number(date.slice(5, 7));
                   const invoicePrefix = kind === "achat" ? "FA" : "FV";
