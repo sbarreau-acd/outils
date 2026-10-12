@@ -418,9 +418,56 @@
       align-items: start;
     }
 
-    .api-config-grid > .field:first-child {
-      grid-column: 1 / -1;
+    .api-access-options {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      margin-bottom: 16px;
     }
+    .api-environment-card { min-width: 0; }
+
+    .api-environment-card .api-environment-buttons {
+      margin-top: 9px;
+    }
+
+    .api-offline-button {
+      flex: 0 0 auto;
+      min-height: 36px;
+      padding: 7px 13px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      background: #db2777;
+      color: #fff;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s ease, transform .15s ease;
+    }
+
+    .api-offline-button:hover {
+      background: #be185d;
+      transform: translateY(-1px);
+    }
+    .api-offline-button:focus-visible {
+      outline: 3px solid rgba(219, 39, 119, .25);
+      outline-offset: 2px;
+    }
+    .api-offline-reset-button {
+      min-height: 34px;
+      padding: 6px 11px;
+      border: 1px solid #fca5a5;
+      border-radius: 8px;
+      background: #fff1f2;
+      color: #b91c1c;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .api-offline-reset-button:hover { background: #fee2e2; }
+    .api-offline-reset-button[hidden] { display: none !important; }
 
     .api-environment-buttons {
       display: flex;
@@ -428,6 +475,17 @@
       gap: 8px;
       overflow-x: auto;
       padding: 3px 0 6px;
+    }
+    .api-environment-buttons.is-connected {
+      justify-content: flex-start;
+      overflow: visible;
+      flex-wrap: wrap;
+    }
+    .api-environment-buttons.is-connected .api-environment-button:not([aria-pressed="true"]) {
+      display: none;
+    }
+    .api-environment-buttons.is-offline-selected > [data-api-environment] {
+      display: none !important;
     }
     .api-environment-button {
       flex: 0 0 auto;
@@ -616,6 +674,73 @@
       overflow-wrap: anywhere;
       color: #1e3a8a;
       font: 600 12px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    .api-session-uuid-button {
+      max-width: min(420px, 50vw);
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #1e3a8a;
+      font: 600 12px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+      overflow-wrap: anywhere;
+      text-align: left;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .api-session-uuid-button:hover,
+    .api-session-uuid-button:focus-visible {
+      color: #1d4ed8;
+      outline: 2px solid #93c5fd;
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+    .api-connection-details-dialog {
+      width: min(920px, calc(100vw - 32px));
+      max-width: none;
+      padding: 0;
+      border: 1px solid #dbe3ef;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, .25);
+      color: var(--text);
+    }
+    .api-connection-details-dialog::backdrop {
+      background: rgba(17, 24, 39, .58);
+      backdrop-filter: blur(3px);
+    }
+    .api-connection-details-dialog .modal-header {
+      background: #17365f;
+      color: #fff;
+    }
+    .api-connection-details-dialog .modal-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+      gap: 16px;
+    }
+    .api-connection-details-dialog .custom-api-url {
+      grid-column: auto;
+    }
+    .api-connection-details-dialog .field {
+      min-width: 0;
+    }
+    .api-connection-details-dialog input[readonly] {
+      background: #f3f4f6;
+      color: #64748b;
+      border-color: #e5e7eb;
+      cursor: not-allowed;
+    }
+    .api-connection-details-dialog .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+    }
+    @media (max-width: 760px) {
+      .api-connection-details-dialog .modal-body {
+        grid-template-columns: 1fr;
+      }
     }
     .api-session-tool-button {
       display: inline-flex;
@@ -9134,6 +9259,9 @@
       white-space: nowrap;
       font-size: 12px;
     }
+    .api-environment-buttons .api-session-tools {
+      margin-left: 6px;
+    }
 
     .folder-editor-correspondents-bulk-delete {
       margin-left: auto;
@@ -10585,6 +10713,7 @@
                 <h4>🌐 Connexion API <span style="font-weight:400; color:var(--muted); font-size:12px;">(facultatif)</span></h4>
 
                 <div class="api-header-actions">
+                  <button class="api-offline-reset-button" id="resetOfflineModeButton" type="button" hidden>Réinitialiser</button>
                   <span class="api-status" id="apiStatus">Non connecté</span>
 
                   <input type="checkbox" id="sandboxModeToggle" hidden aria-hidden="true">
@@ -10600,8 +10729,8 @@
                 </div>
               </div>
 
-              <div class="api-config-grid">
-                <div class="field">
+              <div class="api-access-options">
+                <div class="field api-environment-card">
                   <label>Environnement</label>
                   <div class="api-environment-buttons" id="apiEnvironmentButtons" role="group" aria-label="Choisir un environnement API">
                     <button type="button" class="api-environment-button" data-api-environment="local" aria-pressed="false">Test LOCAL</button>
@@ -10611,6 +10740,7 @@
                     <button type="button" class="api-environment-button" data-api-environment="sandboxProd" aria-pressed="false">SandboxAPI PROD</button>
                     <button type="button" class="api-environment-button" data-api-environment="sandboxAlpha" aria-pressed="false">SandboxAPI ALPHA</button>
                     <button type="button" class="api-environment-button" data-api-environment="custom" aria-pressed="false">Autre</button>
+                    <button class="api-offline-button" id="offlineModeButton" type="button" aria-controls="generatorConfigCard">Hors connexion</button>
                   </div>
                   <select id="apiEnvironment" hidden aria-hidden="true" tabindex="-1">
                     <option value="">Sélectionner un environnement</option>
@@ -10624,6 +10754,9 @@
                   </select>
                 </div>
 
+              </div>
+
+              <div class="api-config-grid">
                 <div class="field custom-api-url" id="customApiUrlField">
                   <label for="customApiUrl">URL des API</label>
                   <input
@@ -10680,7 +10813,7 @@
                 <div class="api-connect-left" id="apiConnectionLeft">
                   <div class="api-session-tools" id="apiSessionTools" hidden>
                     <span>UUID :</span>
-                    <code id="apiSessionUuidDisplay"></code>
+                    <button type="button" class="api-session-uuid-button" id="apiSessionUuidDisplay" aria-haspopup="dialog" aria-controls="apiConnectionDetailsDialog" title="Afficher les informations de connexion"></button>
                     <button class="api-session-tool-button" id="copyApiSessionUuidButton" type="button">Copier</button>
                     <a class="api-session-tool-button" id="apiSwaggerLink" href="#" target="_blank" rel="noopener noreferrer">Swagger ↗</a>
                     <a class="api-session-tool-button" id="apiIsuitePortalLink" href="#" target="_blank" rel="noopener noreferrer">Portail i-Suite ↗</a>
@@ -10696,6 +10829,17 @@
               <div class="api-message" id="apiMessage"></div>
               <div class="creation-progress" id="creationProgress"></div>
             </div>
+
+            <dialog class="api-connection-details-dialog" id="apiConnectionDetailsDialog" aria-labelledby="apiConnectionDetailsTitle">
+              <div class="modal-header">
+                <h3 id="apiConnectionDetailsTitle">Informations de connexion API</h3>
+                <button type="button" class="modal-close" id="apiConnectionDetailsClose" aria-label="Fermer">×</button>
+              </div>
+              <div class="modal-body" id="apiConnectionDetailsBody"></div>
+              <div class="modal-footer">
+                <button type="button" class="secondary-button" id="apiConnectionDetailsDone">Fermer</button>
+              </div>
+            </dialog>
 
             <div class="sandbox-workflow-card" id="sandboxWorkflowCard">
               <div>
@@ -11040,7 +11184,7 @@
               </div>
             </div>
 
-            <div class="generator-config-card" id="generatorConfigCard">
+            <div class="generator-config-card" id="generatorConfigCard" hidden>
 
               <div class="sandbox-modification-filter-actions" id="sandboxModificationFilterActions" hidden>
                 <button
@@ -15070,6 +15214,9 @@
     const apiEnvironmentInput = document.getElementById("apiEnvironment");
     const apiEnvironmentButtons = Array.from(document.querySelectorAll("[data-api-environment]"));
     const apiEnvironmentButtonsContainer = document.getElementById("apiEnvironmentButtons");
+    const offlineModeButton = document.getElementById("offlineModeButton");
+    const resetOfflineModeButton = document.getElementById("resetOfflineModeButton");
+    const apiConfigGrid = document.querySelector(".api-config-grid");
     const customApiUrlField = document.getElementById("customApiUrlField");
     const customApiUrlInput = document.getElementById("customApiUrl");
     let customApiUrlDraft = "";
@@ -15086,6 +15233,9 @@
     const apiConnectionRight = document.getElementById("apiConnectionRight");
     const apiSessionTools = document.getElementById("apiSessionTools");
     const apiSessionUuidDisplay = document.getElementById("apiSessionUuidDisplay");
+    const apiConnectionDetailsDialog = document.getElementById("apiConnectionDetailsDialog");
+    const apiConnectionDetailsClose = document.getElementById("apiConnectionDetailsClose");
+    const apiConnectionDetailsDone = document.getElementById("apiConnectionDetailsDone");
     const copyApiSessionUuidButton = document.getElementById("copyApiSessionUuidButton");
     const apiSwaggerLink = document.getElementById("apiSwaggerLink");
     const apiIsuitePortalLink = document.getElementById("apiIsuitePortalLink");
@@ -15111,6 +15261,8 @@
     const sandboxNewSandboxToggle = document.getElementById("sandboxNewSandboxToggle");
     const sandboxCabinetExistingWarning = document.getElementById("sandboxCabinetExistingWarning");
     const generatorConfigCard = document.getElementById("generatorConfigCard");
+    let generatorConfigRevealed = false;
+    let offlineModeSelected = false;
     const sandboxPrimaryAccount = document.getElementById("sandboxPrimaryAccount");
     const sandboxPrimaryCode = document.getElementById("sandboxPrimaryCode");
     const sandboxPrimaryCodeOptions = document.getElementById("sandboxPrimaryCodeOptions");
@@ -16913,6 +17065,7 @@
       // configuration, pas la barre d'actions.
       if (generatorConfigCard) {
         generatorConfigCard.hidden =
+          !generatorConfigRevealed ||
           (modifyingExistingSandbox && foldersRetrievedOnce) ||
           (!modifyingExistingSandbox && isSandboxExistingOperation("create") && !getSelectedSandboxExistingCabinet()) ||
           (active && isNewSandbox && !sandboxEditorNameInput.value.trim()) ||
@@ -23420,6 +23573,8 @@ ${body}
       updateCustomApiUrlVisibility();
 
       disconnectApiButton.hidden = !connected;
+      offlineModeButton.hidden = connected;
+      resetOfflineModeButton.hidden = connected || !offlineModeSelected;
       apiSessionTools.hidden = !connected;
       apiSessionUuidDisplay.textContent = connected ? apiSessionUuid : "";
       if (connected) {
@@ -23437,20 +23592,26 @@ ${body}
         apiSwaggerLink.href = "#";
         apiIsuitePortalLink.href = "#";
       }
-      connectApiButton.hidden = !connected && !apiEnvironmentInput.value;
-      connectApiButton.textContent = connected
-        ? "Reconnecter"
-        : "Se connecter";
+      connectApiButton.hidden = connected || !apiEnvironmentInput.value;
+      connectApiButton.textContent = "Se connecter";
       apiConnectActions.classList.toggle("connected", connected);
 
       if (connected) {
-        apiHeaderActions.append(apiStatus);
-        apiConnectionLeft.append(apiSessionTools);
-        apiConnectionRight.append(disconnectApiButton, connectApiButton);
+        apiHeaderActions.append(disconnectApiButton, apiStatus);
+        apiEnvironmentButtonsContainer.append(apiSessionTools);
+        apiConnectionRight.append(connectApiButton);
+        apiConnectionDetailsBody.append(
+          customApiUrlField,
+          apiConnectionIdentityField,
+          apiConnectionPasswordField
+        );
       } else {
         apiHeaderActions.append(apiStatus, disconnectApiButton);
         apiConnectionLeft.append(apiSessionTools);
         apiConnectionRight.append(connectApiButton);
+        apiConfigGrid.insertBefore(customApiUrlField, apiLoginPanel);
+        apiConfigGrid.insertBefore(apiConnectionIdentityField, apiLoginPanel);
+        apiConfigGrid.insertBefore(apiConnectionPasswordField, apiLoginPanel);
       }
 
       updateSandboxModeUiState();
@@ -25529,6 +25690,11 @@ ${body}
       const locked = connectedOrConnecting || lockedByGeneratedFolders;
 
       apiEnvironmentButtonsContainer.classList.toggle(
+        "is-connected",
+        apiStatus.classList.contains("connected") && Boolean(apiEnvironmentInput.value)
+      );
+
+      apiEnvironmentButtonsContainer.classList.toggle(
         "has-generated-folders-lock",
         lockedByGeneratedFolders
       );
@@ -25757,20 +25923,8 @@ ${body}
           `Connexion API réussie, mais le contrôle de l’existence des dossiers a échoué : ${existenceCheckError.message}. Le transfert est désactivé tant que ce contrôle n’a pas abouti.`,
           "error"
         );
-      } else if (existenceCheck.matchingCount > 0) {
-        setApiMessage(
-          `Connexion API réussie — ${availableCabinets.length} cabinet(s), ${availableGenres.length} genre(s) et ${availableCollaborators.length} collaborateur(s) disponibles. ` +
-          `${existenceCheck.matchingCount} dossier(s) de la liste existe(nt) déjà sur cette base et sont marqué(s) « Ne pas transférer ».`,
-          "success"
-        );
       } else {
-        setApiMessage(
-          `Connexion API réussie — ${availableCabinets.length} cabinet(s), ${availableGenres.length} genre(s) et ${availableCollaborators.length} collaborateur(s) disponibles.` +
-          (generatedFolders.length
-            ? " Aucun dossier de la liste n’existe déjà sur cette base."
-            : ""),
-          "success"
-        );
+        setApiMessage("");
       }
 
       updateGeneratorConfigurationLockState();
@@ -49514,6 +49668,43 @@ ${body}
       window.location.reload();
     });
 
+    offlineModeButton.addEventListener("click", () => {
+      offlineModeSelected = true;
+      apiEnvironmentButtonsContainer.classList.add("is-offline-selected");
+      resetOfflineModeButton.hidden = false;
+      generatorConfigRevealed = true;
+      updateSandboxNewConfigurationVisibility();
+      updateGeneratorActionCardVisibility();
+      generatorConfigCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+
+    resetOfflineModeButton.addEventListener("click", () => {
+      if (isSandboxModeEnabled()) {
+        clearSandboxFolderListForEditing();
+      } else {
+        clearStandardFolderListForEditing();
+      }
+      offlineModeSelected = false;
+      apiEnvironmentButtonsContainer.classList.remove("is-offline-selected");
+      resetOfflineModeButton.hidden = true;
+      generatorConfigRevealed = false;
+      updateSandboxNewConfigurationVisibility();
+      updateGeneratorActionCardVisibility();
+    });
+
+    apiSessionUuidDisplay.addEventListener("click", () => {
+      if (!apiSessionUuid || apiConnectionDetailsDialog.open) return;
+      apiConnectionDetailsDialog.showModal();
+    });
+
+    apiConnectionDetailsClose.addEventListener("click", () => {
+      apiConnectionDetailsDialog.close();
+    });
+
+    apiConnectionDetailsDone.addEventListener("click", () => {
+      apiConnectionDetailsDialog.close();
+    });
+
     copyApiSessionUuidButton.addEventListener("click", async () => {
       if (!apiSessionUuid) return;
       try {
@@ -49599,6 +49790,11 @@ ${body}
 
     apiEnvironmentButtons.forEach(button => {
       button.addEventListener("click", async () => {
+        offlineModeSelected = false;
+        apiEnvironmentButtonsContainer.classList.remove("is-offline-selected");
+        resetOfflineModeButton.hidden = true;
+        generatorConfigRevealed = true;
+        updateSandboxNewConfigurationVisibility();
         if (apiEnvironmentInput.value === "custom") {
           customApiUrlDraft = customApiUrlInput.value.trim();
         }
