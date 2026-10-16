@@ -7972,16 +7972,32 @@
       border-right: 1px solid #dbe3ef;
       background: #f8fafc;
       overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .folder-editor-ged-sidebar-card {
+      min-width: 0;
+      padding: 12px 10px;
+      border: 1px solid #dbe3ef;
+      border-radius: 9px;
+      background: #fff;
+    }
+    .folder-editor-ged-sidebar-card-title {
+      margin: 0;
+      color: #1e3a5f;
+      font-size: 13px;
+      font-weight: 800;
     }
     .folder-editor-ged-tree-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      margin: 0 4px 10px;
+      margin: 0 0 10px;
     }
     .folder-editor-ged-tree-title {
-      margin: 0 4px;
+      margin: 0;
       color: #475569;
       font-size: 12px;
       font-weight: 800;
@@ -8054,6 +8070,93 @@
       color: #475569;
       font-size: 10px;
       font-weight: 800;
+    }
+    .folder-editor-ged-facturx-badge,
+    .folder-editor-ged-error-badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .folder-editor-ged-facturx-badge {
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1d4ed8;
+      cursor: pointer;
+    }
+    .folder-editor-ged-facturx-badge:hover,
+    .folder-editor-ged-facturx-badge:focus-visible {
+      outline: none;
+      border-color: #2563eb;
+      background: #dbeafe;
+    }
+    .folder-editor-ged-error-badge {
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: #b91c1c;
+    }
+    .folder-editor-ged-lad-content {
+      display: block;
+      overflow: auto;
+      padding: 20px;
+      background: #f8fafc;
+    }
+    .folder-editor-ged-lad-cards {
+      display: grid;
+      gap: 12px;
+    }
+    .folder-editor-ged-lad-card {
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid #dbe3ef;
+      border-radius: 10px;
+      background: #fff;
+    }
+    .folder-editor-ged-lad-card-title {
+      margin: 0;
+      color: #1e3a5f;
+      font-size: 14px;
+      font-weight: 800;
+    }
+    .folder-editor-ged-lad-list {
+      display: grid;
+      gap: 10px;
+    }
+    .folder-editor-ged-lad-line {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .folder-editor-ged-lad-line[data-columns="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .folder-editor-ged-lad-row {
+      min-width: 0;
+      margin: 0;
+      padding: 12px;
+      border: 1px solid #dbe3ef;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .folder-editor-ged-lad-row dt {
+      margin-bottom: 5px;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .folder-editor-ged-lad-row dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+      color: #1f2937;
+      font-size: 13px;
+    }
+    @media (max-width: 760px) {
+      .folder-editor-ged-lad-line,
+      .folder-editor-ged-lad-line[data-columns="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     .folder-editor-ged-tree-button.active .folder-editor-ged-count {
       background: #fff;
@@ -45784,8 +45887,53 @@ ${body}
       section.className = "folder-editor-section folder-editor-isuite-section";
       section.dataset.folderSection = "GED";
       section.setAttribute("aria-label", "Documents GED du dossier");
-      const state = { status: "idle", documents: [], exercises: [], exerciseError: "", rubricPayload: null, rubricError: "", actionMessage: null, treeExpanded: false, selectedRubric: "__initial", exercise: "__all", search: "", columnFilters: { name: "", creationAge: "all", modifiedAge: "all", author: "all", type: "all", size: "all" }, sortColumn: "creation", sortDirection: "desc", page: 1, pageSize: 10, nodes: new Map(), root: null };
+      const state = { status: "idle", documents: [], paniereDocuments: [], paniereTypes: [], paniereStatus: "idle", paniereError: "", paniereTypesError: "", paniereExpanded: false, selectedPaniereId: null, exercises: [], exerciseError: "", rubricPayload: null, rubricError: "", actionMessage: null, treeExpanded: false, selectedRubric: "__initial", exercise: "__all", search: "", columnFilters: { name: "", creationAge: "all", modifiedAge: "all", author: "all", type: "all", size: "all" }, sortColumn: "creation", sortDirection: "desc", page: 1, pageSize: 10, nodes: new Map(), root: null };
       section.gedState = state;
+
+      const normalizePaniereDocuments = payload => {
+        const isPaniereDocument = payload && typeof payload === "object" &&
+          (payload.Id !== undefined || payload.id !== undefined) && payload.PaniereType &&
+          (payload.Nom || payload.Document?.Nom);
+        const items = isPaniereDocument
+          ? [payload]
+          : extractApiArray(payload, ["Documents", "documents", "PaniereDocuments", "paniereDocuments", "Items", "items"]);
+        return items.filter(item => item && typeof item === "object").map(item => {
+          const document = item.Document && typeof item.Document === "object" ? item.Document : {};
+          const name = String(item.Nom || document.Nom || "Document i-dépôt");
+          const extension = String(item.Extension || document.Extension || name.match(/\.([^.\\/]+)$/)?.[1] || "");
+          return {
+            ...item,
+            __sourceType: "paniere",
+            Document: {
+              ...document,
+              Nom: name,
+              DateCreation: item.DateHeureDepot || document.DateCreation || "",
+              DateHeureModification: item.DateHeureTraitement || document.DateHeureModification || "",
+              Extension: extension,
+              Taille: item.Taille ?? document.Taille,
+              Collaborateur: document.Collaborateur || (item.CodeCollaborateurTraitement ? { Nom: item.CodeCollaborateurTraitement } : null)
+            },
+            CodeExercice: item.CodeExercice || ""
+          };
+        });
+      };
+
+      const paniereTypeDetails = item => {
+        const type = item?.PaniereType || item || {};
+        const familyLabels = {
+          _TYPE_FACTURES_ACHAT: "Achats",
+          _TYPE_FACTURES_VENTE: "ventes",
+          _TYPE_DIVERS: "Divers",
+          _TYPE_DONNEES: "Données",
+          _TYPE_OD: "Od"
+        };
+        const familyCode = String(type.Famille || "");
+        return {
+          id: String(type.Id ?? type.id ?? `unknown:${type.Libelle || type.Famille || "i-depot"}`),
+          label: String(type.Libelle || "Panière sans libellé"),
+          family: familyLabels[familyCode] || "Divers"
+        };
+      };
 
       const showStatus = (message, isError = false) => {
         section.replaceChildren();
@@ -45916,6 +46064,141 @@ ${body}
       const authorName = item => {
         const author = item?.Document?.Collaborateur || {};
         return [author.Prenom, author.Nom].filter(Boolean).join(" ") || "—";
+      };
+      const getPaniereErrors = item => {
+        const errors = item?.Erreurs;
+        if (Array.isArray(errors)) return errors.filter(value => value !== null && String(value).trim() && String(value).toLowerCase() !== "string");
+        if (typeof errors === "string") {
+          const value = errors.trim();
+          return value && value.toLowerCase() !== "none" && value.toLowerCase() !== "string" ? [value] : [];
+        }
+        if (errors && typeof errors === "object") {
+          return Object.entries(errors).filter(([key, value]) => {
+            if (String(key).toLowerCase() === "none" || value === null || value === undefined || value === false || value === 0) return false;
+            const text = typeof value === "string" ? value.trim() : String(value);
+            return Boolean(text) && text.toLowerCase() !== "string" && text.toLowerCase() !== "none";
+          });
+        }
+        return errors ? [String(errors)] : [];
+      };
+      const openPaniereLad = async item => {
+        document.querySelectorAll(".folder-editor-ged-preview-backdrop").forEach(existing => existing.gedClose?.());
+        const overlay = document.createElement("div");
+        overlay.className = "folder-editor-ged-preview-backdrop";
+        const dialog = document.createElement("div");
+        dialog.className = "folder-editor-ged-preview-dialog";
+        dialog.style.width = "min(900px, 94vw)";
+        dialog.style.height = "min(720px, 88vh)";
+        dialog.setAttribute("role", "dialog");
+        dialog.setAttribute("aria-modal", "true");
+        const header = document.createElement("div");
+        header.className = "folder-editor-ged-preview-header";
+        const title = document.createElement("div");
+        title.className = "folder-editor-ged-preview-title";
+        title.textContent = `Données LAD — ${item?.Nom || item?.Document?.Nom || "Factur-x"}`;
+        const close = document.createElement("button");
+        close.type = "button";
+        close.className = "folder-editor-ged-preview-close";
+        close.setAttribute("aria-label", "Fermer les données LAD");
+        close.textContent = "×";
+        header.append(title, close);
+        const content = document.createElement("div");
+        content.className = "folder-editor-ged-preview-content folder-editor-ged-lad-content";
+        const message = document.createElement("div");
+        message.className = "folder-editor-ged-preview-message";
+        message.textContent = "Chargement des données LAD…";
+        content.appendChild(message);
+        dialog.append(header, content);
+        overlay.appendChild(dialog);
+        const onKeyDown = event => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            event.stopPropagation();
+            overlay.gedClose();
+          }
+        };
+        overlay.gedClose = () => {
+          document.removeEventListener("keydown", onKeyDown, true);
+          overlay.remove();
+        };
+        close.addEventListener("click", overlay.gedClose);
+        overlay.addEventListener("click", event => { if (event.target === overlay) overlay.gedClose(); });
+        document.addEventListener("keydown", onKeyDown, true);
+        document.body.appendChild(overlay);
+        close.focus();
+        try {
+          const baseUrl = getSelectedApiBaseUrl();
+          if (!baseUrl || !apiSessionUuid) throw new Error("La connexion API n’est pas disponible.");
+          const documentId = item?.Id ?? item?.id;
+          if (documentId === undefined || documentId === null || documentId === "") throw new Error("L’identifiant du document i-dépôt est absent.");
+          await selectFolderSessionForData(baseUrl, apiSessionUuid, folder?.Code);
+          const endpoint = `/v2/panieres/documents/${encodeURIComponent(documentId)}/lad/facture`;
+          const response = await fetch(`${baseUrl}${endpoint}`, {
+            method: "GET",
+            headers: { "Accept": "application/json, text/plain, */*", "UUID": apiSessionUuid }
+          });
+          const responseText = await response.text();
+          if (!response.ok) {
+            const detail = responseText.trim().slice(0, 350);
+            throw new Error(detail ? `${endpoint} : erreur ${response.status} — ${detail}` : `${endpoint} : erreur ${response.status}`);
+          }
+          let lad = {};
+          if (responseText.trim()) {
+            try { lad = JSON.parse(responseText); }
+            catch { throw new Error(`${endpoint} : la réponse reçue n’est pas un JSON exploitable.`); }
+          }
+          if (!overlay.isConnected) return;
+          const fieldRows = [
+            [["Siren", "SIREN"], ["TVAIntracommunautaire", "TVA intracommunautaire"], ["Tiers", "Tiers"], ["Telephone", "Téléphone"], ["Emails", "Emails"]],
+            [["Date", "Date"], ["Piece", "Pièce"], ["Bavoir", "Avoir"], ["DateEcheance", "Date d’échéance"]],
+            [["MontantHT", "Montant HT"], ["TVA", "TVA"], ["Taux", "Taux de TVA"], ["MontantTTC", "Montant TTC"]]
+          ];
+          const cardDefinitions = [
+            { title: "Émetteur de la facture", rows: [fieldRows[0]] },
+            { title: "Éléments de la facture", rows: fieldRows.slice(1) }
+          ];
+          const cards = document.createElement("div");
+          cards.className = "folder-editor-ged-lad-cards";
+          cardDefinitions.forEach(definition => {
+            const card = document.createElement("section");
+            card.className = "folder-editor-ged-lad-card";
+            const cardTitle = document.createElement("h3");
+            cardTitle.className = "folder-editor-ged-lad-card-title";
+            cardTitle.textContent = definition.title;
+            const list = document.createElement("div");
+            list.className = "folder-editor-ged-lad-list";
+            definition.rows.forEach(fields => {
+              const line = document.createElement("div");
+              line.className = "folder-editor-ged-lad-line";
+              line.dataset.columns = String(fields.length);
+              fields.forEach(([key, label]) => {
+                const row = document.createElement("dl");
+                row.className = "folder-editor-ged-lad-row";
+                const term = document.createElement("dt");
+                term.textContent = label;
+                const detail = document.createElement("dd");
+                const value = lad?.[key];
+                if (value === null || value === undefined || value === "") detail.textContent = "—";
+                else if (typeof value === "boolean") detail.textContent = value ? "Oui" : "Non";
+                else if (Array.isArray(value)) detail.textContent = value.length ? value.map(item => typeof item === "object" ? JSON.stringify(item) : String(item)).join(" · ") : "—";
+                else if (typeof value === "object") detail.textContent = JSON.stringify(value);
+                else detail.textContent = String(value);
+                row.append(term, detail);
+                line.appendChild(row);
+              });
+              list.appendChild(line);
+            });
+            card.append(cardTitle, list);
+            cards.appendChild(card);
+          });
+          content.replaceChildren(cards);
+        } catch (error) {
+          if (!overlay.isConnected) return;
+          const errorMessage = document.createElement("div");
+          errorMessage.className = "folder-editor-ged-preview-message";
+          errorMessage.textContent = error?.message || "Impossible de récupérer les données LAD.";
+          content.replaceChildren(errorMessage);
+        }
       };
       const openDocumentPreview = async item => {
         document.querySelectorAll(".folder-editor-ged-preview-backdrop").forEach(existing => existing.gedClose?.());
@@ -46052,19 +46335,22 @@ ${body}
       const deleteDocument = async (item, button) => {
         const documentId = item?.Id ?? item?.id;
         if (documentId === undefined || documentId === null || documentId === "") {
-          state.actionMessage = { type: "error", text: "L’identifiant du document GED est absent." };
+          state.actionMessage = { type: "error", text: "L’identifiant du document est absent." };
           render();
           return;
         }
         const documentName = item?.Document?.Nom || `document ${documentId}`;
-        if (!window.confirm(`Confirmez-vous la suppression du document « ${documentName} » ?`)) return;
+        const isPaniereDocument = item?.__sourceType === "paniere";
+        if (!window.confirm(`Confirmez-vous la suppression du document « ${documentName} » ${isPaniereDocument ? "de la panière" : "de la GED"} ?`)) return;
         button.disabled = true;
         button.textContent = "…";
         try {
           const baseUrl = getSelectedApiBaseUrl();
           if (!baseUrl || !apiSessionUuid) throw new Error("La connexion API n’est pas disponible.");
           await selectFolderSessionForData(baseUrl, apiSessionUuid, folder?.Code);
-          const endpoint = `/v1/ged/documents?ids=${encodeURIComponent(documentId)}`;
+          const endpoint = isPaniereDocument
+            ? `/v1/panieres/documents?documentsIds=${encodeURIComponent(documentId)}`
+            : `/v1/ged/documents?ids=${encodeURIComponent(documentId)}`;
           const response = await fetch(`${baseUrl}${endpoint}`, {
             method: "DELETE",
             headers: { "Accept": "application/json, text/plain, */*", "UUID": apiSessionUuid }
@@ -46074,24 +46360,30 @@ ${body}
             const detail = responseText.trim().slice(0, 350);
             throw new Error(detail ? `${endpoint} : erreur ${response.status} — ${detail}` : `${endpoint} : erreur ${response.status}`);
           }
-          const selectedRubric = state.selectedRubric;
-          state.documents = state.documents.filter(candidate => String(candidate?.Id ?? candidate?.id) !== String(documentId));
-          const selectedStillContainsDocuments = state.documents.some(candidate =>
-            candidate.__gedNodeKeys?.includes(selectedRubric)
-          );
-          state.selectedRubric = selectedStillContainsDocuments ? selectedRubric : "__all";
-          state.actionMessage = { type: "success", text: `Le document « ${documentName} » a été supprimé.` };
-          initializeTree();
+          if (isPaniereDocument) {
+            state.paniereDocuments = state.paniereDocuments.filter(candidate => String(candidate?.Id ?? candidate?.id) !== String(documentId));
+            state.actionMessage = { type: "success", text: `Le document « ${documentName} » a été supprimé de la panière.` };
+          } else {
+            const selectedRubric = state.selectedRubric;
+            state.documents = state.documents.filter(candidate => String(candidate?.Id ?? candidate?.id) !== String(documentId));
+            const selectedStillContainsDocuments = state.documents.some(candidate =>
+              candidate.__gedNodeKeys?.includes(selectedRubric)
+            );
+            state.selectedRubric = selectedStillContainsDocuments ? selectedRubric : "__all";
+            state.actionMessage = { type: "success", text: `Le document « ${documentName} » a été supprimé de la GED.` };
+            initializeTree();
+          }
           render();
         } catch (error) {
-          state.actionMessage = { type: "error", text: error?.message || "Impossible de supprimer le document GED." };
+          state.actionMessage = { type: "error", text: error?.message || "Impossible de supprimer le document." };
           render();
         }
       };
       const downloadDocument = async (item, button) => {
         const documentId = item?.Id ?? item?.id;
+        const isPaniereDocument = item?.__sourceType === "paniere";
         if (documentId === undefined || documentId === null || documentId === "") {
-          state.actionMessage = { type: "error", text: "L’identifiant du document GED est absent." };
+          state.actionMessage = { type: "error", text: "L’identifiant du document est absent." };
           render();
           return;
         }
@@ -46101,7 +46393,9 @@ ${body}
           const baseUrl = getSelectedApiBaseUrl();
           if (!baseUrl || !apiSessionUuid) throw new Error("La connexion API n’est pas disponible.");
           await selectFolderSessionForData(baseUrl, apiSessionUuid, folder?.Code);
-          const endpoint = `/v1/ged/documents/${encodeURIComponent(documentId)}/fichier`;
+          const endpoint = isPaniereDocument
+            ? `/v1/panieres/documents/${encodeURIComponent(documentId)}/fichier?UUID=${encodeURIComponent(apiSessionUuid)}`
+            : `/v1/ged/documents/${encodeURIComponent(documentId)}/fichier`;
           const response = await fetch(`${baseUrl}${endpoint}`, {
             method: "GET",
             headers: { "Accept": "application/octet-stream, */*", "UUID": apiSessionUuid }
@@ -46137,14 +46431,14 @@ ${body}
           link.remove();
           window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
         } catch (error) {
-          state.actionMessage = { type: "error", text: error?.message || "Impossible de télécharger le document GED." };
+          state.actionMessage = { type: "error", text: error?.message || "Impossible de télécharger le document." };
           render();
         } finally {
           button.disabled = false;
           button.title = "Télécharger le document";
         }
       };
-      const uploadDocument = async (file, button, rubricId) => {
+      const uploadDocument = async (file, button, rubricId, paniereId = "") => {
         if (!file) return;
         button.disabled = true;
         button.textContent = "Envoi…";
@@ -46154,8 +46448,9 @@ ${body}
           await selectFolderSessionForData(baseUrl, apiSessionUuid, folder?.Code);
           const formData = new FormData();
           formData.append("file", file, file.name);
-          formData.append("idArboged", String(rubricId));
-          if (state.exercise !== "__all" && state.exercise !== "__empty") {
+          const isPaniereUpload = paniereId !== "" && paniereId !== null && paniereId !== undefined;
+          if (!isPaniereUpload) formData.append("idArboged", String(rubricId));
+          if (!isPaniereUpload && state.exercise !== "__all" && state.exercise !== "__empty") {
             const selectedExercise = state.exercises.find(exercise => String(exercise.Code).trim() === state.exercise);
             if (!selectedExercise) throw new Error(`L’exercice « ${state.exercise} » est introuvable dans GET /v1/exercices.`);
             const rawEndDate = String(selectedExercise.DateFin || "").trim();
@@ -46170,7 +46465,9 @@ ${body}
             if (!dateExercice) throw new Error(`La date de fin de l’exercice « ${state.exercise} » est absente ou invalide.`);
             formData.append("DateExercice", dateExercice);
           }
-          const endpoint = "/v1/ged/documents";
+          const endpoint = isPaniereUpload
+            ? `/v1/panieres/documents?type=${encodeURIComponent(paniereId)}`
+            : "/v1/ged/documents";
           const response = await fetch(`${baseUrl}${endpoint}`, {
             method: "POST",
             headers: { "Accept": "text/plain, application/json, */*", "UUID": apiSessionUuid },
@@ -46181,10 +46478,12 @@ ${body}
             const detail = responseText.trim().slice(0, 350);
             throw new Error(detail ? `${endpoint} : erreur ${response.status} — ${detail}` : `${endpoint} : erreur ${response.status}`);
           }
-          state.actionMessage = { type: "success", text: `Le document « ${file.name} » a été ajouté à la rubrique sélectionnée.` };
+          state.actionMessage = { type: "success", text: isPaniereUpload
+            ? `Le document « ${file.name} » a été ajouté à la panière sélectionnée.`
+            : `Le document « ${file.name} » a été ajouté à la rubrique sélectionnée.` };
           await load(true);
         } catch (error) {
-          state.actionMessage = { type: "error", text: error?.message || "Impossible d’ajouter le document GED." };
+          state.actionMessage = { type: "error", text: error?.message || "Impossible d’ajouter le document." };
           render();
         } finally {
           button.disabled = false;
@@ -46193,7 +46492,26 @@ ${body}
       };
       const render = () => {
         const currentNode = state.nodes.get(state.selectedRubric) || state.root;
-        const scoped = state.selectedRubric === "__all" ? state.documents : (currentNode?.documents || state.documents);
+        const paniereGroups = new Map();
+        state.paniereTypes.forEach(type => {
+          const details = paniereTypeDetails(type);
+          if (!paniereGroups.has(details.id)) paniereGroups.set(details.id, { ...details, documents: [] });
+        });
+        state.paniereDocuments.forEach(item => {
+          const type = paniereTypeDetails(item);
+          if (!paniereGroups.has(type.id)) paniereGroups.set(type.id, { ...type, documents: [] });
+          paniereGroups.get(type.id).documents.push(item);
+        });
+        const selectedPaniere = state.selectedPaniereId === null
+          ? null
+          : paniereGroups.get(String(state.selectedPaniereId)) || null;
+        if (!selectedPaniere && state.selectedPaniereId !== null) state.selectedPaniereId = null;
+        const visiblePaniereGroups = state.paniereExpanded
+          ? paniereGroups
+          : new Map([...paniereGroups].filter(([, group]) => group.documents.length > 0));
+        const scoped = selectedPaniere
+          ? selectedPaniere.documents
+          : state.selectedRubric === "__all" ? state.documents : (currentNode?.documents || state.documents);
         const matchesExercise = item => {
           const code = String(item?.CodeExercice ?? "").trim();
           if (state.exercise === "__empty") return !code;
@@ -46221,8 +46539,8 @@ ${body}
           const nameNeedle = state.columnFilters.name.trim().toLocaleLowerCase("fr");
           if (nameNeedle && !name.includes(nameNeedle)) return false;
           if (!matchesDateAge(documentInfo.DateCreation, state.columnFilters.creationAge)) return false;
-          if (!matchesDateAge(documentInfo.DateHeureModification, state.columnFilters.modifiedAge)) return false;
-          if (state.columnFilters.author !== "all" && author !== state.columnFilters.author.toLocaleLowerCase("fr")) return false;
+          if (!selectedPaniere && !matchesDateAge(documentInfo.DateHeureModification, state.columnFilters.modifiedAge)) return false;
+          if (!selectedPaniere && state.columnFilters.author !== "all" && author !== state.columnFilters.author.toLocaleLowerCase("fr")) return false;
           if (state.columnFilters.type !== "all" && type !== state.columnFilters.type) return false;
           const size = Number(documentInfo.Taille);
           if (state.columnFilters.size !== "all") {
@@ -46236,7 +46554,7 @@ ${body}
         };
         const needle = state.search.trim().toLocaleLowerCase("fr");
         const filtered = scoped.filter(item => {
-          if (!matchesExercise(item)) return false;
+          if (!selectedPaniere && !matchesExercise(item)) return false;
           if (!matchesColumnFilters(item)) return false;
           const searchText = [item?.Document?.Nom, item?.Document?.Sujet, item?.Document?.Commentaire,
             authorName(item), item?.Document?.Extension].join(" ").toLocaleLowerCase("fr");
@@ -46295,11 +46613,88 @@ ${body}
         layout.className = "folder-editor-ged-layout";
         const sidebar = document.createElement("aside");
         sidebar.className = "folder-editor-ged-sidebar";
+        const idepotCard = document.createElement("div");
+        idepotCard.className = "folder-editor-ged-sidebar-card folder-editor-ged-idepot-card";
+        const idepotTitle = document.createElement("h3");
+        idepotTitle.className = "folder-editor-ged-sidebar-card-title";
+        idepotTitle.textContent = "i-dépôt";
+        const idepotHeader = document.createElement("div");
+        idepotHeader.className = "folder-editor-ged-tree-header";
+        const paniereToggle = document.createElement("button");
+        paniereToggle.type = "button";
+        paniereToggle.className = "folder-editor-ged-tree-toggle";
+        paniereToggle.textContent = state.paniereExpanded ? "Replier tout" : "Déplier tout";
+        paniereToggle.setAttribute("aria-expanded", state.paniereExpanded ? "true" : "false");
+        paniereToggle.addEventListener("click", () => {
+          state.paniereExpanded = !state.paniereExpanded;
+          render();
+        });
+        idepotHeader.append(idepotTitle, paniereToggle);
+        idepotCard.appendChild(idepotHeader);
+        if (state.paniereStatus === "loaded" && state.paniereDocuments.length === 0 && !state.paniereExpanded) {
+          const emptyPanieres = document.createElement("div");
+          emptyPanieres.className = "folder-editor-ged-muted";
+          emptyPanieres.textContent = "Aucune rubrique ne contient de document.";
+          emptyPanieres.style.padding = "8px";
+          idepotCard.appendChild(emptyPanieres);
+        }
+        const paniereErrors = [
+          state.paniereTypesError && `Liste des panières indisponible : ${state.paniereTypesError}`,
+          state.paniereStatus === "error" && `Liste des documents i-dépôt indisponible : ${state.paniereError}`
+        ].filter(Boolean);
+        if (paniereErrors.length) {
+          const paniereError = document.createElement("div");
+          paniereError.className = "folder-editor-isuite-warning";
+          paniereError.textContent = paniereErrors.join(" ");
+          const retryPanieres = document.createElement("button");
+          retryPanieres.type = "button";
+          retryPanieres.className = "folder-editor-ged-retry";
+          retryPanieres.textContent = "Réessayer";
+          retryPanieres.addEventListener("click", () => load(true));
+          idepotCard.append(paniereError, retryPanieres);
+        }
+        const paniereTree = document.createElement("ul");
+        paniereTree.className = "folder-editor-ged-tree";
+        if (paniereGroups.size === 0) {
+          const empty = document.createElement("li");
+          empty.className = "folder-editor-ged-empty";
+          empty.textContent = "Aucune panière disponible.";
+          paniereTree.appendChild(empty);
+        } else {
+          visiblePaniereGroups.forEach(group => {
+            const item = document.createElement("li");
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "folder-editor-ged-tree-button" + (String(state.selectedPaniereId) === group.id ? " active" : "");
+            button.title = `${group.label} (${group.family})`;
+            const label = document.createElement("span");
+            label.className = "folder-editor-ged-tree-label";
+            label.textContent = `${group.label} (${group.family})`;
+            const count = document.createElement("span");
+            count.className = "folder-editor-ged-count";
+            count.textContent = String(group.documents.length);
+            button.append(label, count);
+            button.addEventListener("click", () => {
+              state.selectedPaniereId = group.id;
+              state.selectedRubric = "__all";
+              state.exercise = "__all";
+              state.page = 1;
+              render();
+            });
+            item.appendChild(button);
+            paniereTree.appendChild(item);
+          });
+        }
+        idepotCard.appendChild(paniereTree);
+        sidebar.appendChild(idepotCard);
+
+        const rubricsCard = document.createElement("div");
+        rubricsCard.className = "folder-editor-ged-sidebar-card folder-editor-ged-rubrics-card";
         const treeHeader = document.createElement("div");
         treeHeader.className = "folder-editor-ged-tree-header";
         const treeTitle = document.createElement("div");
         treeTitle.className = "folder-editor-ged-tree-title";
-        treeTitle.textContent = "Rubriques";
+        treeTitle.textContent = "Rubriques GED";
         const treeToggle = document.createElement("button");
         treeToggle.type = "button";
         treeToggle.className = "folder-editor-ged-tree-toggle";
@@ -46315,13 +46710,13 @@ ${body}
           render();
         });
         treeHeader.append(treeTitle, treeToggle);
-        sidebar.appendChild(treeHeader);
+        rubricsCard.appendChild(treeHeader);
         const tree = document.createElement("ul");
         tree.className = "folder-editor-ged-tree";
         const allDocumentsItem = document.createElement("li");
         const allDocumentsButton = document.createElement("button");
         allDocumentsButton.type = "button";
-        allDocumentsButton.className = "folder-editor-ged-tree-button" + (state.selectedRubric === "__all" ? " active" : "");
+        allDocumentsButton.className = "folder-editor-ged-tree-button" + (!selectedPaniere && state.selectedRubric === "__all" ? " active" : "");
         allDocumentsButton.title = "Afficher tous les documents du dossier";
         const allDocumentsLabel = document.createElement("span");
         allDocumentsLabel.className = "folder-editor-ged-tree-label";
@@ -46335,6 +46730,7 @@ ${body}
           allDocumentsButton.appendChild(allDocumentsCount);
         }
         allDocumentsButton.addEventListener("click", () => {
+          state.selectedPaniereId = null;
           state.selectedRubric = "__all";
           state.page = 1;
           render();
@@ -46359,7 +46755,7 @@ ${body}
           count.textContent = String(documentCount);
           button.appendChild(label);
           if (documentCount > 0) button.appendChild(count);
-          button.addEventListener("click", () => { state.selectedRubric = node.key; state.page = 1; render(); });
+          button.addEventListener("click", () => { state.selectedPaniereId = null; state.selectedRubric = node.key; state.page = 1; render(); });
           li.appendChild(button);
           if (node.children.length && showChildren && (depth === 0 || state.treeExpanded)) {
             const children = document.createElement("ul");
@@ -46384,7 +46780,8 @@ ${body}
             tree.appendChild(empty);
           }
         }
-        sidebar.appendChild(tree);
+        rubricsCard.appendChild(tree);
+        sidebar.appendChild(rubricsCard);
 
         const main = document.createElement("div");
         main.className = "folder-editor-ged-main";
@@ -46392,7 +46789,9 @@ ${body}
         toolbar.className = "folder-editor-ged-toolbar";
         const breadcrumb = document.createElement("div");
         breadcrumb.className = "folder-editor-ged-breadcrumb";
-        breadcrumb.textContent = [state.root.label, ...(currentNode?.path || [])].filter(Boolean).join("  ›  ");
+        breadcrumb.textContent = selectedPaniere
+          ? [state.root.label, `${selectedPaniere.label} (${selectedPaniere.family})`].filter(Boolean).join("  ›  ")
+          : [state.root.label, ...(currentNode?.path || [])].filter(Boolean).join("  ›  ");
         const filters = document.createElement("div");
         filters.className = "folder-editor-ged-filters";
         const search = document.createElement("input");
@@ -46428,6 +46827,7 @@ ${body}
           exercise.appendChild(option);
         });
         exercise.value = state.exercise;
+        exercise.hidden = Boolean(selectedPaniere);
         exercise.addEventListener("change", () => { state.exercise = exercise.value; state.page = 1; render(); });
         const hasActiveFilters = Boolean(state.search.trim()) || state.exercise !== "__all" ||
           Object.entries(state.columnFilters).some(([key, value]) => value !== (key === "name" ? "" : "all"));
@@ -46455,15 +46855,18 @@ ${body}
         uploadButton.type = "button";
         uploadButton.className = "folder-editor-ged-upload-button";
         uploadButton.textContent = "+ Ajouter un document";
-        uploadButton.disabled = !selectedRubricId;
-        uploadButton.title = selectedRubricId
-          ? "Ajouter un document dans cette rubrique"
-          : "Sélectionnez une rubrique GED pour ajouter un document";
+        uploadButton.disabled = selectedPaniere ? !selectedPaniere.id : !selectedRubricId;
+        uploadButton.title = selectedPaniere
+          ? `Ajouter un document dans la panière « ${selectedPaniere.label} »`
+          : selectedRubricId
+            ? "Ajouter un document dans cette rubrique"
+            : "Sélectionnez une rubrique GED ou une panière pour ajouter un document";
         uploadButton.addEventListener("click", () => fileInput.click());
         fileInput.addEventListener("change", () => {
           const file = fileInput.files?.[0];
           fileInput.value = "";
-          if (file && selectedRubricId) uploadDocument(file, uploadButton, selectedRubricId);
+          if (file && selectedPaniere) uploadDocument(file, uploadButton, "", selectedPaniere.id);
+          else if (file && selectedRubricId) uploadDocument(file, uploadButton, selectedRubricId);
         });
         filters.append(search, exercise, resetFiltersButton, uploadButton, fileInput);
         toolbar.append(breadcrumb, filters);
@@ -46499,16 +46902,27 @@ ${body}
           select.addEventListener("change", () => updateColumnFilter(key, select.value));
           return select;
         };
-        const columnDefinitions = [
-          { label: "Nom du document", key: "name", filter: "name" },
-          { label: "Création", key: "creation", filter: "creationAge" },
-          { label: "Créat/Modif", key: "modified", filter: "modifiedAge" },
-          { label: "Exercice", key: "exercise" },
-          { label: "Auteur", key: "author", filter: "author" },
-          { label: "Type", key: "type", filter: "type" },
-          { label: "Taille", key: "size", filter: "size" },
-          { label: "Action", key: "action", sortable: false }
-        ];
+        const columnDefinitions = selectedPaniere
+          ? [
+              { label: "Nom du document", key: "name", filter: "name" },
+              { label: "Création", key: "creation", filter: "creationAge" },
+              { label: "Factur-x", key: "modified", sortable: false },
+              { label: "AVAC", key: "exercise", sortable: false },
+              { label: "Erreurs", key: "author", sortable: false },
+              { label: "Type", key: "type", filter: "type" },
+              { label: "Taille", key: "size", filter: "size" },
+              { label: "Action", key: "action", sortable: false }
+            ]
+          : [
+              { label: "Nom du document", key: "name", filter: "name" },
+              { label: "Création", key: "creation", filter: "creationAge" },
+              { label: "Créat/Modif", key: "modified", filter: "modifiedAge" },
+              { label: "Exercice", key: "exercise" },
+              { label: "Auteur", key: "author", filter: "author" },
+              { label: "Type", key: "type", filter: "type" },
+              { label: "Taille", key: "size", filter: "size" },
+              { label: "Action", key: "action", sortable: false }
+            ];
         const dateAgeOptions = [["all", "Toutes les dates"], ["older", "Plus d’un an"], ["newer", "Moins d’un an"]];
         const exerciseScopedDocuments = scoped.filter(matchesExercise);
         const authors = [...new Set(exerciseScopedDocuments.map(authorName).filter(Boolean))]
@@ -46578,45 +46992,56 @@ ${body}
           const cell = document.createElement("td");
           cell.colSpan = 8;
           cell.className = "folder-editor-ged-muted";
-          cell.textContent = "Aucun document dans cette rubrique pour les filtres sélectionnés.";
+          cell.textContent = selectedPaniere?.documents.length === 0
+            ? "Aucune rubrique ne contient de document."
+            : "Aucun document dans cette rubrique pour les filtres sélectionnés.";
           row.appendChild(cell);
           tbody.appendChild(row);
         } else {
           pageItems.forEach(item => {
             const row = document.createElement("tr");
             const documentInfo = item?.Document || {};
-            const values = [documentInfo.Nom || "—", formatFolderCreationDate(documentInfo.DateCreation),
-              formatFolderCreationDate(documentInfo.DateHeureModification), item?.CodeExercice || "—",
-              authorName(item), String(documentInfo.Extension || "—").replace(/^\./, "").toUpperCase(),
-              formatSize(documentInfo.Taille)];
+            const avacValue = String(item?.EtatAssistantVirtuelCompta ?? "").trim();
+            const values = selectedPaniere
+              ? [documentInfo.Nom || "—", formatFolderCreationDate(documentInfo.DateCreation), item?.FactureX || "",
+                  avacValue.toLocaleLowerCase("fr") === "aucun" ? "" : avacValue,
+                  getPaniereErrors(item).length ? getPaniereErrors(item).length : "",
+                  String(documentInfo.Extension || "—").replace(/^\./, "").toUpperCase(), formatSize(documentInfo.Taille)]
+              : [documentInfo.Nom || "—", formatFolderCreationDate(documentInfo.DateCreation),
+                  formatFolderCreationDate(documentInfo.DateHeureModification), item?.CodeExercice || "—",
+                  authorName(item), String(documentInfo.Extension || "—").replace(/^\./, "").toUpperCase(),
+                  formatSize(documentInfo.Taille)];
             values.forEach((value, index) => {
               const cell = document.createElement("td");
               if (index === 0) {
                 const documentCell = document.createElement("div");
                 documentCell.className = "folder-editor-ged-document-cell";
-                const previewButton = document.createElement("button");
-                previewButton.type = "button";
-                previewButton.className = "folder-editor-ged-preview-button";
-                previewButton.title = "Visualiser le document";
-                previewButton.setAttribute("aria-label", `Visualiser ${String(value)}`);
-                const eye = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                eye.setAttribute("viewBox", "0 0 24 24");
-                eye.setAttribute("width", "16");
-                eye.setAttribute("height", "16");
-                eye.setAttribute("fill", "none");
-                eye.setAttribute("stroke", "currentColor");
-                eye.setAttribute("stroke-width", "2");
-                eye.setAttribute("stroke-linecap", "round");
-                eye.setAttribute("stroke-linejoin", "round");
-                const eyePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                eyePath.setAttribute("d", "M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z");
-                const eyePupil = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                eyePupil.setAttribute("cx", "12");
-                eyePupil.setAttribute("cy", "12");
-                eyePupil.setAttribute("r", "3");
-                eye.append(eyePath, eyePupil);
-                previewButton.appendChild(eye);
-                previewButton.addEventListener("click", () => openDocumentPreview(item));
+                let previewButton = null;
+                if (item?.__sourceType !== "paniere") {
+                  previewButton = document.createElement("button");
+                  previewButton.type = "button";
+                  previewButton.className = "folder-editor-ged-preview-button";
+                  previewButton.title = "Visualiser le document";
+                  previewButton.setAttribute("aria-label", `Visualiser ${String(value)}`);
+                  const eye = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                  eye.setAttribute("viewBox", "0 0 24 24");
+                  eye.setAttribute("width", "16");
+                  eye.setAttribute("height", "16");
+                  eye.setAttribute("fill", "none");
+                  eye.setAttribute("stroke", "currentColor");
+                  eye.setAttribute("stroke-width", "2");
+                  eye.setAttribute("stroke-linecap", "round");
+                  eye.setAttribute("stroke-linejoin", "round");
+                  const eyePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                  eyePath.setAttribute("d", "M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z");
+                  const eyePupil = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                  eyePupil.setAttribute("cx", "12");
+                  eyePupil.setAttribute("cy", "12");
+                  eyePupil.setAttribute("r", "3");
+                  eye.append(eyePath, eyePupil);
+                  previewButton.appendChild(eye);
+                  previewButton.addEventListener("click", () => openDocumentPreview(item));
+                }
                 const downloadButton = document.createElement("button");
                 downloadButton.type = "button";
                 downloadButton.className = "folder-editor-ged-download-button";
@@ -46636,11 +47061,32 @@ ${body}
                 downloadIcon.appendChild(downloadPath);
                 downloadButton.appendChild(downloadIcon);
                 downloadButton.addEventListener("click", () => downloadDocument(item, downloadButton));
+                if (previewButton) documentCell.appendChild(previewButton);
+                documentCell.appendChild(downloadButton);
                 const documentName = document.createElement("span");
                 documentName.className = "folder-editor-ged-document-name";
                 documentName.textContent = String(value);
-                documentCell.append(previewButton, downloadButton, documentName);
+                documentCell.append(documentName);
                 cell.appendChild(documentCell);
+              } else if (selectedPaniere && columnDefinitions[index]?.key === "modified") {
+                if (String(item?.FactureX || "").trim() === "_FACTUREX") {
+                  const facturxButton = document.createElement("button");
+                  facturxButton.type = "button";
+                  facturxButton.className = "folder-editor-ged-facturx-badge";
+                  facturxButton.textContent = "Factur-x";
+                  facturxButton.title = "Afficher les données LAD de la facture";
+                  facturxButton.addEventListener("click", () => openPaniereLad(item));
+                  cell.appendChild(facturxButton);
+                }
+              } else if (selectedPaniere && columnDefinitions[index]?.key === "author") {
+                const errors = getPaniereErrors(item);
+                if (errors.length) {
+                  const errorBadge = document.createElement("span");
+                  errorBadge.className = "folder-editor-ged-error-badge";
+                  errorBadge.textContent = `Erreur ${errors.length}`;
+                  errorBadge.title = errors.map(error => Array.isArray(error) ? `${error[0]} : ${error[1]}` : String(error)).join("\n");
+                  cell.appendChild(errorBadge);
+                }
               } else {
                 cell.textContent = String(value);
               }
@@ -46711,15 +47157,15 @@ ${body}
         section.appendChild(layout);
       };
       const load = async (force = false) => {
-        if (!force && (state.status === "loading" || state.status === "loaded")) return;
+        if (state.status === "loading" || (!force && state.status === "loaded")) return;
         state.status = "loading";
-        showStatus("Chargement des documents GED du dossier…");
+        showStatus("Chargement des documents GED et i-dépôt du dossier…");
         try {
           const baseUrl = getSelectedApiBaseUrl();
           if (!baseUrl || !apiSessionUuid) throw new Error("La connexion API n’est pas disponible.");
           await selectFolderSessionForData(baseUrl, apiSessionUuid, folder?.Code);
           const endpoint = "/v1/ged/documents/filtrer";
-          const [documentResult, rubricResult, exerciseResult] = await Promise.allSettled([
+          const [documentResult, rubricResult, exerciseResult, paniereResult, paniereTypesResult] = await Promise.allSettled([
             fetch(`${baseUrl}${endpoint}`, {
               method: "POST",
               headers: { "Accept": "application/json, text/plain, */*", "UUID": apiSessionUuid,
@@ -46727,7 +47173,9 @@ ${body}
               body: JSON.stringify({})
             }),
             fetchFolderRelatedJson(baseUrl, apiSessionUuid, "/v1/ged/arborescence?documents=false&criteres=false"),
-            fetchFolderRelatedJson(baseUrl, apiSessionUuid, "/v1/exercices")
+            fetchFolderRelatedJson(baseUrl, apiSessionUuid, "/v1/exercices"),
+            fetchFolderRelatedJson(baseUrl, apiSessionUuid, "/v1/panieres/documents"),
+            fetchFolderRelatedJson(baseUrl, apiSessionUuid, "/v1/panieres/types")
           ]);
           if (documentResult.status === "rejected") throw documentResult.reason;
           const response = documentResult.value;
@@ -46742,6 +47190,28 @@ ${body}
             catch { throw new Error(`${endpoint} : la réponse reçue n’est pas un JSON exploitable.`); }
           }
           state.documents = extractApiArray(payload, ["Documents", "documents", "Items", "items"]);
+          if (paniereResult.status === "fulfilled") {
+            state.paniereDocuments = normalizePaniereDocuments(paniereResult.value);
+            state.paniereStatus = "loaded";
+            state.paniereError = "";
+          } else {
+            state.paniereDocuments = [];
+            state.paniereStatus = "error";
+            state.paniereError = paniereResult.reason?.message || "erreur API";
+          }
+          if (paniereTypesResult.status === "fulfilled") {
+            const paniereTypesPayload = paniereTypesResult.value;
+            const isSinglePaniereType = paniereTypesPayload && typeof paniereTypesPayload === "object" &&
+              (paniereTypesPayload.Id !== undefined || paniereTypesPayload.id !== undefined) &&
+              (paniereTypesPayload.Libelle || paniereTypesPayload.Famille);
+            state.paniereTypes = isSinglePaniereType
+              ? [paniereTypesPayload]
+              : extractApiArray(paniereTypesPayload, ["Panieres", "Panières", "Types", "types", "Items", "items"]);
+            state.paniereTypesError = "";
+          } else {
+            state.paniereTypes = [];
+            state.paniereTypesError = paniereTypesResult.reason?.message || "erreur API";
+          }
           state.rubricPayload = rubricResult.status === "fulfilled" ? rubricResult.value : null;
           state.rubricError = rubricResult.status === "rejected"
             ? `La liste globale des rubriques est indisponible (${rubricResult.reason?.message || "erreur API"}).`
@@ -47535,7 +48005,7 @@ ${body}
         const gedTab = document.createElement("button");
         gedTab.type = "button";
         gedTab.className = "folder-editor-tab";
-        gedTab.textContent = "GED";
+        gedTab.textContent = "GED / i-dépôt";
         gedTab.setAttribute("role", "tab");
         gedTab.setAttribute("aria-controls", gedSectionId);
         gedTab.setAttribute("aria-selected", "false");
@@ -47548,12 +48018,12 @@ ${body}
           gedTab.classList.add("active");
           gedTab.setAttribute("aria-selected", "true");
           gedSection.classList.add("active");
-          gedSection.gedLoad?.();
+          gedSection.gedLoad?.(true);
         });
 
         tabs.appendChild(gedTab);
         folderEditorForm.appendChild(gedSection);
-        renderedSections.push({ tab: gedTab, section: gedSection, title: "GED" });
+        renderedSections.push({ tab: gedTab, section: gedSection, title: "GED / i-dépôt" });
       }
 
       // Tout champ futur ou spécifique reste accessible dans l'onglet Divers,
