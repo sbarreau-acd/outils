@@ -2270,6 +2270,25 @@
       background: #f8fbff;
     }
 
+    .generator-config-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .generator-config-card-header[hidden] {
+      display: none !important;
+    }
+
+    .generator-config-card-title {
+      margin: 0;
+      color: #173b68;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
     .generator-config-card .folder-actions {
       margin-top: 22px;
     }
@@ -2329,6 +2348,11 @@
 
     #generatorCollaboratorLevel2Field {
       order: 8;
+      grid-column: span 2;
+    }
+
+    #generatorFolderSearchField {
+      order: 9;
       grid-column: span 2;
     }
 
@@ -2520,6 +2544,79 @@
 
     .api-multi-panel.open {
       display: block;
+    }
+
+    body.api-multi-dialog-open::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 29;
+      background: rgba(15, 23, 42, .48);
+      backdrop-filter: blur(2px);
+    }
+
+    #cabinetMultiPanel.open,
+    #collaboratorLevel1MultiPanel.open,
+    #collaboratorLevel2MultiPanel.open {
+      position: fixed;
+      z-index: 1000;
+      top: 50%;
+      left: 50%;
+      right: auto;
+      width: min(760px, calc(100vw - 32px));
+      min-width: 0;
+      max-height: min(82vh, 760px);
+      transform: translate(-50%, -50%);
+      box-shadow: 0 24px 70px rgba(15, 23, 42, .3);
+    }
+
+    .api-multi-dialog-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 16px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f8fafc;
+    }
+
+    .api-multi-dialog-title {
+      margin: 0;
+      color: #173b68;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .api-multi-dialog-close {
+      width: 34px;
+      height: 34px;
+      border: 1px solid #dbe3ef;
+      border-radius: 8px;
+      background: #fff;
+      color: #334155;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .api-multi-dialog-close:hover {
+      background: #eff6ff;
+      color: var(--primary);
+    }
+
+    #cabinetMultiPanel .api-multi-toolbar,
+    #collaboratorLevel1MultiPanel .api-multi-toolbar,
+    #collaboratorLevel2MultiPanel .api-multi-toolbar {
+      display: grid;
+      padding: 12px;
+      margin: 0;
+      background: #fff;
+    }
+
+    #cabinetMultiPanel .api-multi-items,
+    #collaboratorLevel1MultiPanel .api-multi-items,
+    #collaboratorLevel2MultiPanel .api-multi-items {
+      max-height: min(48vh, 440px);
     }
 
     /* Le tableau des dossiers possède un en-tête sticky (z-index: 20).
@@ -10539,7 +10636,13 @@
 
     #sandboxExistingOperation { display: none !important; }
     #folderGeneratorConfig.sandbox-modification-fields {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns:
+        minmax(260px, 2fr)
+        minmax(220px, 1.35fr)
+        minmax(180px, 1.1fr)
+        max-content;
+      gap: 12px;
+      align-items: start;
     }
     #folderGeneratorConfig.sandbox-modification-fields > .field {
       grid-column: auto !important;
@@ -10547,6 +10650,12 @@
     }
     #folderGeneratorConfig.sandbox-modification-fields > .field[hidden] {
       display: none !important;
+    }
+    #folderGeneratorConfig.sandbox-modification-fields #retrieveFoldersButton {
+      align-self: start;
+      min-height: 42px;
+      margin: 42px 0 0;
+      white-space: nowrap;
     }
     #folderGeneratorConfig[hidden] {
       display: none !important;
@@ -11289,13 +11398,16 @@
 
             <div class="generator-config-card" id="generatorConfigCard" hidden>
 
-              <div class="sandbox-modification-filter-actions" id="sandboxModificationFilterActions" hidden>
-                <button
-                  class="generator-reset-button"
-                  id="sandboxModificationClearFiltersButton"
-                  type="button"
-                  title="Vider les cabinets et les collaborateurs sélectionnés"
-                >Réinitialiser</button>
+              <div class="generator-config-card-header" id="generatorConfigCardHeader" hidden>
+                <h3 class="generator-config-card-title">Filtrer les dossiers</h3>
+                <div class="sandbox-modification-filter-actions" id="sandboxModificationFilterActions" hidden>
+                  <button
+                    class="generator-reset-button"
+                    id="sandboxModificationClearFiltersButton"
+                    type="button"
+                    title="Vider les cabinets et les collaborateurs sélectionnés"
+                  >Réinitialiser</button>
+                </div>
               </div>
 
               <div class="form-grid" id="folderGeneratorConfig">
@@ -11348,7 +11460,20 @@
                     class="api-multi-panel"
                     id="cabinetMultiPanel"
                     aria-hidden="true"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="cabinetMultiDialogTitle"
                   >
+                    <div class="api-multi-dialog-header">
+                      <h3 class="api-multi-dialog-title" id="cabinetMultiDialogTitle">Sélectionner les cabinets d’affectation</h3>
+                      <button
+                        type="button"
+                        class="api-multi-dialog-close"
+                        id="cabinetMultiDialogClose"
+                        aria-label="Fermer la sélection des cabinets"
+                        title="Fermer"
+                      >×</button>
+                    </div>
                     <div class="api-multi-toolbar">
                       <input
                         type="search"
@@ -11510,7 +11635,20 @@
                     class="api-multi-panel"
                     id="collaboratorLevel1MultiPanel"
                     aria-hidden="true"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="collaboratorLevel1DialogTitle"
                   >
+                    <div class="api-multi-dialog-header">
+                      <h3 class="api-multi-dialog-title" id="collaboratorLevel1DialogTitle">Sélectionner les collaborateurs niveau 1</h3>
+                      <button
+                        type="button"
+                        class="api-multi-dialog-close"
+                        id="collaboratorLevel1DialogClose"
+                        aria-label="Fermer la sélection des collaborateurs"
+                        title="Fermer"
+                      >×</button>
+                    </div>
                     <div class="api-multi-toolbar">
                       <input
                         type="search"
@@ -11574,7 +11712,20 @@
                     class="api-multi-panel"
                     id="collaboratorLevel2MultiPanel"
                     aria-hidden="true"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="collaboratorLevel2DialogTitle"
                   >
+                    <div class="api-multi-dialog-header">
+                      <h3 class="api-multi-dialog-title" id="collaboratorLevel2DialogTitle">Sélectionner les collaborateurs niveau 2</h3>
+                      <button
+                        type="button"
+                        class="api-multi-dialog-close"
+                        id="collaboratorLevel2DialogClose"
+                        aria-label="Fermer la sélection des collaborateurs"
+                        title="Fermer"
+                      >×</button>
+                    </div>
                     <div class="api-multi-toolbar">
                       <input
                         type="search"
@@ -11600,6 +11751,17 @@
                 <div class="field-help api-validation-help" id="collaboratorLevel2ValidationHelp">
                   Facultatif — saisissez un ou plusieurs codes collaborateurs (10 caractères maximum par code).
                 </div>
+              </div>
+
+              <div class="field" id="generatorFolderSearchField" hidden>
+                <label for="retrieveFolderSearchInput">Recherche dossier</label>
+                <input
+                  type="text"
+                  id="retrieveFolderSearchInput"
+                  autocomplete="off"
+                  placeholder="Code ou nom du dossier"
+                >
+                <div class="field-help" id="retrieveFolderSearchHelp">Facultatif</div>
               </div>
 
               <div class="field slider-field international-rate-field" id="generatorInternationalNamesField">
@@ -15617,6 +15779,7 @@
     const cabinetMultiToggle = document.getElementById("cabinetMultiToggle");
     const cabinetMultiPanel = document.getElementById("cabinetMultiPanel");
     const cabinetMultiSearch = document.getElementById("cabinetMultiSearch");
+    const cabinetMultiDialogClose = document.getElementById("cabinetMultiDialogClose");
     const cabinetMultiItems = document.getElementById("cabinetMultiItems");
     const cabinetMultiClear = document.getElementById("cabinetMultiClear");
     const cabinetMultiSelectAll =
@@ -15637,12 +15800,14 @@
     const collaboratorLevel1MultiToggle = document.getElementById("collaboratorLevel1MultiToggle");
     const collaboratorLevel1MultiPanel = document.getElementById("collaboratorLevel1MultiPanel");
     const collaboratorLevel1MultiSearch = document.getElementById("collaboratorLevel1MultiSearch");
+    const collaboratorLevel1DialogClose = document.getElementById("collaboratorLevel1DialogClose");
     const collaboratorLevel1MultiItems = document.getElementById("collaboratorLevel1MultiItems");
     const collaboratorLevel1MultiClear = document.getElementById("collaboratorLevel1MultiClear");
 
     const collaboratorLevel2MultiToggle = document.getElementById("collaboratorLevel2MultiToggle");
     const collaboratorLevel2MultiPanel = document.getElementById("collaboratorLevel2MultiPanel");
     const collaboratorLevel2MultiSearch = document.getElementById("collaboratorLevel2MultiSearch");
+    const collaboratorLevel2DialogClose = document.getElementById("collaboratorLevel2DialogClose");
     const collaboratorLevel2MultiItems = document.getElementById("collaboratorLevel2MultiItems");
     const collaboratorLevel2MultiClear = document.getElementById("collaboratorLevel2MultiClear");
 
@@ -15662,6 +15827,7 @@
     const malePercentValue = document.getElementById("malePercentValue");
     const generateFoldersButton = document.getElementById("generateFoldersButton");
     const retrieveFoldersButton = document.getElementById("retrieveFoldersButton");
+    const retrieveFolderSearchInput = document.getElementById("retrieveFolderSearchInput");
     const retrieveFolderDataButton =
       document.getElementById("retrieveFolderDataButton");
 
@@ -16977,6 +17143,12 @@
           validateApiMultiSelectConfig(config);
         }
       }
+      const cabinetApiMultiConfig = getApiMultiSelectConfigs().find(
+        config => config.key === "cabinet"
+      );
+      if (cabinetApiMultiConfig) {
+        validateApiMultiSelectConfig(cabinetApiMultiConfig);
+      }
       wasSandboxModificationMode = modifyingExistingSandbox;
       const waitingForExistingCabinet = Boolean(
         active && !isNewSandbox && !modifyingExistingSandbox && !existingCabinetSelected
@@ -17180,23 +17352,34 @@
           (existingNewSandbox && locked && !sandboxEditModeEnabled) ||
           (modifyingExistingSandbox && foldersRetrievedOnce);
         folderGeneratorConfig.classList.toggle("sandbox-modification-fields", modifyingExistingSandbox);
+        const folderSearchField = document.getElementById("generatorFolderSearchField");
+        if (folderSearchField) {
+          folderSearchField.hidden = !modifyingExistingSandbox;
+        }
         const collaboratorLevel1Label =
           document.querySelector('#generatorCollaboratorLevel1Field label');
         if (collaboratorLevel1Label) {
           collaboratorLevel1Label.innerHTML = modifyingExistingSandbox
-            ? 'Collaborateurs <span class="optional-label">(facultatif)</span>'
+            ? 'Collaborateurs'
             : 'Collaborateurs niveau 1 <span class="optional-label">(facultatif)</span>';
         }
         folderGeneratorConfig.querySelectorAll(":scope > .field").forEach(field => {
-          field.hidden = modifyingExistingSandbox && ![
-            "generatorCabinetField",
-            "generatorCollaboratorLevel1Field"
-          ].includes(field.id);
+          field.hidden = field.id === "generatorFolderSearchField"
+            ? !modifyingExistingSandbox
+            : modifyingExistingSandbox && ![
+                "generatorCabinetField",
+                "generatorCollaboratorLevel1Field"
+              ].includes(field.id);
         });
       }
       if (sandboxModificationActions) {
         sandboxModificationActions.hidden =
           !active || !modifyingExistingSandbox || foldersRetrievedOnce;
+      }
+      const generatorConfigCardHeader =
+        document.getElementById("generatorConfigCardHeader");
+      if (generatorConfigCardHeader) {
+        generatorConfigCardHeader.hidden = !modifyingExistingSandbox;
       }
       if (sandboxModificationFilterActions) {
         sandboxModificationFilterActions.hidden =
@@ -21229,10 +21412,9 @@ ${body}
       retrieveFoldersButton.hidden = !active || isSandboxExistingOperation("create");
 
       if (active) {
-        const target =
-          isSandboxExistingOperation("modify") && sandboxModificationActions
-            ? sandboxModificationActions
-            : sandboxEditorActions;
+        const target = isSandboxExistingOperation("modify")
+          ? folderGeneratorConfig
+          : sandboxEditorActions;
         if (retrieveFoldersButton.parentElement !== target) {
           target.appendChild(retrieveFoldersButton);
         }
@@ -21317,10 +21499,13 @@ ${body}
 
       if (!connected) {
         sandboxModeToggle.checked = false;
-        const creationWorkflowMode = sandboxWorkflowModeInputs.find(input => input.value === "create");
-        if (creationWorkflowMode) creationWorkflowMode.checked = true;
-        const creationOperationMode = document.querySelector('input[name="sandboxExistingOperation"][value="create"]');
-        if (creationOperationMode) creationOperationMode.checked = true;
+        const savedWorkflowMode = getPreference("sandboxWorkflowMode") === "modify"
+          ? "modify"
+          : "create";
+        const savedWorkflowModeInput = sandboxWorkflowModeInputs.find(input => input.value === savedWorkflowMode);
+        if (savedWorkflowModeInput) savedWorkflowModeInput.checked = true;
+        const savedOperationMode = document.querySelector(`input[name="sandboxExistingOperation"][value="${savedWorkflowMode}"]`);
+        if (savedOperationMode) savedOperationMode.checked = true;
         sandboxConfigurationSnapshot = null;
         sandboxCabinetData = null;
         sandboxCollaboratorData = [];
@@ -21554,6 +21739,7 @@ ${body}
       if (!apiSessionUuid) return;
 
       const selectedOperation = operation === "modify" ? "modify" : "create";
+      setPreference("sandboxWorkflowMode", selectedOperation);
       const workflowModeInput = sandboxWorkflowModeInputs.find(input => input.value === selectedOperation);
       const operationInput = document.querySelector(`input[name="sandboxExistingOperation"][value="${selectedOperation}"]`);
       if (workflowModeInput) workflowModeInput.checked = true;
@@ -21719,8 +21905,9 @@ ${body}
 
       if (!codes.length) {
         if (optional) {
-          help.textContent =
-            `Facultatif — saisissez un ou plusieurs codes ${entityLabel}.`;
+          help.textContent = isSandboxExistingOperation("modify")
+            ? "Facultatif"
+            : `Facultatif — saisissez un ou plusieurs codes ${entityLabel}.`;
           syncVisiblePickerValidationState(input);
           return true;
         }
@@ -21796,7 +21983,9 @@ ${body}
 
       if (!codes.length) {
         help.textContent = optional
-          ? "Facultatif — saisissez un ou plusieurs codes collaborateurs (10 caractères maximum par code)."
+          ? isSandboxExistingOperation("modify")
+            ? "Facultatif"
+            : "Facultatif — saisissez un ou plusieurs codes collaborateurs (10 caractères maximum par code)."
           : "Saisissez au moins un code collaborateur (10 caractères maximum).";
 
         if (!optional) {
@@ -21875,6 +22064,8 @@ ${body}
     }
 
 
+    let pendingApiMultiDialogOpeningClick = null;
+
     function getApiMultiSelectConfigs() {
       return [
         {
@@ -21885,13 +22076,14 @@ ${body}
           help: cabinetValidationHelp,
           toggle: cabinetMultiToggle,
           panel: cabinetMultiPanel,
-          search: cabinetCodePicker,
+          search: cabinetMultiSearch,
+          dialogCloseButton: cabinetMultiDialogClose,
           itemsContainer: cabinetMultiItems,
           clearButton: cabinetMultiClear,
           selectAllButton: cabinetMultiSelectAll,
           deselectAllButton: cabinetMultiDeselectAll,
           getItems: () => availableCabinets,
-          optional: false,
+          optional: isSandboxExistingOperation("modify"),
           entityLabel: "cabinet",
           getLabel: item => item.label || ""
         },
@@ -21921,7 +22113,8 @@ ${body}
           help: collaboratorLevel1ValidationHelp,
           toggle: collaboratorLevel1MultiToggle,
           panel: collaboratorLevel1MultiPanel,
-          search: collaboratorLevel1CodePicker,
+          search: collaboratorLevel1MultiSearch,
+          dialogCloseButton: collaboratorLevel1DialogClose,
           itemsContainer: collaboratorLevel1MultiItems,
           clearButton: collaboratorLevel1MultiClear,
           getItems: () => availableCollaborators,
@@ -21937,7 +22130,8 @@ ${body}
           help: collaboratorLevel2ValidationHelp,
           toggle: collaboratorLevel2MultiToggle,
           panel: collaboratorLevel2MultiPanel,
-          search: collaboratorLevel2CodePicker,
+          search: collaboratorLevel2MultiSearch,
+          dialogCloseButton: collaboratorLevel2DialogClose,
           itemsContainer: collaboratorLevel2MultiItems,
           clearButton: collaboratorLevel2MultiClear,
           getItems: () => availableCollaborators,
@@ -22482,7 +22676,7 @@ ${body}
 
       commitApiMultiSelectionChange(config);
       renderApiMultiSelectOptions(config);
-      config.picker.focus();
+      config.search.focus();
     }
 
     function getFilteredApiMultiItems(config) {
@@ -22590,7 +22784,7 @@ ${body}
       commitApiMultiSelectionChange(config);
       config.picker.value = "";
       renderApiMultiSelectOptions(config);
-      config.picker.focus();
+      config.search.focus();
     }
 
     function deselectAllApiMultiItems(config) {
@@ -22602,7 +22796,7 @@ ${body}
       commitApiMultiSelectionChange(config);
       config.picker.value = "";
       renderApiMultiSelectOptions(config);
-      config.picker.focus();
+      config.search.focus();
     }
 
     function renderApiMultiSelectOptions(config) {
@@ -22864,10 +23058,13 @@ ${body}
 
           // Le champ visible sert à filtrer la prochaine sélection.
           config.picker.value = "";
+          if (config.search !== config.picker) {
+            config.search.value = "";
+          }
           renderApiMultiSelectOptions(config);
 
           // La liste reste ouverte pour permettre plusieurs sélections.
-          config.picker.focus();
+          config.search.focus();
         });
 
         config.itemsContainer.appendChild(option);
@@ -22879,6 +23076,9 @@ ${body}
       config.panel.setAttribute("aria-hidden", "true");
       config.toggle.classList.remove("open");
       config.toggle.setAttribute("aria-expanded", "false");
+      if (config.key === "cabinet" || isCollaboratorApiMultiConfig(config)) {
+        document.body.classList.remove("api-multi-dialog-open");
+      }
     }
 
     function closeAllApiMultiSelects(exceptConfig = null) {
@@ -22892,6 +23092,7 @@ ${body}
     function positionApiMultiSelectPanel(config) {
       const panel = config?.panel;
       if (!panel) return;
+      if (config.key === "cabinet" || isCollaboratorApiMultiConfig(config)) return;
 
       const multiSelect = panel.closest(".api-multi-select");
       if (!multiSelect) return;
@@ -22977,6 +23178,10 @@ ${body}
       }
 
       closeAllApiMultiSelects(config);
+      if (config.key === "cabinet" || isCollaboratorApiMultiConfig(config)) {
+        document.body.classList.add("api-multi-dialog-open");
+        config.search.value = "";
+      }
       renderApiMultiSelectOptions(config);
 
       config.panel.classList.add("open");
@@ -22985,6 +23190,7 @@ ${body}
       config.toggle.setAttribute("aria-expanded", "true");
 
       positionApiMultiSelectPanel(config);
+      config.search.focus();
     }
 
     function toggleApiMultiSelect(config) {
@@ -23033,6 +23239,9 @@ ${body}
         });
 
         config.picker.addEventListener("click", event => {
+          if (pendingApiMultiDialogOpeningClick === config) {
+            pendingApiMultiDialogOpeningClick = null;
+          }
           event.stopPropagation();
 
           if (
@@ -23043,6 +23252,12 @@ ${body}
             openApiMultiSelect(config);
           }
         });
+
+        if (config.search !== config.picker) {
+          config.search.addEventListener("input", () => {
+            renderApiMultiSelectOptions(config);
+          });
+        }
 
         config.picker.addEventListener("input", () => {
           if (
@@ -23147,10 +23362,13 @@ ${body}
 
           config.input.value = "";
           config.picker.value = "";
+          if (config.search !== config.picker) {
+            config.search.value = "";
+          }
 
           commitApiMultiSelectionChange(config);
           renderApiMultiSelectOptions(config);
-          config.picker.focus();
+          config.search.focus();
         });
 
         if (config.selectAllButton) {
@@ -23178,9 +23396,42 @@ ${body}
         config.panel.addEventListener("click", event => {
           event.stopPropagation();
         });
+
+        if (config.dialogCloseButton) {
+          config.dialogCloseButton.addEventListener("click", event => {
+            event.preventDefault();
+            closeApiMultiSelect(config);
+          });
+        }
       });
 
+      document.addEventListener("pointerdown", event => {
+        pendingApiMultiDialogOpeningClick =
+          getApiMultiSelectConfigs().find(config =>
+            (config.key === "cabinet" || isCollaboratorApiMultiConfig(config)) &&
+            !config.panel.classList.contains("open") &&
+            config.picker.contains(event.target)
+          ) || null;
+
+        if (pendingApiMultiDialogOpeningClick) {
+          const pendingConfig = pendingApiMultiDialogOpeningClick;
+          window.setTimeout(() => {
+            if (pendingApiMultiDialogOpeningClick === pendingConfig) {
+              pendingApiMultiDialogOpeningClick = null;
+            }
+          }, 1000);
+        }
+      }, true);
+
+      document.addEventListener("pointercancel", () => {
+        pendingApiMultiDialogOpeningClick = null;
+      }, true);
+
       document.addEventListener("click", () => {
+        if (pendingApiMultiDialogOpeningClick) {
+          pendingApiMultiDialogOpeningClick = null;
+          return;
+        }
         closeAllApiMultiSelects();
       });
 
@@ -23202,15 +23453,18 @@ ${body}
     }
 
     function isCurrentCabinetValid() {
-      if (!apiSessionUuid || !availableCabinets.length) return false;
+      if (!apiSessionUuid) return false;
 
       const codes = parseCodeList(cabinetCodeInput.value);
 
-      return (
-        codes.length > 0 &&
-        codes.every(code =>
-          Boolean(findReferenceItemByCode(availableCabinets, code))
-        )
+      if (!codes.length) {
+        return isSandboxExistingOperation("modify");
+      }
+
+      if (!availableCabinets.length) return false;
+
+      return codes.every(code =>
+        Boolean(findReferenceItemByCode(availableCabinets, code))
       );
     }
 
@@ -24047,7 +24301,6 @@ ${body}
       const visible =
         isSandboxModeEnabled() &&
         !isSandboxExistingOperation("create") &&
-        configurationValid &&
         !foldersRetrievedOnce &&
         !foldersHaveBeenGenerated;
 
@@ -24061,6 +24314,7 @@ ${body}
 
       retrieveFoldersButton.disabled =
         !visible ||
+        !configurationValid ||
         retrieveFoldersInProgress;
 
       retrieveFoldersButton.textContent =
@@ -26031,7 +26285,11 @@ ${body}
       }
 
       updateGeneratorConfigurationLockState();
-      setSandboxWorkflowMode("create");
+      setSandboxWorkflowMode(
+        getPreference("sandboxWorkflowMode") === "modify"
+          ? "modify"
+          : "create"
+      );
 
       return {
         baseUrl,
@@ -28720,15 +28978,27 @@ ${body}
         )
       ].filter(Boolean);
 
-      const body = {
-        CodesSocietes: parseCodeList(
-          cabinetCodeInput.value
-        ).map(code => normalizeReferenceCode(code))
-      };
+      const body = {};
+
+      const cabinetCodes = parseCodeList(
+        cabinetCodeInput.value
+      ).map(code => normalizeReferenceCode(code));
+
+      if (cabinetCodes.length) {
+        body.CodesSocietes = cabinetCodes;
+      }
 
       if (uniqueCollaboratorCodes.length) {
         body.CodeCollaborateursLies =
           uniqueCollaboratorCodes;
+      }
+
+      const search = String(
+        retrieveFolderSearchInput?.value || ""
+      ).trim();
+
+      if (search) {
+        body.Recherche = search;
       }
 
       return body;
@@ -51311,6 +51581,9 @@ ${body}
 
     sandboxModificationClearFiltersButton?.addEventListener("click", () => {
       closeAllApiMultiSelects();
+      if (retrieveFolderSearchInput) {
+        retrieveFolderSearchInput.value = "";
+      }
 
       getApiMultiSelectConfigs()
         .filter(config =>
@@ -51692,6 +51965,14 @@ ${body}
         } finally {
           retrieveFoldersInProgress = false;
           updateRetrieveFoldersButtonState();
+          if (foldersRetrievedOnce) {
+            requestAnimationFrame(() => {
+              document.getElementById("generatorActionCard")?.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+              });
+            });
+          }
         }
       }
     );
@@ -53027,6 +53308,12 @@ ${body}
       memorableCheckbox.checked = getPreferenceBoolean("passwordMemorable", false);
 
       // Générateur de dossiers
+      const savedSandboxWorkflowMode = getPreference("sandboxWorkflowMode") === "modify"
+        ? "modify"
+        : "create";
+      sandboxWorkflowModeInputs.forEach(input => {
+        input.checked = input.value === savedSandboxWorkflowMode;
+      });
       folderCountInput.value = getPreferenceInteger("folderCount", 10, 1, 1000);
       cabinetCodeInput.value = getPreference("cabinetCode") || "CABINET";
       folderCodePrefixInput.value =
