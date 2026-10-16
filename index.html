@@ -10978,7 +10978,7 @@
                     autocomplete="off"
                   >
                   <div class="field-help">
-                    Seuls les domaines suiteexpert.fr et localhost sont autorisés.
+                    Connexion interdite à isuiteacd.suiteexpert.fr. Seuls les autres domaines suiteexpert.fr et localhost sont autorisés.
                   </div>
                 </div>
 
@@ -26004,12 +26004,15 @@ ${body}
     function isAllowedApiUrl(value) {
       try {
         const url = new URL(value);
+        const host = url.hostname.toLowerCase().replace(/\.$/, "");
 
-        if (url.hostname === "localhost") {
-          return url.protocol === "http:" || url.protocol === "https:";
+        if (host === "isuiteacd.suiteexpert.fr") {
+          return false;
         }
 
-        const host = url.hostname.toLowerCase();
+        if (host === "localhost") {
+          return url.protocol === "http:" || url.protocol === "https:";
+        }
 
         return (
           url.protocol === "https:" &&
@@ -26025,6 +26028,17 @@ ${body}
         const customUrl = normalizeApiBaseUrl(customApiUrlInput.value);
 
         if (!isAllowedApiUrl(customUrl)) {
+          let host = "";
+          try {
+            host = new URL(customUrl).hostname.toLowerCase().replace(/\.$/, "");
+          } catch {}
+
+          if (host === "isuiteacd.suiteexpert.fr") {
+            throw new Error(
+              "La connexion à l’environnement isuiteacd.suiteexpert.fr est interdite."
+            );
+          }
+
           throw new Error(
             "URL invalide. Utilisez une URL du domaine suiteexpert.fr ou localhost."
           );
