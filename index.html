@@ -2326,44 +2326,110 @@
       font-weight: 700;
     }
 
-    #generatorGenreField {
-      order: 4;
+    #exerciseClosingMonthsField {
+      order: 2;
       grid-column: span 2;
+      min-height: 130px;
+      padding: 12px;
+      border: 1px solid #d5e4f7;
+      border-radius: 10px;
+      background: #ffffff;
     }
 
-    #generatorPrefixField {
+    #exerciseClosingMonthsField > label {
+      display: block;
+      min-height: 0;
+      margin-bottom: 6px;
+      color: #173b68;
+      font-weight: 800;
+    }
+
+    .exercise-closing-month-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px 10px;
+    }
+
+    .exercise-closing-month-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    #exerciseClosingMonthsField .exercise-closing-month-option {
+      min-height: 0;
+      margin: 0;
+      font-size: 12px;
+    }
+
+    #exerciseClosingMonthsField .exercise-closing-month-option input[type="checkbox"] {
+      flex: 0 0 14px;
+      width: 14px !important;
+      min-width: 14px;
+      max-width: 14px;
+      height: 14px !important;
+      min-height: 14px;
+      margin: 0;
+      padding: 0;
+      accent-color: #2563eb;
+    }
+
+    #exerciseClosingMonthsField.has-error {
+      border-color: #ef4444;
+      background: #fff7f7;
+    }
+
+    #exerciseClosingMonthsField .field-help.invalid {
+      color: #dc2626;
+    }
+
+    #exerciseClosingMonthsHelp:empty {
+      display: none;
+    }
+
+    #generatorGenreField {
       order: 5;
       grid-column: span 2;
     }
 
-    #generatorCabinetField {
+    #generatorPrefixField {
       order: 6;
       grid-column: span 2;
     }
 
-    #generatorCollaboratorLevel1Field {
+    #generatorCabinetField {
       order: 7;
       grid-column: span 2;
     }
 
-    #generatorCollaboratorLevel2Field {
+    #generatorCollaboratorLevel1Field {
       order: 8;
       grid-column: span 2;
     }
 
-    #generatorFolderSearchField {
+    #generatorCollaboratorLevel2Field {
       order: 9;
       grid-column: span 2;
     }
 
+    #generatorFolderSearchField {
+      order: 10;
+      grid-column: span 2;
+    }
+
     #generatorInternationalNamesField {
-      order: 2;
-      grid-column: span 4;
+      order: 3;
+      grid-column: span 3;
     }
 
     #generatorGenderField {
-      order: 3;
-      grid-column: span 4;
+      order: 4;
+      grid-column: span 3;
     }
 
     @media (max-width: 1050px) {
@@ -3604,7 +3670,7 @@
 
     .folder-bulk-actions {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       align-items: center;
       gap: 6px;
       padding: 6px 8px;
@@ -3689,6 +3755,62 @@
 
     .bulk-missions-modal {
       width: min(680px, calc(100vw - 32px));
+    }
+
+    .bulk-exercises-modal {
+      width: min(680px, calc(100vw - 32px));
+    }
+
+    .bulk-exercise-months {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 16px;
+      margin: 14px 0 0;
+      padding: 14px;
+      border: 1px solid #dbe3ef;
+      border-radius: 10px;
+    }
+
+    .bulk-exercise-months legend {
+      padding: 0 6px;
+      color: #173b68;
+      font-weight: 700;
+    }
+
+    .bulk-exercise-month-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .bulk-exercise-month-option input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: #2563eb;
+    }
+
+    .bulk-exercise-create-missions-option {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 14px;
+      color: #1e3a8a;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    .bulk-exercise-create-missions-option input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: #2563eb;
+    }
+
+    #bulkExercisesStatus.visible {
+      display: block;
+      margin-top: 12px;
     }
 
     .bulk-missions-summary {
@@ -5584,6 +5706,12 @@
 
     .folder-editor-error.visible {
       display: block;
+    }
+
+    .folder-editor-error.success {
+      border-color: #86efac;
+      background: #f0fdf4;
+      color: #15803d;
     }
 
     @media (max-width: 900px) {
@@ -11424,6 +11552,17 @@
                 <div class="field-help">Entre 1 et 1 000 dossiers.</div>
               </div>
 
+              <div class="field" id="exerciseClosingMonthsField">
+                <label>Mois de clôture</label>
+                <div class="exercise-closing-month-options" role="group" aria-label="Mois de clôture de l’exercice">
+                  <label class="exercise-closing-month-option"><input type="checkbox" value="3" checked> Mars</label>
+                  <label class="exercise-closing-month-option"><input type="checkbox" value="6" checked> Juin</label>
+                  <label class="exercise-closing-month-option"><input type="checkbox" value="9" checked> Septembre</label>
+                  <label class="exercise-closing-month-option"><input type="checkbox" value="12" checked> Décembre</label>
+                </div>
+                <div class="field-help" id="exerciseClosingMonthsHelp"></div>
+              </div>
+
               <div class="field" id="generatorCabinetField">
                 <label for="cabinetCodePicker">Cabinets d’affectation</label>
                 <div class="api-multi-select" data-multi-select="cabinetCode">
@@ -12020,6 +12159,15 @@
                     >
                       MAJ missions
                     </button>
+
+                    <button
+                      type="button"
+                      class="folder-bulk-action-button"
+                      id="bulkExercisesButton"
+                      disabled
+                    >
+                      MAJ Exercices
+                    </button>
                   </div>
                 </details>
 
@@ -12428,6 +12576,34 @@
       <div class="modal-footer">
         <button class="secondary-button" id="bulkMissionsCancelButton" type="button">Annuler</button>
         <button class="primary-button" id="bulkMissionsConfirmButton" type="button">Oui, continuer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="bulkExercisesModal" aria-hidden="true">
+    <div class="modal bulk-exercises-modal" role="dialog" aria-modal="true" aria-labelledby="bulkExercisesModalTitle">
+      <div class="modal-header">
+        <h3 id="bulkExercisesModalTitle">MAJ Exercices</h3>
+        <button class="modal-close" id="bulkExercisesModalClose" type="button" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="bulk-missions-summary" id="bulkExercisesSummary"></p>
+        <fieldset class="bulk-exercise-months" id="bulkExerciseMonthsFieldset">
+          <legend>Mois de clôture</legend>
+          <label class="bulk-exercise-month-option"><input type="checkbox" value="3"> Mars</label>
+          <label class="bulk-exercise-month-option"><input type="checkbox" value="6"> Juin</label>
+          <label class="bulk-exercise-month-option"><input type="checkbox" value="9"> Septembre</label>
+          <label class="bulk-exercise-month-option"><input type="checkbox" value="12"> Décembre</label>
+        </fieldset>
+        <label class="bulk-exercise-create-missions-option">
+          <input type="checkbox" id="bulkExerciseCreateMissionsInput" checked>
+          Créer les missions
+        </label>
+        <div class="folder-editor-error" id="bulkExercisesStatus" role="status" aria-live="polite"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-button" id="bulkExercisesCancelButton" type="button">Annuler</button>
+        <button class="primary-button" id="bulkExercisesConfirmButton" type="button">Lancer le traitement</button>
       </div>
     </div>
   </div>
@@ -15753,6 +15929,11 @@
     const folderGeneratorConfig = document.getElementById("folderGeneratorConfig");
     const folderCountInput = document.getElementById("folderCount");
     const folderCountField = document.getElementById("folderCountField");
+    const exerciseClosingMonthsField = document.getElementById("exerciseClosingMonthsField");
+    const exerciseClosingMonthsHelp = document.getElementById("exerciseClosingMonthsHelp");
+    const exerciseClosingMonthInputs = Array.from(
+      document.querySelectorAll(".exercise-closing-month-options input[type='checkbox']")
+    );
     const folderCountHomeMarker = document.getElementById("folderCountHomeMarker");
     const folderCodePrefixInput = document.getElementById("folderCodePrefix");
     const cabinetCodeInput = document.getElementById("cabinetCode");
@@ -15944,6 +16125,17 @@
     const bulkMissionsStatus = document.getElementById("bulkMissionsStatus");
     const bulkMissionsCancelButton = document.getElementById("bulkMissionsCancelButton");
     const bulkMissionsConfirmButton = document.getElementById("bulkMissionsConfirmButton");
+    const bulkExercisesButton = document.getElementById("bulkExercisesButton");
+    const bulkExercisesModal = document.getElementById("bulkExercisesModal");
+    const bulkExercisesModalClose = document.getElementById("bulkExercisesModalClose");
+    const bulkExercisesSummary = document.getElementById("bulkExercisesSummary");
+    const bulkExercisesStatus = document.getElementById("bulkExercisesStatus");
+    const bulkExercisesCancelButton = document.getElementById("bulkExercisesCancelButton");
+    const bulkExercisesConfirmButton = document.getElementById("bulkExercisesConfirmButton");
+    const bulkExerciseCreateMissionsInput = document.getElementById("bulkExerciseCreateMissionsInput");
+    const bulkExerciseMonthInputs = Array.from(
+      document.querySelectorAll("#bulkExerciseMonthsFieldset input[type='checkbox']")
+    );
     const folderListFilter = document.getElementById("folderListFilter");
     const folderCabinetFilter = document.getElementById("folderCabinetFilter");
     const folderGenreFilter = document.getElementById("folderGenreFilter");
@@ -16079,6 +16271,8 @@
     let currentBulkCollaboratorChoices = [];
     let currentBulkMissionTargets = [];
     let bulkMissionsRunning = false;
+    let currentBulkExerciseTargets = [];
+    let bulkExercisesRunning = false;
 
     // Dossiers existants modifiés localement et en attente d'un PATCH.
     const folderUpdatePendingIndexes = new Set();
@@ -21531,6 +21725,7 @@ ${body}
       // Valeurs par défaut du générateur hors mode SANDBOX.
       folderCountInput.value = "1";
       genreCodeInput.value = "CLIENT";
+      resetExerciseClosingMonthsToDefaults();
 
       // Connecté : aucun cabinet présélectionné.
       // Non connecté : conserver le code fictif historique CABINET.
@@ -21617,6 +21812,7 @@ ${body}
       // Paramètres de génération par défaut
       folderCountInput.value = "10";
       genreCodeInput.value = "CLIENT";
+      resetExerciseClosingMonthsToDefaults();
       cabinetCodeInput.value = "";
       collaboratorLevel1CodeInput.value = "";
       collaboratorLevel2CodeInput.value = "";
@@ -28698,13 +28894,62 @@ ${body}
       });
     }
 
+    function getSelectedExerciseClosingMonths() {
+      return exerciseClosingMonthInputs
+        .filter(input => input.checked)
+        .map(input => Number(input.value))
+        .filter(month => Number.isInteger(month) && month >= 1 && month <= 12);
+    }
+
+    function validateExerciseClosingMonths() {
+      const valid = getSelectedExerciseClosingMonths().length > 0;
+      exerciseClosingMonthsField?.classList.toggle("has-error", !valid);
+      exerciseClosingMonthsHelp?.classList.toggle("invalid", !valid);
+      if (exerciseClosingMonthsHelp) {
+        exerciseClosingMonthsHelp.textContent = valid
+          ? ""
+          : "Sélectionnez au moins un mois de clôture.";
+      }
+      return valid;
+    }
+
+    function resetExerciseClosingMonthsToDefaults() {
+      exerciseClosingMonthInputs.forEach(input => {
+        input.checked = true;
+      });
+      validateExerciseClosingMonths();
+    }
+
+    function formatExerciseIsoDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
     function generateCurrentExercise() {
-      const year = new Date().getFullYear();
+      const selectedMonths = getSelectedExerciseClosingMonths();
+      const closingMonth = selectedMonths.length
+        ? selectedMonths[Math.floor(Math.random() * selectedMonths.length)]
+        : 12;
+      return generateExerciseForClosingMonth(closingMonth);
+    }
+
+    function generateExerciseForClosingMonth(closingMonth) {
+      const today = new Date();
+      const currentYear = today.getFullYear();
+      const currentMonth = today.getMonth() + 1;
+      const endYear = closingMonth < currentMonth
+        ? currentYear + 1
+        : currentYear;
+      const startDate = new Date(endYear - 1, closingMonth, 1);
+      const endDate = new Date(endYear, closingMonth, 0);
 
       return {
-        "Code": String(year),
-        "DateDebut": `${year}-01-01`,
-        "DateFin": `${year}-12-31`,
+        "Code": String(endYear),
+        "DateDebut": formatExerciseIsoDate(startDate),
+        "DateFin": formatExerciseIsoDate(endDate),
+        "Cloture": false,
         "Courant": true
       };
     }
@@ -49722,6 +49967,134 @@ ${body}
       bulkMissionsStatus.classList.remove("visible");
     }
 
+    function openBulkExercisesModal() {
+      if (!apiSessionUuid) {
+        setApiMessage("Connectez-vous à un environnement API pour mettre à jour les exercices.", "error");
+        return;
+      }
+      const targets = getFolderBulkTargetEntries()
+        .filter(({ folder }) => String(folder?.Code || "").trim());
+      if (!targets.length) return;
+
+      currentBulkExerciseTargets = targets.map(({ folder, index }) => ({
+        folder,
+        index,
+        code: String(folder.Code).trim()
+      }));
+
+      const configuredMonths = getSelectedExerciseClosingMonths();
+      const initialMonths = configuredMonths.length ? configuredMonths : [3, 6, 9, 12];
+      bulkExerciseMonthInputs.forEach(input => {
+        input.checked = initialMonths.includes(Number(input.value));
+      });
+      bulkExercisesSummary.textContent =
+        "Chaque dossier sera vérifié. Un exercice sera créé uniquement si aucun exercice n’existe, avec un mois de clôture choisi parmi ceux cochés. L’action s’appliquera à " +
+        currentBulkExerciseTargets.length + " dossier(s).";
+      bulkExerciseCreateMissionsInput.checked = true;
+      bulkExercisesStatus.textContent = "";
+      bulkExercisesStatus.classList.remove("visible", "success");
+      bulkExercisesConfirmButton.disabled = false;
+      bulkExercisesCancelButton.disabled = false;
+      bulkExercisesModalClose.disabled = false;
+      bulkExercisesConfirmButton.textContent = "Lancer le traitement";
+      bulkExercisesModal.classList.add("open");
+      bulkExercisesModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeBulkExercisesModal() {
+      if (bulkExercisesRunning) return;
+      bulkExercisesModal.classList.remove("open");
+      bulkExercisesModal.setAttribute("aria-hidden", "true");
+      currentBulkExerciseTargets = [];
+      bulkExercisesStatus.textContent = "";
+      bulkExercisesStatus.classList.remove("visible", "success");
+    }
+
+    async function runBulkExercisesUpdate() {
+      if (!currentBulkExerciseTargets.length || !apiSessionUuid || bulkExercisesRunning) return;
+      const selectedMonths = bulkExerciseMonthInputs
+        .filter(input => input.checked)
+        .map(input => Number(input.value))
+        .filter(month => Number.isInteger(month) && month >= 1 && month <= 12);
+      if (!selectedMonths.length) {
+        bulkExercisesStatus.textContent = "Sélectionnez au moins un mois de clôture.";
+        bulkExercisesStatus.classList.add("visible");
+        return;
+      }
+
+      bulkExercisesRunning = true;
+      bulkExercisesConfirmButton.disabled = true;
+      bulkExercisesCancelButton.disabled = true;
+      bulkExercisesModalClose.disabled = true;
+      bulkExercisesConfirmButton.textContent = "Traitement…";
+      bulkExercisesStatus.classList.remove("success");
+      bulkExercisesStatus.classList.add("visible");
+
+      let completed = 0;
+      let created = 0;
+      let missionsCreated = 0;
+      let alreadyPresent = 0;
+      const createMissions = bulkExerciseCreateMissionsInput.checked;
+      const errors = [];
+
+      for (let i = 0; i < currentBulkExerciseTargets.length; i += 1) {
+        const target = currentBulkExerciseTargets[i];
+        bulkExercisesStatus.textContent =
+          "Vérification du dossier " + (i + 1) + " / " + currentBulkExerciseTargets.length + " : " + target.code;
+        try {
+          const baseUrl = getSelectedApiBaseUrl();
+          await selectFolderSessionForData(baseUrl, apiSessionUuid, target.code);
+          const exercisePayload = await fetchFolderRelatedJson(baseUrl, apiSessionUuid, "/v1/exercices");
+          const exercises = mapRetrievedExercises(exercisePayload);
+
+          if (exercises.length) {
+            alreadyPresent += 1;
+          } else {
+            const closingMonth = selectedMonths[Math.floor(Math.random() * selectedMonths.length)];
+            const exercise = generateExerciseForClosingMonth(closingMonth);
+            await postBulkExercise(target.code, exercise);
+            exercises.push(normalizeRetrievedExercise(exercise));
+            created += 1;
+            if (generatedFolderRelations[target.index]) {
+              generatedFolderRelations[target.index].exercises = exercises;
+              generatedFolderRelations[target.index].exercise = chooseCurrentExercise(exercises);
+            }
+            if (createMissions) {
+              bulkExercisesStatus.textContent =
+                "Création de la mission pour le dossier " + target.code + "…";
+              await postFolderEditorMissionModel(target.code, exercise.Code);
+              missionsCreated += 1;
+            }
+          }
+
+          if (generatedFolderRelations[target.index]) {
+            generatedFolderRelations[target.index].exercises = exercises;
+            generatedFolderRelations[target.index].exercise = chooseCurrentExercise(exercises);
+          }
+          completed += 1;
+        } catch (error) {
+          errors.push(target.code + " : " + (error?.message || "échec de la mise à jour"));
+        }
+      }
+
+      renderFolders();
+      updateFolderBulkActionButtonsState();
+      bulkExercisesRunning = false;
+      bulkExercisesCancelButton.disabled = false;
+      bulkExercisesModalClose.disabled = false;
+      bulkExercisesConfirmButton.disabled = false;
+      bulkExercisesConfirmButton.textContent = "Fermer";
+      bulkExercisesStatus.textContent =
+        completed + " dossier(s) vérifié(s), " + created + " exercice(s) créé(s), " + alreadyPresent + " dossier(s) avec exercice déjà présent." +
+        (createMissions ? " " + missionsCreated + " mission(s) créée(s)." : "") +
+        (errors.length ? " Erreurs : " + errors.join(" | ") : "");
+      bulkExercisesStatus.classList.toggle("success", errors.length === 0);
+      bulkExercisesStatus.classList.add("visible");
+      setApiMessage(errors.length
+        ? "Mise à jour des exercices terminée avec " + errors.length + " dossier(s) en erreur."
+        : "Mise à jour des exercices terminée pour " + completed + " dossier(s).", errors.length ? "error" : "success");
+    }
+
     async function postBulkExercise(folderCode, payload) {
       const baseUrl = getSelectedApiBaseUrl();
       await selectFolderSessionForData(baseUrl, apiSessionUuid, folderCode);
@@ -49775,18 +50148,33 @@ ${body}
     }
 
     function buildBulkExerciseForYear(year, previousExercise, isCurrent) {
-      const payload = previousExercise
-        ? buildNextExercisePayload(previousExercise)
-        : {
-            Code: String(year),
-            DateDebut: year + "-01-01",
-            DateFin: year + "-12-31",
-            Cloture: false,
-            Courant: false
-          };
-      payload.Code = String(payload.Code || year);
-      payload.DateDebut = year + "-01-01";
-      payload.DateFin = year + "-12-31";
+      let payload;
+      if (previousExercise) {
+        const previousEndText = formatExerciseDateForApi(previousExercise.DateFin);
+        const [previousEndYear, previousEndMonth, previousEndDay] = previousEndText
+          .split("-")
+          .map(Number);
+        const previousEnd = new Date(Date.UTC(previousEndYear, previousEndMonth - 1, previousEndDay));
+        const startDate = new Date(previousEnd.getTime());
+        startDate.setUTCDate(startDate.getUTCDate() + 1);
+
+        const nextEndYear = previousEnd.getUTCFullYear() + 1;
+        const nextEndMonth = previousEnd.getUTCMonth();
+        const lastDayOfNextEndMonth = new Date(Date.UTC(nextEndYear, nextEndMonth + 1, 0)).getUTCDate();
+        const endDate = new Date(Date.UTC(
+          nextEndYear,
+          nextEndMonth,
+          Math.min(previousEnd.getUTCDate(), lastDayOfNextEndMonth)
+        ));
+
+        payload = buildNextExercisePayload(previousExercise);
+        payload.Code = String(endDate.getUTCFullYear());
+        payload.DateDebut = formatExerciseIsoDate(startDate);
+        payload.DateFin = formatExerciseIsoDate(endDate);
+      } else {
+        payload = generateCurrentExercise();
+        payload.Code = String(payload.DateFin.slice(0, 4) || year);
+      }
       payload.Cloture = false;
       payload.Courant = Boolean(isCurrent);
       return payload;
@@ -49798,37 +50186,53 @@ ${body}
       const initialPayload = await fetchFolderRelatedJson(baseUrl, apiSessionUuid, "/v1/exercices");
       let exercises = mapRetrievedExercises(initialPayload);
       let createdCount = 0;
+      const todayText = getTodayExerciseApiDate();
+      const today = new Date(todayText + "T00:00:00Z");
       const dated = exercises
-        .map(exercise => ({ exercise, year: getExerciseYear(exercise) }))
-        .filter(item => Number.isFinite(item.year))
-        .sort((a, b) => a.year - b.year);
+        .map(exercise => ({
+          exercise,
+          start: new Date(formatExerciseDateForApi(exercise.DateDebut) + "T00:00:00Z"),
+          end: new Date(formatExerciseDateForApi(exercise.DateFin) + "T00:00:00Z")
+        }))
+        .filter(item => Number.isFinite(item.start.getTime()) && Number.isFinite(item.end.getTime()))
+        .sort((a, b) => a.end - b.end);
 
-      if (!dated.length) {
+      if (!exercises.length) {
         const payload = buildBulkExerciseForYear(currentYear, null, true);
         await postBulkExercise(folderCode, payload);
         exercises.push(normalizeRetrievedExercise(payload));
         createdCount += 1;
+      } else if (!dated.length) {
+        throw new Error("Impossible de déterminer les dates du dernier exercice.");
       } else {
-        let latest = dated[dated.length - 1].exercise;
-        let latestYear = dated[dated.length - 1].year;
-        while (latestYear < currentYear) {
-          const nextYear = latestYear + 1;
-          const payload = buildBulkExerciseForYear(nextYear, latest, nextYear === currentYear);
-          await postBulkExercise(folderCode, payload);
-          latest = normalizeRetrievedExercise(payload);
-          exercises.push(latest);
-          latestYear = nextYear;
-          createdCount += 1;
-        }
-        if (!exercises.some(exercise => getExerciseYear(exercise) === currentYear)) {
-          const payload = buildBulkExerciseForYear(currentYear, null, true);
-          await postBulkExercise(folderCode, payload);
-          exercises.push(normalizeRetrievedExercise(payload));
-          createdCount += 1;
-        } else if (dated.some(item => item.year === currentYear)) {
-          const currentExercise = exercises.find(exercise => getExerciseYear(exercise) === currentYear);
-          await putFolderEditorCurrentExercise(folderCode, currentExercise);
-          currentExercise.Courant = true;
+        const currentExercise = dated.find(item => item.start <= today && today <= item.end);
+        if (currentExercise) {
+          if (!currentExercise.exercise.Courant) {
+            await putFolderEditorCurrentExercise(folderCode, currentExercise.exercise);
+            currentExercise.exercise.Courant = true;
+          }
+        } else {
+          let latest = dated[dated.length - 1].exercise;
+          let latestEnd = dated[dated.length - 1].end;
+          let attempts = 0;
+          while (latestEnd < today && attempts < 100) {
+            const payload = buildBulkExerciseForYear(currentYear, latest, false);
+            const nextStart = new Date(payload.DateDebut + "T00:00:00Z");
+            const nextEnd = new Date(payload.DateFin + "T00:00:00Z");
+            payload.Courant = nextStart <= today && today <= nextEnd;
+            await postBulkExercise(folderCode, payload);
+            latest = normalizeRetrievedExercise(payload);
+            exercises.push(latest);
+            createdCount += 1;
+            attempts += 1;
+            if (nextEnd <= latestEnd) {
+              throw new Error("La période du nouvel exercice ne progresse pas après le dernier exercice.");
+            }
+            latestEnd = nextEnd;
+          }
+          if (attempts >= 100 && latestEnd < today) {
+            throw new Error("Trop d’exercices manquants pour atteindre la date du jour.");
+          }
         }
       }
 
@@ -49935,6 +50339,7 @@ ${body}
       regenerateAllSiretsButton.disabled = !enabled;
       bulkCollaboratorsButton.disabled = !enabled;
       bulkMissionsButton.disabled = !enabled || !apiSessionUuid;
+      bulkExercisesButton.disabled = !enabled || !apiSessionUuid;
 
       if (folderAdvancedOptionsTarget) {
         if (selectedCount > 0) {
@@ -51782,6 +52187,10 @@ ${body}
       updateTransferButtonState();
     });
 
+    exerciseClosingMonthInputs.forEach(input => {
+      input.addEventListener("change", validateExerciseClosingMonths);
+    });
+
     folderCountInput.addEventListener("change", () => {
       if (isSandboxModeEnabled()) {
         sandboxLevel2EditedByUser = false;
@@ -52245,6 +52654,11 @@ ${body}
     );
 
     generateFoldersButton.addEventListener("click", async () => {
+      if (!validateExerciseClosingMonths()) {
+        exerciseClosingMonthInputs[0]?.focus();
+        return;
+      }
+
       if (!validateEditorFolderContact()) return;
       retrievedFolderIndexes.clear();
       folderUpdatePendingIndexes.clear();
@@ -52977,6 +53391,20 @@ ${body}
         return;
       }
       runBulkMissionsUpdate();
+    });
+    bulkExercisesButton.addEventListener("click", openBulkExercisesModal);
+    bulkExercisesModalClose.addEventListener("click", closeBulkExercisesModal);
+    bulkExercisesCancelButton.addEventListener("click", closeBulkExercisesModal);
+    bulkExercisesConfirmButton.addEventListener("click", () => {
+      if (bulkExercisesRunning) return;
+      if (bulkExercisesConfirmButton.textContent === "Fermer") {
+        closeBulkExercisesModal();
+        return;
+      }
+      runBulkExercisesUpdate();
+    });
+    bulkExercisesModal.addEventListener("click", event => {
+      if (event.target === bulkExercisesModal) closeBulkExercisesModal();
     });
     bulkMissionsModal.addEventListener("click", event => {
       if (event.target === bulkMissionsModal) closeBulkMissionsModal();
