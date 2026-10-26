@@ -2670,6 +2670,34 @@
       color: var(--primary);
     }
 
+    .api-multi-dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+      padding: 10px 14px;
+      border-top: 1px solid #e5e7eb;
+      background: #f8fafc;
+    }
+
+    .api-multi-dialog-footer[hidden] {
+      display: none !important;
+    }
+
+    .api-multi-dialog-confirm {
+      min-height: 36px;
+      padding: 7px 16px;
+      border: 1px solid #1d4ed8;
+      border-radius: 8px;
+      background: #2563eb;
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .api-multi-dialog-confirm:hover {
+      background: #1d4ed8;
+    }
+
     #cabinetMultiPanel .api-multi-toolbar,
     #collaboratorLevel1MultiPanel .api-multi-toolbar,
     #collaboratorLevel2MultiPanel .api-multi-toolbar {
@@ -11649,6 +11677,9 @@
                       class="api-multi-items"
                       id="cabinetMultiItems"
                     ></div>
+                    <div class="api-multi-dialog-footer" id="cabinetMultiFooter" hidden>
+                      <button type="button" class="api-multi-dialog-confirm" id="cabinetMultiValidate">Valider</button>
+                    </div>
                   </div>
                 </div>
                 <datalist class="api-reference-datalist" id="cabinetOptions"></datalist>
@@ -15962,6 +15993,8 @@
     const cabinetMultiSearch = document.getElementById("cabinetMultiSearch");
     const cabinetMultiDialogClose = document.getElementById("cabinetMultiDialogClose");
     const cabinetMultiItems = document.getElementById("cabinetMultiItems");
+    const cabinetMultiFooter = document.getElementById("cabinetMultiFooter");
+    const cabinetMultiValidate = document.getElementById("cabinetMultiValidate");
     const cabinetMultiClear = document.getElementById("cabinetMultiClear");
     const cabinetMultiSelectAll =
       document.getElementById("cabinetMultiSelectAll");
@@ -22275,6 +22308,8 @@ ${body}
           search: cabinetMultiSearch,
           dialogCloseButton: cabinetMultiDialogClose,
           itemsContainer: cabinetMultiItems,
+          validateButton: cabinetMultiValidate,
+          validateFooter: cabinetMultiFooter,
           clearButton: cabinetMultiClear,
           selectAllButton: cabinetMultiSelectAll,
           deselectAllButton: cabinetMultiDeselectAll,
@@ -22966,15 +23001,24 @@ ${body}
     }
 
     function selectAllApiMultiItems(config) {
-      if (
-        config.input.disabled ||
-        !config.getItems().length
-      ) {
+      if (config.input.disabled) {
         return;
       }
 
+      const visibleItems = getFilteredApiMultiItems(config);
+      if (!visibleItems.length) return;
+
+      const selectedCodes = new Set(
+        getValidSelectedCodes(config).map(normalizeReferenceCode)
+      );
+      visibleItems.forEach(item => {
+        selectedCodes.add(item.normalizedCode);
+      });
+
       config.input.value = formatCodeList(
-        config.getItems().map(item => item.code)
+        config.getItems()
+          .filter(item => selectedCodes.has(item.normalizedCode))
+          .map(item => item.code)
       );
 
       commitApiMultiSelectionChange(config);
@@ -23006,6 +23050,9 @@ ${body}
       config.itemsContainer.innerHTML = "";
 
       const visibleItems = getFilteredApiMultiItems(config);
+      if (config.validateFooter) {
+        config.validateFooter.hidden = false;
+      }
 
       if (!visibleItems.length) {
         const empty = document.createElement("div");
@@ -23272,6 +23319,9 @@ ${body}
       config.panel.setAttribute("aria-hidden", "true");
       config.toggle.classList.remove("open");
       config.toggle.setAttribute("aria-expanded", "false");
+      if (config.validateFooter) {
+        config.validateFooter.hidden = true;
+      }
       if (config.key === "cabinet" || isCollaboratorApiMultiConfig(config)) {
         document.body.classList.remove("api-multi-dialog-open");
       }
@@ -23595,6 +23645,13 @@ ${body}
 
         if (config.dialogCloseButton) {
           config.dialogCloseButton.addEventListener("click", event => {
+            event.preventDefault();
+            closeApiMultiSelect(config);
+          });
+        }
+
+        if (config.validateButton) {
+          config.validateButton.addEventListener("click", event => {
             event.preventDefault();
             closeApiMultiSelect(config);
           });
