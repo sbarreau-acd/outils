@@ -23299,11 +23299,9 @@ ${body}
 
           commitApiMultiSelectionChange(config);
 
-          // Le champ visible sert à filtrer la prochaine sélection.
+          // Garder le filtre pour faciliter les sélections successives dans
+          // les résultats correspondants.
           config.picker.value = "";
-          if (config.search !== config.picker) {
-            config.search.value = "";
-          }
           renderApiMultiSelectOptions(config);
 
           // La liste reste ouverte pour permettre plusieurs sélections.
