@@ -9308,6 +9308,8 @@
       margin-left: auto;
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .folder-editor-add-web-user-button {
@@ -9390,6 +9392,19 @@
       max-height: calc(100vh - 180px);
       overflow: auto;
       padding: 28px 34px 18px;
+    }
+
+    .web-users-import-message {
+      color: #334155;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .web-users-import-dialog {
+      z-index: 12200;
     }
 
     .web-user-form-grid {
@@ -15264,6 +15279,403 @@
       link.click();
       link.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function exportFolderEditorWebUsersToExcel(
+      optionsWeb,
+      webUsers
+    ) {
+      const tiles = Array.isArray(optionsWeb) ? optionsWeb : [];
+      const users = Array.isArray(webUsers) ? webUsers : [];
+      if (!users.length) return;
+
+      const headers = [
+        "Prénom",
+        "Nom",
+        "E-mail",
+        "Administrateur",
+        ...tiles.map((tile, index) => {
+          const label = String(tile?.Libelle || `Tuile ${index + 1}`).trim();
+          const option = String(tile?.Option ?? "").trim();
+          return option ? `${label} (${option})` : label;
+        })
+      ];
+
+      const rows = [
+        headers,
+        ...users.map(user => [
+          user?.Prenom || "",
+          user?.Nom || "",
+          user?.Email || "",
+          user?.Administrateur ? "Oui" : "Non",
+          ...tiles.map(tile => {
+            if (user?.Administrateur) return "";
+
+            return findWebUserOptionForTile(user?.Options, tile)?.Valeur === true
+              ? "Oui"
+              : "Non";
+          })
+        ])
+      ];
+
+      const dateStamp = new Date().toISOString().slice(0, 10).replaceAll("-", "");
+      const workbook = buildSingleSheetXlsxBlob("Web-users", rows);
+      downloadBlob(
+        workbook,
+        `web_users_${dateStamp}.xlsx`
+      );
+    }
+
+    function normalizeWebUserImportHeader(value) {
+      return String(value ?? "")
+        .trim()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLocaleUpperCase("fr-FR")
+        .replace(/[^A-Z0-9]/g, "");
+    }
+
+    function normalizeXlsxZipPath(path) {
+      const parts = [];
+      String(path || "")
+        .replace(/\\/g, "/")
+        .replace(/^\/+/, "")
+        .split("/")
+        .forEach(part => {
+          if (!part || part === ".") return;
+          if (part === "..") parts.pop();
+          else parts.push(part);
+        });
+      return parts.join("/");
+    }
+
+    async function readXlsxZipEntry(bytes, entryName) {
+      const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      const readUint16 = offset => view.getUint16(offset, true);
+      const readUint32 = offset => view.getUint32(offset, true);
+      const decoder = new TextDecoder("utf-8");
+      const minimumOffset = Math.max(0, bytes.length - 65557);
+      let endRecordOffset = -1;
+
+      for (let offset = bytes.length - 22; offset >= minimumOffset; offset--) {
+        if (readUint32(offset) === 0x06054B50) {
+          endRecordOffset = offset;
+          break;
+        }
+      }
+
+      if (endRecordOffset < 0) {
+        throw new Error("Le fichier sélectionné n’est pas un classeur Excel valide.");
+      }
+
+      const entryCount = readUint16(endRecordOffset + 10);
+      let directoryOffset = readUint32(endRecordOffset + 16);
+
+      for (let index = 0; index < entryCount; index++) {
+        if (readUint32(directoryOffset) !== 0x02014B50) {
+          throw new Error("Le contenu du fichier Excel est invalide.");
+        }
+
+        const compressionMethod = readUint16(directoryOffset + 10);
+        const compressedSize = readUint32(directoryOffset + 20);
+        const fileNameLength = readUint16(directoryOffset + 28);
+        const extraLength = readUint16(directoryOffset + 30);
+        const commentLength = readUint16(directoryOffset + 32);
+        const localHeaderOffset = readUint32(directoryOffset + 42);
+        const fileName = decoder.decode(
+          bytes.subarray(directoryOffset + 46, directoryOffset + 46 + fileNameLength)
+        );
+
+        if (fileName === entryName) {
+          if (readUint32(localHeaderOffset) !== 0x04034B50) {
+            throw new Error("Une entrée du fichier Excel est invalide.");
+          }
+
+          const localNameLength = readUint16(localHeaderOffset + 26);
+          const localExtraLength = readUint16(localHeaderOffset + 28);
+          const contentOffset = localHeaderOffset + 30 + localNameLength + localExtraLength;
+          const compressedData = bytes.subarray(contentOffset, contentOffset + compressedSize);
+
+          if (compressionMethod === 0) {
+            return compressedData;
+          }
+
+          if (compressionMethod !== 8 || typeof DecompressionStream !== "function") {
+            throw new Error("Ce format de compression Excel n’est pas pris en charge par ce navigateur.");
+          }
+
+          try {
+            const stream = new Blob([compressedData])
+              .stream()
+              .pipeThrough(new DecompressionStream("deflate-raw"));
+            return new Uint8Array(await new Response(stream).arrayBuffer());
+          } catch (error) {
+            throw new Error("Impossible de décompresser le fichier Excel.");
+          }
+        }
+
+        directoryOffset += 46 + fileNameLength + extraLength + commentLength;
+      }
+
+      return null;
+    }
+
+    async function parseWebUsersXlsxFile(file) {
+      if (!file || !/\.xlsx$/i.test(file.name || "")) {
+        throw new Error("Sélectionnez un fichier Excel au format .xlsx.");
+      }
+
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const decoder = new TextDecoder("utf-8");
+
+      const readText = async (path, optional = false) => {
+        const data = await readXlsxZipEntry(bytes, path);
+        if (!data) {
+          if (optional) return "";
+          throw new Error(`Le fichier Excel ne contient pas ${path}.`);
+        }
+        return decoder.decode(data);
+      };
+
+      const parseXml = (xml, name) => {
+        const documentXml = new DOMParser().parseFromString(xml, "application/xml");
+        if (documentXml.getElementsByTagName("parsererror").length) {
+          throw new Error(`Le fichier Excel contient un XML invalide (${name}).`);
+        }
+        return documentXml;
+      };
+
+      const workbookXml = parseXml(
+        await readText("xl/workbook.xml"),
+        "classeur"
+      );
+      const workbookRelationsXml = parseXml(
+        await readText("xl/_rels/workbook.xml.rels"),
+        "relations"
+      );
+      const firstSheet = workbookXml.getElementsByTagNameNS("*", "sheet")[0];
+      if (!firstSheet) {
+        throw new Error("Le classeur Excel ne contient aucune feuille.");
+      }
+
+      const relationshipId =
+        firstSheet.getAttributeNS(
+          "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
+          "id"
+        ) || firstSheet.getAttribute("r:id");
+      const relationship = Array.from(
+        workbookRelationsXml.getElementsByTagNameNS("*", "Relationship")
+      ).find(item => item.getAttribute("Id") === relationshipId);
+
+      if (!relationship) {
+        throw new Error("Impossible de repérer la première feuille du classeur.");
+      }
+
+      const relationTarget = relationship.getAttribute("Target") || "";
+      const sheetPath = normalizeXlsxZipPath(
+        relationTarget.startsWith("/") || relationTarget.startsWith("xl/")
+          ? relationTarget
+          : `xl/${relationTarget}`
+      );
+
+      const sharedStringsXml = await readText("xl/sharedStrings.xml", true);
+      const sharedStrings = sharedStringsXml
+        ? Array.from(
+            parseXml(sharedStringsXml, "chaînes partagées")
+              .getElementsByTagNameNS("*", "si")
+          ).map(item =>
+            Array.from(item.getElementsByTagNameNS("*", "t"))
+              .map(textNode => textNode.textContent || "")
+              .join("")
+          )
+        : [];
+
+      const sheetXml = parseXml(await readText(sheetPath), "feuille de données");
+      const rows = Array.from(
+        sheetXml.getElementsByTagNameNS("*", "sheetData")[0]
+          ?.getElementsByTagNameNS("*", "row") || []
+      );
+
+      return rows.map(row => {
+        const values = [];
+        Array.from(row.getElementsByTagNameNS("*", "c")).forEach(cell => {
+          const reference = cell.getAttribute("r") || "";
+          const columnLetters = reference.match(/^[A-Z]+/i)?.[0] || "A";
+          const columnIndex = columnLetters
+            .toUpperCase()
+            .split("")
+            .reduce((result, letter) => result * 26 + letter.charCodeAt(0) - 64, 0) - 1;
+          const type = cell.getAttribute("t") || "";
+          const valueNode = cell.getElementsByTagNameNS("*", "v")[0];
+          let value = valueNode?.textContent || "";
+
+          if (type === "inlineStr") {
+            value = Array.from(cell.getElementsByTagNameNS("*", "t"))
+              .map(textNode => textNode.textContent || "")
+              .join("");
+          } else if (type === "s") {
+            value = sharedStrings[Number(value)] ?? "";
+          } else if (type === "b") {
+            value = value === "1" ? "Oui" : "Non";
+          }
+
+          values[columnIndex] = value;
+        });
+
+        return values.map(value => value ?? "");
+      });
+    }
+
+    function parseWebUserImportBoolean(value) {
+      const normalized = String(value ?? "")
+        .trim()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLocaleUpperCase("fr-FR");
+
+      if (!normalized) return { valid: true, empty: true, value: false };
+      if (["OUI", "TRUE", "VRAI", "1", "YES"].includes(normalized)) {
+        return { valid: true, empty: false, value: true };
+      }
+      if (["NON", "FALSE", "FAUX", "0", "NO"].includes(normalized)) {
+        return { valid: true, empty: false, value: false };
+      }
+      return { valid: false, empty: false, value: false };
+    }
+
+    function validateWebUsersImportRows(rows, optionsWeb) {
+      const errors = [];
+      const sourceRows = Array.isArray(rows) ? rows : [];
+      const tiles = Array.isArray(optionsWeb) ? optionsWeb : [];
+      const meaningfulRows = sourceRows.filter(row =>
+        Array.isArray(row) && row.some(value => String(value ?? "").trim() !== "")
+      );
+
+      if (meaningfulRows.length < 2) {
+        return { errors: ["Le fichier ne contient aucune ligne de web-user."], users: [] };
+      }
+
+      const header = meaningfulRows[0].map(value => String(value ?? "").trim());
+      const headerIndexes = new Map();
+      header.forEach((value, index) => {
+        const key = normalizeWebUserImportHeader(value);
+        if (!key) return;
+        if (headerIndexes.has(key)) {
+          errors.push(`La colonne « ${value} » apparaît plusieurs fois dans l’en-tête.`);
+        } else {
+          headerIndexes.set(key, index);
+        }
+      });
+
+      const coreHeaders = {
+        PRENOM: "Prénom",
+        NOM: "Nom",
+        EMAIL: "E-mail",
+        ADMINISTRATEUR: "Administrateur"
+      };
+      Object.entries(coreHeaders).forEach(([key, label]) => {
+        if (!headerIndexes.has(key)) {
+          errors.push(`Colonne obligatoire absente : « ${label} ».`);
+        }
+      });
+
+      const moduleColumns = [];
+      const knownHeaders = new Set(Object.keys(coreHeaders));
+      tiles.forEach((tile, index) => {
+        const label = String(tile?.Libelle || `Tuile ${index + 1}`).trim();
+        const option = String(tile?.Option ?? "").trim();
+        const expectedHeader = option ? `${label} (${option})` : label;
+        const key = normalizeWebUserImportHeader(expectedHeader);
+        if (!key) return;
+        knownHeaders.add(key);
+        if (headerIndexes.has(key)) {
+          moduleColumns.push({
+            index: headerIndexes.get(key),
+            tile
+          });
+        }
+      });
+
+      header.forEach(value => {
+        const key = normalizeWebUserImportHeader(value);
+        if (key && !knownHeaders.has(key)) {
+          errors.push(`Colonne non reconnue : « ${value} ».`);
+        }
+      });
+
+      if (errors.length) return { errors, users: [] };
+
+      const column = key => headerIndexes.get(key);
+      const users = [];
+
+      meaningfulRows.slice(1).forEach((row, rowIndex) => {
+        const lineNumber = rowIndex + 2;
+        const getValue = key => String(row[column(key)] ?? "").trim();
+        const prenom = getValue("PRENOM");
+        const nom = getValue("NOM");
+        const email = getValue("EMAIL");
+        const adminValue = parseWebUserImportBoolean(getValue("ADMINISTRATEUR"));
+        const rowErrors = [];
+
+        if (!nom) rowErrors.push("Nom obligatoire.");
+        if (!email) rowErrors.push("E-mail obligatoire.");
+        if (adminValue.empty) {
+          rowErrors.push("Administrateur doit être renseigné avec Oui ou Non.");
+        } else if (!adminValue.valid) {
+          rowErrors.push("Administrateur doit contenir Oui ou Non.");
+        }
+
+        const moduleValues = moduleColumns.map(({ index, tile }) => ({
+          tile,
+          raw: String(row[index] ?? "").trim(),
+          parsed: parseWebUserImportBoolean(row[index])
+        }));
+
+        if (adminValue.valid && !adminValue.empty && adminValue.value) {
+          if (moduleValues.some(module => module.raw !== "")) {
+            rowErrors.push("Les modules doivent être vides pour un administrateur.");
+          }
+        } else if (adminValue.valid && !adminValue.empty) {
+          moduleValues.forEach(module => {
+            if (!module.parsed.valid) {
+              rowErrors.push(`Valeur de module invalide pour « ${module.tile?.Libelle || "module"} » (utilisez Oui ou Non).`);
+            } else if (module.parsed.value && module.tile?.Valeur !== true) {
+              rowErrors.push(`Le module « ${module.tile?.Libelle || "module"} » n’est pas actif sur ce dossier.`);
+            }
+          });
+
+          if (!moduleValues.some(module => module.parsed.valid && module.parsed.value)) {
+            rowErrors.push("Au moins un module doit être à Oui pour un non-administrateur.");
+          }
+        }
+
+        if (rowErrors.length) {
+          rowErrors.forEach(message => errors.push(`Ligne ${lineNumber} : ${message}`));
+          return;
+        }
+
+        const selectedOptions = moduleValues
+          .filter(module => module.parsed.value)
+          .map(module => ({
+            Option: Number(module.tile?.Option),
+            Valeur: true
+          }));
+
+        if (!adminValue.value && selectedOptions.some(option => !Number.isFinite(option.Option))) {
+          errors.push(`Ligne ${lineNumber} : une référence de module n’est pas numérique.`);
+          return;
+        }
+
+        users.push({
+          Prenom: prenom,
+          Nom: nom,
+          Email: email,
+          Administrateur: adminValue.value,
+          Options: selectedOptions
+        });
+      });
+
+      return { errors, users };
     }
 
     function isSandboxCollaboratorExported(code) {
@@ -29753,6 +30165,121 @@ ${body}
         .toLowerCase();
     }
 
+    function createWebUsersImportDialog(title, message) {
+      const overlay = document.createElement("div");
+      overlay.className = "web-user-modal-overlay web-users-import-dialog open";
+      overlay.setAttribute("role", "presentation");
+
+      const dialog = document.createElement("div");
+      dialog.className = "web-user-modal-dialog";
+      dialog.setAttribute("role", "dialog");
+      dialog.setAttribute("aria-modal", "true");
+      dialog.setAttribute("aria-label", title);
+
+      const header = document.createElement("div");
+      header.className = "web-user-modal-header";
+
+      const heading = document.createElement("h3");
+      heading.textContent = title;
+
+      const closeButton = document.createElement("button");
+      closeButton.type = "button";
+      closeButton.className = "web-user-modal-close";
+      closeButton.setAttribute("aria-label", "Fermer");
+      closeButton.textContent = "×";
+      header.append(heading, closeButton);
+
+      const body = document.createElement("div");
+      body.className = "web-user-modal-body";
+      const messageNode = document.createElement("div");
+      messageNode.className = "web-users-import-message";
+      messageNode.textContent = message;
+      body.appendChild(messageNode);
+
+      const footer = document.createElement("div");
+      footer.className = "web-user-modal-footer";
+      dialog.append(header, body, footer);
+      overlay.appendChild(dialog);
+      document.body.appendChild(overlay);
+
+      let closable = true;
+      let closeHandler = null;
+
+      const handleKeydown = event => {
+        if (event.key === "Escape" && closable) close();
+      };
+
+      const close = () => {
+        if (!closable) return;
+        overlay.remove();
+        document.removeEventListener("keydown", handleKeydown);
+        if (typeof closeHandler === "function") closeHandler();
+      };
+
+      closeButton.addEventListener("click", close);
+      overlay.addEventListener("click", event => {
+        if (event.target === overlay) close();
+      });
+      document.addEventListener("keydown", handleKeydown);
+
+      const setActions = actions => {
+        footer.innerHTML = "";
+        (Array.isArray(actions) ? actions : []).forEach(action => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = action.primary
+            ? "web-user-save-button"
+            : "web-user-cancel-button";
+          button.textContent = action.label;
+          button.addEventListener("click", () => {
+            if (typeof action.onClick === "function") action.onClick();
+          });
+          footer.appendChild(button);
+        });
+      };
+
+      const ask = actions => new Promise(resolve => {
+        let settled = false;
+        closeHandler = () => {
+          if (!settled) {
+            settled = true;
+            resolve(null);
+          }
+        };
+        setActions(actions.map(action => ({
+          ...action,
+          onClick: () => {
+            if (settled) return;
+            settled = true;
+            resolve(action.value);
+          }
+        })));
+        footer.querySelector("button")?.focus();
+      });
+
+      return {
+        ask,
+        close,
+        setActions,
+        setClosable(value) {
+          closable = Boolean(value);
+          closeButton.disabled = !closable;
+        },
+        setMessage(value) {
+          messageNode.textContent = value;
+        }
+      };
+    }
+
+    function showWebUsersImportNotice(title, message) {
+      const dialog = createWebUsersImportDialog(title, message);
+      dialog.setActions([{
+        label: "Fermer",
+        primary: true,
+        onClick: dialog.close
+      }]);
+    }
+
     function findExistingWebUserByEmail(
       folderCode,
       email
@@ -29785,6 +30312,182 @@ ${body}
           email
         )
       );
+    }
+
+    async function openWebUsersImportPicker(
+      folderIndex,
+      optionsWeb,
+      currentUsers
+    ) {
+      if (!apiSessionUuid) {
+        showWebUsersImportNotice(
+          "Importer des web-users",
+          "Une connexion API est nécessaire pour importer des web-users."
+        );
+        return;
+      }
+
+      const folder = generatedFolders[folderIndex];
+      const folderCode = String(folder?.Code || "").trim();
+      if (!folderCode) {
+        showWebUsersImportNotice(
+          "Importer des web-users",
+          "Le code du dossier est absent."
+        );
+        return;
+      }
+
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = ".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+      fileInput.hidden = true;
+      fileInput.addEventListener("change", async () => {
+        const file = fileInput.files?.[0];
+        fileInput.remove();
+        if (!file) return;
+
+        let validation;
+        try {
+          const rows = await parseWebUsersXlsxFile(file);
+          validation = validateWebUsersImportRows(rows, optionsWeb);
+        } catch (error) {
+          showWebUsersImportNotice(
+            "Fichier d’import invalide",
+            error?.message || "Impossible de lire le fichier Excel."
+          );
+          return;
+        }
+
+        if (validation.errors.length) {
+          const listedErrors = validation.errors.slice(0, 25);
+          const omitted = validation.errors.length - listedErrors.length;
+          const message = [
+            "Aucun web-user n’a été importé. Corrigez les erreurs suivantes puis sélectionnez à nouveau le fichier :",
+            "",
+            ...listedErrors.map(error => `• ${error}`),
+            ...(omitted > 0 ? [`… et ${omitted} autre(s) erreur(s).`] : [])
+          ].join("\n");
+          showWebUsersImportNotice("Fichier d’import invalide", message);
+          return;
+        }
+
+        const existingEmails = new Set(
+          [
+            ...getRememberedFolderWebUsers(folderCode),
+            ...(Array.isArray(currentUsers) ? currentUsers : [])
+          ].map(user => normalizeWebUserEmail(user?.Email)).filter(Boolean)
+        );
+        const seenEmails = new Set();
+        const usersToImport = [];
+        let skippedDuplicates = 0;
+
+        validation.users.forEach(user => {
+          const email = normalizeWebUserEmail(user.Email);
+          if (existingEmails.has(email) || seenEmails.has(email)) {
+            skippedDuplicates++;
+            return;
+          }
+          seenEmails.add(email);
+          usersToImport.push(user);
+        });
+
+        if (!usersToImport.length) {
+          showWebUsersImportNotice(
+            "Import des web-users",
+            `Aucun web-user à importer. ${skippedDuplicates} adresse(s) e-mail sont déjà présentes dans le dossier ou répétées dans le fichier.`
+          );
+          return;
+        }
+
+        const dialog = createWebUsersImportDialog(
+          "Importer les web-users",
+          `Fichier valide : ${validation.users.length} ligne(s) contrôlée(s). ${skippedDuplicates} doublon(s) seront ignorés.\n\nEnvoyer un mail pour informer les web-users de la création de leur compte ?`
+        );
+        const sendMail = await dialog.ask([
+          { label: "Oui", value: true, primary: true },
+          { label: "Non", value: false },
+          { label: "Annuler", value: null }
+        ]);
+
+        if (sendMail === null) {
+          dialog.close();
+          return;
+        }
+
+        dialog.setClosable(false);
+        dialog.setActions([]);
+
+        let imported = 0;
+        let failed = 0;
+        const failures = [];
+
+        for (let index = 0; index < usersToImport.length; index++) {
+          const user = usersToImport[index];
+          dialog.setMessage(
+            `Import en cours : ${index + 1}/${usersToImport.length}\n${user.Email}`
+          );
+
+          const body = user.Administrateur
+            ? {
+                Nom: user.Nom,
+                Prenom: user.Prenom,
+                Email: user.Email,
+                Administrateur: true
+              }
+            : {
+                Options: user.Options,
+                Nom: user.Nom,
+                Prenom: user.Prenom,
+                Email: user.Email,
+                Administrateur: false
+              };
+
+          try {
+            await postFolderWebUser(folderCode, body, sendMail);
+            imported++;
+          } catch (error) {
+            const detail = error?.message || "Erreur inconnue.";
+            if (/existe déjà/i.test(detail)) {
+              skippedDuplicates++;
+            } else {
+              failed++;
+              failures.push(`${user.Email} : ${detail}`);
+            }
+          }
+        }
+
+        let refreshError = "";
+        try {
+          const refreshed = await refreshFolderOptionsWebFromSession(folderCode);
+          refreshCurrentFolderISuiteSection(
+            folderCode,
+            refreshed.usersError,
+            refreshed.error
+          );
+          refreshError = refreshed.usersError || refreshed.error || "";
+        } catch (error) {
+          refreshError = error?.message || "Impossible d’actualiser l’onglet i-Suite.";
+        }
+
+        const report = [
+          `Import terminé : ${imported} web-user(s) créé(s), ${skippedDuplicates} doublon(s) ignoré(s), ${failed} erreur(s).`,
+          ...(refreshError ? [``, `Actualisation de l’onglet i-Suite : ${refreshError}`] : []),
+          ...(failures.length
+            ? ["", ...failures.slice(0, 15).map(failure => `• ${failure}`)]
+            : [])
+        ].join("\n");
+
+        dialog.setMessage(report);
+        dialog.setClosable(true);
+        dialog.setActions([{
+          label: "Fermer",
+          primary: true,
+          onClick: dialog.close
+        }]);
+      });
+
+      document.body.appendChild(fileInput);
+      fileInput.click();
     }
 
     function normalizeFolderEditorRelations(
@@ -45648,7 +46351,8 @@ ${body}
 
     function refreshCurrentFolderISuiteSection(
       folderCode,
-      usersError = ""
+      usersError = "",
+      optionsError = ""
     ) {
       const currentSection =
         document.getElementById(
@@ -45664,7 +46368,7 @@ ${body}
           getRememberedFolderOptionsWeb(
             folderCode
           ),
-          "",
+          optionsError,
           getRememberedFolderWebUsers(
             folderCode
           ),
@@ -45673,8 +46377,9 @@ ${body}
 
       // Garder le même élément DOM afin de conserver les écouteurs du
       // bouton d'onglet déjà créés dans openFolderEditor().
-      currentSection.innerHTML =
-        replacement.innerHTML;
+      currentSection.replaceChildren(
+        ...Array.from(replacement.childNodes)
+      );
     }
 
     async function submitAddWebUserForm(
@@ -45923,10 +46628,20 @@ ${body}
         wrapper.appendChild(warning);
       }
 
-      if (
-        !Array.isArray(optionsWeb) ||
-        !optionsWeb.length
-      ) {
+      const hasOptionsWeb =
+        Array.isArray(optionsWeb) &&
+        optionsWeb.length > 0;
+      const hasWebUsers =
+        Array.isArray(webUsers) &&
+        webUsers.length > 0;
+
+      const combinedBlock =
+        document.createElement("div");
+
+      combinedBlock.className =
+        "folder-editor-isuite-combined-block";
+
+      if (!hasOptionsWeb) {
         const empty =
           document.createElement("div");
 
@@ -45936,17 +46651,8 @@ ${body}
         empty.textContent =
           "Aucune option i-Suite n'a été retournée pour ce dossier.";
 
-        wrapper.appendChild(empty);
-        section.appendChild(wrapper);
-
-        return section;
+        combinedBlock.appendChild(empty);
       }
-
-      const combinedBlock =
-        document.createElement("div");
-
-      combinedBlock.className =
-        "folder-editor-isuite-combined-block";
 
       const combinedTitle =
         document.createElement("div");
@@ -46000,8 +46706,77 @@ ${body}
         }
       );
 
+      const importWebUsersButton =
+        document.createElement("button");
+
+      importWebUsersButton.type =
+        "button";
+
+      importWebUsersButton.className =
+        "folder-editor-add-web-user-button";
+
+      importWebUsersButton.textContent =
+        "Importer des web-users (Excel)";
+
+      importWebUsersButton.disabled =
+        !apiSessionUuid;
+
+      importWebUsersButton.title =
+        apiSessionUuid
+          ? "Importer des web-users depuis un fichier Excel"
+          : "Une connexion API est nécessaire.";
+
+      importWebUsersButton.addEventListener(
+        "click",
+        () => {
+          openWebUsersImportPicker(
+            currentFolderEditorIndex,
+            optionsWeb,
+            webUsers
+          );
+        }
+      );
+
+      const exportWebUsersButton =
+        document.createElement("button");
+
+      exportWebUsersButton.type =
+        "button";
+
+      exportWebUsersButton.className =
+        "folder-editor-add-web-user-button";
+
+      exportWebUsersButton.textContent =
+        "Exporter les web-users (Excel)";
+
+      exportWebUsersButton.disabled =
+        !hasWebUsers;
+
+      exportWebUsersButton.title =
+        hasWebUsers
+          ? "Exporter les web-users et leurs options i-Suite au format Excel"
+          : "Aucun web-user à exporter.";
+
+      exportWebUsersButton.addEventListener(
+        "click",
+        () => {
+          exportFolderEditorWebUsersToExcel(
+            optionsWeb,
+            webUsers
+          );
+        }
+      );
+
       combinedTitleActions.appendChild(
         addWebUserButton
+      );
+
+      combinedTitleActions.appendChild(
+        importWebUsersButton
+      );
+
+      combinedTitleActions.appendChild(
+        exportWebUsersButton
       );
 
       combinedTitle.appendChild(
