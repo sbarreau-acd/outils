@@ -9407,6 +9407,10 @@
       z-index: 12200;
     }
 
+    .web-users-import-dialog .web-user-modal-footer [data-import-cancel="true"] {
+      margin-left: 24px;
+    }
+
     .web-user-form-grid {
       display: grid;
       grid-template-columns: 140px minmax(0, 1fr);
@@ -24644,9 +24648,11 @@ ${body}
       }
 
       apiSessionUuid = null;
+      generatorConfigRevealed = false;
       apiConnectionLogin = "";
       apiConnectionPassword = "";
       apiEnvironmentInput.value = "";
+      offlineModeSelected = false;
       apiLoginInput.value = "";
       apiPasswordInput.value = "";
       updateApiEnvironmentSelection();
@@ -26900,6 +26906,7 @@ ${body}
       }
 
       apiSessionUuid = uuid;
+      generatorConfigRevealed = true;
       apiConnectionLogin = String(login || "").trim();
       apiConnectionPassword = String(password || "");
       hideApiPasswordValues();
@@ -30203,9 +30210,15 @@ ${body}
 
       let closable = true;
       let closeHandler = null;
+      let defaultAction = null;
 
       const handleKeydown = event => {
-        if (event.key === "Escape" && closable) close();
+        if (event.key === "Escape" && closable) {
+          close();
+        } else if (event.key === "Enter" && closable && defaultAction) {
+          event.preventDefault();
+          defaultAction();
+        }
       };
 
       const close = () => {
@@ -30222,6 +30235,7 @@ ${body}
       document.addEventListener("keydown", handleKeydown);
 
       const setActions = actions => {
+        defaultAction = null;
         footer.innerHTML = "";
         (Array.isArray(actions) ? actions : []).forEach(action => {
           const button = document.createElement("button");
@@ -30230,6 +30244,8 @@ ${body}
             ? "web-user-save-button"
             : "web-user-cancel-button";
           button.textContent = action.label;
+          if (action.cancel) button.dataset.importCancel = "true";
+          if (action.default) button.dataset.dialogDefault = "true";
           button.addEventListener("click", () => {
             if (typeof action.onClick === "function") action.onClick();
           });
@@ -30245,15 +30261,20 @@ ${body}
             resolve(null);
           }
         };
-        setActions(actions.map(action => ({
+        const promptActions = actions.map(action => ({
           ...action,
           onClick: () => {
             if (settled) return;
             settled = true;
             resolve(action.value);
           }
-        })));
-        footer.querySelector("button")?.focus();
+        }));
+        setActions(promptActions);
+        const defaultPromptAction =
+          promptActions.find(action => action.default) ||
+          promptActions.find(action => action.value === false);
+        defaultAction = defaultPromptAction?.onClick || null;
+        footer.querySelector('[data-dialog-default="true"]')?.focus();
       });
 
       return {
@@ -30403,9 +30424,9 @@ ${body}
           `Fichier valide : ${validation.users.length} ligne(s) contrôlée(s). ${skippedDuplicates} doublon(s) seront ignorés.\n\nEnvoyer un mail pour informer les web-users de la création de leur compte ?`
         );
         const sendMail = await dialog.ask([
-          { label: "Oui", value: true, primary: true },
-          { label: "Non", value: false },
-          { label: "Annuler", value: null }
+          { label: "Oui", value: true },
+          { label: "Non", value: false, primary: true, default: true },
+          { label: "Annuler", value: null, cancel: true }
         ]);
 
         if (sendMail === null) {
@@ -51781,7 +51802,7 @@ ${body}
         offlineModeSelected = false;
         apiEnvironmentButtonsContainer.classList.remove("is-offline-selected");
         resetOfflineModeButton.hidden = true;
-        generatorConfigRevealed = true;
+        generatorConfigRevealed = false;
         updateSandboxNewConfigurationVisibility();
         if (apiEnvironmentInput.value === "custom") {
           customApiUrlDraft = customApiUrlInput.value.trim();
@@ -51798,7 +51819,19 @@ ${body}
       await submitApiConnection(connectApiButton);
     });
 
+    [apiLoginInput, apiPasswordInput].forEach(input => {
+      input.addEventListener("keydown", event => {
+        if (event.key !== "Enter" || event.isComposing) return;
+        event.preventDefault();
+        if (!connectApiButton.disabled) {
+          void submitApiConnection(connectApiButton);
+        }
+      });
+    });
+
     apiEnvironmentInput.addEventListener("change", () => {
+      generatorConfigRevealed = false;
+      offlineModeSelected = false;
       apiLoginInput.value = "";
       apiPasswordInput.value = "";
       hideApiPasswordValues();
@@ -51845,6 +51878,8 @@ ${body}
     customApiUrlInput.addEventListener("change", () => {
       customApiUrlDraft = customApiUrlInput.value.trim();
       apiSessionUuid = null;
+      generatorConfigRevealed = false;
+      offlineModeSelected = false;
       apiConnectionLogin = "";
       apiConnectionPassword = "";
       availableCabinets = [];
