@@ -15287,7 +15287,6 @@
     ) {
       const tiles = Array.isArray(optionsWeb) ? optionsWeb : [];
       const users = Array.isArray(webUsers) ? webUsers : [];
-      if (!users.length) return;
 
       const headers = [
         "Prénom",
@@ -46750,12 +46749,12 @@ ${body}
         "Exporter les web-users (Excel)";
 
       exportWebUsersButton.disabled =
-        !hasWebUsers;
+        false;
 
       exportWebUsersButton.title =
         hasWebUsers
           ? "Exporter les web-users et leurs options i-Suite au format Excel"
-          : "Aucun web-user à exporter.";
+          : "Télécharger la trame Excel des web-users pour ce dossier.";
 
       exportWebUsersButton.addEventListener(
         "click",
