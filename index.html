@@ -15087,6 +15087,19 @@
         mapExcelHeaders("exercices", exerciceSourceHeaders)
       ];
 
+      const honorairesRows = [[
+        "ADRESSE.ADR_CODE",
+        "EXO_CODE",
+        "PREST_CODE",
+        "HONO_MEMO",
+        "HONO_I_TYPE",
+        "HONO_M_MONTANT",
+        "HONO_I_PERIODE",
+        "HONO_ECHEANCE.HONOECH_AAAAMM",
+        "MISS_CODE",
+        "HONO_I_NBECH"
+      ]];
+
       const correspondantRows = [
         mapExcelHeaders("correspondant", correspondantSourceHeaders)
       ];
@@ -15097,10 +15110,33 @@
 
       exportFolderEntries.forEach(({ folder, index: folderIndex }) => {
         const relations = generatedFolderRelations[folderIndex];
+        const exercise = relations?.exercise;
+        let echeance = "";
+
+        if (exercise?.DateDebut) {
+          try {
+            echeance = formatExerciseDateForApi(exercise.DateDebut)
+              .slice(0, 7)
+              .replace("-", "");
+          } catch {
+            // Une date d’exercice invalide laisse l’échéance vide.
+          }
+        }
+
+        honorairesRows.push([
+          folder.Code,
+          exercise?.Code ?? "",
+          "CHON1",
+          "Honoraires comptables",
+          1,
+          5000 + secureRandom(5001),
+          1,
+          echeance,
+          "COMPTA",
+          12
+        ]);
 
         if (!relations) return;
-
-        const exercise = relations.exercise;
 
         exerciceRows.push(
           mapExcelRow("exercices", exerciceSourceHeaders, [
@@ -15210,6 +15246,7 @@
         exerciceRows,
         correspondantRows,
         relationRows,
+        honorairesRows,
         correspondanceRows
       };
     }
@@ -15819,6 +15856,7 @@
         exerciceRows,
         correspondantRows,
         relationRows,
+        honorairesRows,
         correspondanceRows
       } = buildExcelExportData();
 
@@ -15842,6 +15880,10 @@
         {
           name: "Correspondance",
           rows: correspondanceRows
+        },
+        {
+          name: "Honoraires",
+          rows: honorairesRows
         }
       ];
 
