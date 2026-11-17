@@ -26688,14 +26688,9 @@ ${body}
         : (API_ENVIRONMENTS[selectedEnvironment] || "");
     }
 
-    function isApiEnvironmentCredentialsRequired() {
-      return apiEnvironmentInput.value === "custom" ||
-        apiEnvironmentInput.value.toLowerCase().startsWith("sandbox");
-    }
-
     function updateApiEnvironmentSelection() {
       const selectedEnvironment = apiEnvironmentInput.value;
-      const credentialsRequired = isApiEnvironmentCredentialsRequired();
+      const credentialsRequired = Boolean(selectedEnvironment);
       apiEnvironmentButtonsContainer.classList.toggle("has-selection", Boolean(selectedEnvironment));
       apiEnvironmentButtons.forEach(button => {
         const selected = button.dataset.apiEnvironment === selectedEnvironment;
@@ -26888,9 +26883,6 @@ ${body}
 
       setApiStatus("connecting", "Connexion…");
       setApiMessage("");
-      if (!isApiEnvironmentCredentialsRequired()) {
-        apiLoginPanel.classList.remove("visible");
-      }
 
       let response;
 
@@ -51788,30 +51780,21 @@ ${body}
       }
     });
 
-    async function submitApiConnection(button, forceFormCredentials = false) {
+    async function submitApiConnection(button) {
+      if (button.disabled) return;
       if (!apiEnvironmentInput.value) {
         setApiMessage("Sélectionnez un environnement API avant de vous connecter.", "error");
         apiEnvironmentButtons[0]?.focus();
         return;
       }
-      const credentialsRequired = isApiEnvironmentCredentialsRequired();
-      const useFormCredentials = Boolean(
-        credentialsRequired || forceFormCredentials ||
-        apiLoginPanel.classList.contains("visible")
-      );
-      const login = useFormCredentials ? apiLoginInput.value.trim() : "";
-      const password = useFormCredentials ? apiPasswordInput.value : "";
+      const login = apiLoginInput.value.trim();
+      const password = apiPasswordInput.value;
 
-      if (credentialsRequired && (!login || !password)) {
+      if (!login || !password) {
         apiLoginPanel.classList.add("visible");
         setApiMessage("Saisissez votre identifiant et votre mot de passe avant de vous connecter.", "error");
         (login ? apiPasswordInput : apiLoginInput).focus();
         return;
-      }
-
-      if (!useFormCredentials) {
-        apiLoginInput.value = login;
-        apiPasswordInput.value = password;
       }
 
       if (apiEnvironmentInput.value === "custom") {
@@ -51830,7 +51813,7 @@ ${body}
       button.textContent = "Connexion…";
       try {
         const session = await connectToApi(login, password);
-        if (session && credentialsRequired) apiPasswordInput.value = "";
+        if (session) apiPasswordInput.value = "";
       } finally {
         button.disabled = false;
         button.textContent = previousText;
@@ -51840,7 +51823,7 @@ ${body}
     }
 
     apiEnvironmentButtons.forEach(button => {
-      button.addEventListener("click", async () => {
+      button.addEventListener("click", () => {
         offlineModeSelected = false;
         apiEnvironmentButtonsContainer.classList.remove("is-offline-selected");
         resetOfflineModeButton.hidden = true;
@@ -51851,9 +51834,6 @@ ${body}
         }
         apiEnvironmentInput.value = button.dataset.apiEnvironment;
         apiEnvironmentInput.dispatchEvent(new Event("change", { bubbles: true }));
-        if (button.textContent.trim().toUpperCase().startsWith("TEST")) {
-          await submitApiConnection(connectApiButton);
-        }
       });
     });
 
@@ -54906,14 +54886,10 @@ ${body}
 
         // Accepte également un fragment d'objet JSON sans accolades extérieures, par exemple :
         // "Identification": { ... }
-        // ou directement :
-        // "URL": "http://localhost/cnx/api",
-        // "Identifiant": "",
-        // "MotDePasse": ""
         // Les accolades extérieures sont ajoutées uniquement pour l'analyse.
         if (!isJsonCandidate && /^\"(?:[^\"\\]|\\.)+\"\s*:/.test(raw)) {
           // Un fragment copié depuis un objet plus large peut se terminer par une
-          // virgule (ex. "MotDePasse": "",). Comme les accolades extérieures
+          // virgule. Comme les accolades extérieures
           // sont ajoutées par l'outil, cette virgule finale doit être ignorée.
           const fragment = raw.replace(/,\s*$/, "");
           normalized = `{${fragment}}`;
